@@ -1,5 +1,4 @@
 # Coding-Anki
-# Coding-Anki
 
 Welcome to the **Coding-Anki** repository, designed to help me practice and reinforce your understanding of data structures and algorithms using a spaced repetition approach.
 
