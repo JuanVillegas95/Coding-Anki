@@ -10,8 +10,6 @@ This repository leverages Git branches to create a system for coding practice. B
 - **practice/**: Branches where the implementation is removed, keeping only the tests for practice.
 
 ## Exercises
-
-### Exercises
-
-- Find the Largest Element
+### OpenGL
+1. OpenGL-Create_window
 
