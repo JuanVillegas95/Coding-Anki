@@ -13,7 +13,11 @@ This repository leverages Git branches to create a system for coding practice. B
 ### OpenGL
 1. OpenGL-Create_window
 
-Remove untracked files: Use the git clean command to remove untracked files and directories. This command will remove files that are not tracked by Git, including new files you created.
+## Handy commands
+Remove untracked files and move to another branch:
 ```bash
+git reset --hard origin/<branch-name>
 git clean -fd
+git checkout main
 ```
+This command will remove files that are not tracked by Git, including new files you created.
