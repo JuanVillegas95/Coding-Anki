@@ -12,13 +12,11 @@ This repository leverages Git branches to create a system for coding practice. B
 ### Projects
 - Normal commit messages are used for projects. To view a solution, simply go one commit ahead.
 
-## Example Workflow for Problems
-### Branch: `algorithms`
+### Example Workflow for Problems and Projects
+#### Branch: `algorithms`
 1. **Commit 1 (Problem):** `[problem] binary-search: added exercise with incomplete function`
 2. **Commit 2 (Solution):** `[solution] binary-search: implemented binary search function`
-
-## Example Workflow for Projects
-### Branch: `open-gl`
+#### Branch: `open-gl`
 1. **Commit 1:** `set up project`
 2. **Commit 2:** `create a window`
 3. **Commit 3:** `draw a circle`
