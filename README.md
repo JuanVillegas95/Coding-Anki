@@ -31,7 +31,7 @@ This repository leverages Git branches to create a system for coding practice. B
   - **Solution Commit:** `[solution] binary-search: implemented binary search function`
 
 ### Projects
-- **Project 1:** Example Project
+- **Particle simulator:** 
   - **Branch:** `open-gl`
 1. **Commit 1:** `set up project`  Implement a window .h and .c with the functions create, destroy, loop.
 3. **Commit 2:** `create a window`  Implement a particle .h and .c with the functions create, destroy, draw.
