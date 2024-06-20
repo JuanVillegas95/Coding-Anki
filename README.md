@@ -12,7 +12,7 @@ This repository leverages Git branches to create a system for coding practice. B
 ### Projects
 - Normal commit messages are used for projects. To view a solution, simply go one commit ahead.
 
-### Example Workflow for Problems and Projects
+## Example Workflow for Problems and Projects
 #### Branch: `algorithms`
 1. **Commit 1 (Problem):** `[problem] binary-search: added exercise with incomplete function`
 2. **Commit 2 (Solution):** `[solution] binary-search: implemented binary search function`
@@ -20,8 +20,10 @@ This repository leverages Git branches to create a system for coding practice. B
 1. **Commit 1:** `set up project`
 2. **Commit 2:** `create a window`
 3. **Commit 3:** `draw a circle`
+3. **Commit ...:** `...`
    
 ## Existing Problems and Projects
+
 ### Problems
 - **Binary Search**
   - **Branch:** `algorithms`
@@ -30,6 +32,7 @@ This repository leverages Git branches to create a system for coding practice. B
 
 ### Projects
 - **Project 1:** Example Project
-  - **Branch:** `project-example`
-  - **Commit 1:** `initial commit`
-  - **Commit 2:** `implemented feature X`
+  - **Branch:** `open-gl`
+1. **Commit 1:** `set up project`  Implement a window .h and .c with the functions create, destroy, loop.
+3. **Commit 2:** `create a window`  Implement a particle .h and .c with the functions create, destroy, draw.
+4. **Commit 3:** `draw a circle`
