@@ -36,3 +36,9 @@ This repository leverages Git branches to create a system for coding practice. B
 1. **Commit 1:** `set up project`  Implement a window .h and .c with the functions create, destroy, loop.
 3. **Commit 2:** `create a window`  Implement a particle .h and .c with the functions create, destroy, draw.
 4. **Commit 3:** `draw a circle`
+
+## Handy commands
+To move your current branch pointer to a specific commit:
+```
+git reset --hard <commit_hash>
+```
