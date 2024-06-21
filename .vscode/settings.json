@@ -63,6 +63,8 @@
     "set": "cpp",
     "fstream": "cpp",
     "iomanip": "cpp",
-    "window.h": "c"
+    "window.h": "c",
+    "particle.h": "c",
+    "stdio.h": "c"
   }
 }

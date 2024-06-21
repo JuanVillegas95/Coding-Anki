@@ -1,5 +1,5 @@
 #include "window.h"
-#include "particle.h" // Include the particle header
+#include "particle.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -46,19 +46,23 @@ void window_destroy(Window* _window){
     free(_window);
 }
 
-void window_loop(Window* _window){
-    if(!_window) return;
+void window_loop(Window* _window) {
+    if (!_window) return;
 
-    Particle* particle = create_particle(0.0f, 0.0f, 0.1f, 1.0f, 0.0f, 0.0f);
+    Particle* particle = particle_create(0.0f, 0.0f, 0.1f, 1.0f, 0.0f, 0.0f, 0.01f, 0.01f);
 
-    while(!glfwWindowShouldClose(_window->handle)){
+    while (!glfwWindowShouldClose(_window->handle)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        draw_particle(particle);
+        // Update particle position using the function
+        particle_update_position(particle);
+
+        // Draw particle
+        particle_draw(particle);
 
         glfwSwapBuffers(_window->handle);
         glfwPollEvents();
     }
 
-    destroy_particle(particle);
+    particle_destroy(particle);
 }
