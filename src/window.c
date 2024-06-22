@@ -49,11 +49,16 @@ void window_destroy(Window* window){
 void window_loop(Window* window) {
     if (!window) return;
 
+    double lastTime = glfwGetTime();
     Particle* particle = particle_create(0.0f, 0.0f, 0.1f, 1.0f, 0.0f, 0.0f, 0.01f, 0.01f);
     while (!glfwWindowShouldClose(window->handle)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        particle_update_position(particle);
+        double currentTime = glfwGetTime();
+        double deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        particle_updatePosition(particle, deltaTime);
         particle_draw(particle);
 
         glfwSwapBuffers(window->handle);

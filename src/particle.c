@@ -5,8 +5,8 @@
 #include <GLFW/glfw3.h>
 
 #define PI 3.1416
+#define GRAVITY -9.8f
 #define STEPS 100
-
 struct Particle {
     float x, y;
     float radius;
@@ -55,8 +55,9 @@ void particle_draw(Particle* particle){
   glEnd();
 }
 
-void particle_update_position(Particle* particle) {
+void particle_updatePosition(Particle* particle, double deltaTime) {
     if (!particle) return;
-    particle->x += particle->vx;
-    particle->y += particle->vy;
+    particle->vy += GRAVITY * deltaTime;
+    particle->x += particle->vx * deltaTime;
+    particle->y += particle->vy * deltaTime;
 }
