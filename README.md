@@ -33,10 +33,15 @@ This repository leverages Git branches to create a system for coding practice. B
 ### Projects
 - **Particle simulator:** 
   - **Branch:** `open-gl`
-1. **Commit 1:** `set up project`  Implement a window .h and .c with the functions create, destroy, loop. SHA `3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac`
-3. **Commit 2:** `create a window`  Implement a particle .h and .c with the functions create, destroy, draw and add velocity . SHA `9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8`
-4. **Commit 3:** `draw a circle and add velocity` Add delta time and gravity to the particle implementation SHA `094b23fe41bd322afbce7f1464904cfd5efd5cba`
-4. **Commit 3:** `add delta time and gravity`  SHA `d6006d28febe0ab3118d5643b150895ea9d2135e`
+
+| Number | Commit Message                    | SHA                                        | Description                                                                           |
+|--------|-----------------------------------|--------------------------------------------|---------------------------------------------------------------------------------------|
+| 1      | set up project                    | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac   | Implement a window .h and .c with the functions create, destroy, loop.                |
+| 2      | create a window                   | 9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8   | Implement a particle .h and .c with the functions create, destroy, draw and add velocity. |
+| 3      | draw a circle and add velocity    | 094b23fe41bd322afbce7f1464904cfd5efd5cba   | Add delta time and gravity to the particle implementation                             |
+| 3      | add delta time and gravity        | d6006d28febe0ab3118d5643b150895ea9d2135e   |                                                                                       |
+
+
 
 ## Handy commands
 To move your current branch pointer to a specific commit:
