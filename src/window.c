@@ -10,57 +10,53 @@ struct Window {
     char* title;
 };
 
-Window* window_create(int _height, int _width, char* _title){
+Window* window_create(int height, int width, char* title){
     if(!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         return NULL;
     }
 
-    GLFWwindow* _handle = glfwCreateWindow(_width, _height, _title, NULL, NULL);
-    if(!_handle) {
+    GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
+    if(!handle) {
         fprintf(stderr, "Failed to initialize GLFWwindow\n");
         return NULL;
     }
-    glfwMakeContextCurrent(_handle);
+    glfwMakeContextCurrent(handle);
 
-    Window* _window = (Window*)malloc(sizeof(Window));
-    if(!_window) {
+    Window* window = (Window*)malloc(sizeof(Window));
+    if(!window) {
         fprintf(stderr, "Failed to initialize window structure\n");
         return NULL;
     }
 
-    _window->handle = _handle;
-    _window->height = _height;
-    _window->width = _width;
-    _window->title = _title;
+    window->handle = handle;
+    window->height = height;
+    window->width = width;
+    window->title = title;
 
-    return _window;
+    return window;
 }
 
-void window_destroy(Window* _window){
-    if(!_window) return;
+void window_destroy(Window* window){
+    if(!window) return;
 
-    _window->height = 0;
-    _window->width = 0;
-    glfwDestroyWindow(_window->handle);
-    free(_window);
+    window->height = 0;
+    window->width = 0;
+    glfwDestroyWindow(window->handle);
+    free(window);
 }
 
-void window_loop(Window* _window) {
-    if (!_window) return;
+void window_loop(Window* window) {
+    if (!window) return;
 
     Particle* particle = particle_create(0.0f, 0.0f, 0.1f, 1.0f, 0.0f, 0.0f, 0.01f, 0.01f);
-
-    while (!glfwWindowShouldClose(_window->handle)) {
+    while (!glfwWindowShouldClose(window->handle)) {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Update particle position using the function
         particle_update_position(particle);
-
-        // Draw particle
         particle_draw(particle);
 
-        glfwSwapBuffers(_window->handle);
+        glfwSwapBuffers(window->handle);
         glfwPollEvents();
     }
 

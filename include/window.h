@@ -5,8 +5,8 @@
 
 typedef struct Window Window;
 
-Window* window_create(int _height, int _width, char* _title);
-void window_destroy(Window* _window);
-void window_loop(Window* _window);
+Window* window_create(int height, int width, char* title);
+void window_destroy(Window* window);
+void window_loop(Window* window);
 
 #endif // WINDOW_H

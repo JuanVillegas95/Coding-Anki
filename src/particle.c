@@ -11,7 +11,7 @@ struct Particle {
     float x, y;
     float radius;
     float r, g, b;
-    float vx, vy;  // Velocity components
+    float vx, vy;  
 };
 
 
