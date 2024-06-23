@@ -40,7 +40,7 @@ This repository leverages Git branches to create a system for coding practice. B
 | 2      | create a window                   | 9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8   | Implement a particle .h and .c with the functions create, destroy, draw and add velocity. |
 | 3      | draw a circle and add velocity    | 094b23fe41bd322afbce7f1464904cfd5efd5cba   | Add delta time and gravity to the particle implementation                             |
 | 4      | add delta time and gravity        | d6006d28febe0ab3118d5643b150895ea9d2135e   | Add collision for the white box                                                       |
-| 5      | add collision detection for the box        | 24096b975322a9e352859f06eb744259b8b681b6   | Add collision for the white box                                                       |
+| 5      | add collision detection for the box        | 24096b975322a9e352859f06eb744259b8b681b6   |                                                     |
 
 
 
