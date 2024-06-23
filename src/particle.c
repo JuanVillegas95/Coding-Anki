@@ -14,7 +14,6 @@ struct Particle {
     float vx, vy;  
 };
 
-
 Particle* particle_create(float x, float y, float radius, float r, float g, float b, float vx, float vy) {
     Particle* particle = (Particle*)malloc(sizeof(Particle));
     if (!particle) return NULL;
@@ -30,7 +29,6 @@ Particle* particle_create(float x, float y, float radius, float r, float g, floa
 
     return particle;
 }
-
 
 void particle_destroy(Particle* particle){
   if(!particle) return;
@@ -55,9 +53,30 @@ void particle_draw(Particle* particle){
   glEnd();
 }
 
-void particle_updatePosition(Particle* particle, double deltaTime) {
+
+void particle_update(Particle* particle, double deltaTime, float minX, float maxX, float minY, float maxY) {
     if (!particle) return;
+
+    // Update position with current velocity
     particle->vy += GRAVITY * deltaTime;
     particle->x += particle->vx * deltaTime;
     particle->y += particle->vy * deltaTime;
+
+    // Collision detection and response with the bounding box
+    if (particle->x - particle->radius < minX) {
+        particle->x = minX + particle->radius; // Correct position
+        particle->vx *= -1; // Reverse velocity
+    }
+    if (particle->x + particle->radius > maxX) {
+        particle->x = maxX - particle->radius; // Correct position
+        particle->vx *= -1; // Reverse velocity
+    }
+    if (particle->y - particle->radius < minY) {
+        particle->y = minY + particle->radius; // Correct position
+        particle->vy *= -1; // Reverse velocity
+    }
+    if (particle->y + particle->radius > maxY) {
+        particle->y = maxY - particle->radius; // Correct position
+        particle->vy *= -1; // Reverse velocity
+    }
 }
