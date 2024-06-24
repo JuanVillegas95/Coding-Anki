@@ -4,9 +4,10 @@
 #include <math.h>
 #include <GLFW/glfw3.h>
 
-#define PI 3.1416
+#define PI 3.1416f
 #define GRAVITY -9.8f
 #define STEPS 100
+
 struct Particle {
     float x, y;
     float radius;
