@@ -63,7 +63,7 @@ void window_destroy(Window* window){
     free(window);
 }
 
-void draw_box(float minX, float maxX, float minY, float maxY) {
+static void window_drawBox(float minX, float maxX, float minY, float maxY) {
     glColor3f(1.0f, 1.0f, 1.0f); // White color for the box
     glBegin(GL_LINE_LOOP);
     glVertex2f(minX, minY);
@@ -73,26 +73,23 @@ void draw_box(float minX, float maxX, float minY, float maxY) {
     glEnd();
 }
 
-void add_particle(Window* window) {
+static void window_addParticle(Window* window, float minX, float maxX, float minY, float maxY) {
     if (window->particle_count >= MAX_PARTICLES) return;
 
-    float minX = -0.9f;
-    float maxX = 0.9f;
-    float minY = -0.9f;
-    float maxY = 0.9f;
-
-    float x = minX + ((float)rand() / RAND_MAX) * (maxX - minX);
-    float y = minY + ((float)rand() / RAND_MAX) * (maxY - minY);
-    float radius = 0.02f + (float)rand() / RAND_MAX * 0.05f;
     float r = (float)rand() / RAND_MAX;
     float g = (float)rand() / RAND_MAX;
     float b = (float)rand() / RAND_MAX;
+
+    float x = minX + ((float)rand() / RAND_MAX) * (maxX - minX);
+    float y = minY + ((float)rand() / RAND_MAX) * (maxY - minY);
+
     float vx = (float)rand() / RAND_MAX * 0.5f - 0.25f;
     float vy = (float)rand() / RAND_MAX * 0.5f - 0.25f;
 
+    float radius = 0.02f + (float)rand() / RAND_MAX * 0.05f;
+
     window->particles[window->particle_count++] = particle_create(x, y, radius, r, g, b, vx, vy);
 }
-
 
 void window_loop(Window* window) {
     if (!window) return;
@@ -111,17 +108,18 @@ void window_loop(Window* window) {
         double deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
+        window_drawBox(minX, maxX, minY, maxY);
+
         for (int i = 0; i < window->particle_count; ++i) {
             if (window->particles[i]) {
-                particle_update(window->particles[i], deltaTime, minX, maxX, minY, maxY);
                 particle_draw(window->particles[i]);
+                particle_update(window->particles[i], deltaTime, minX, maxX, minY, maxY);
             }
         }
 
-        draw_box(minX, maxX, minY, maxY);
 
         if (window->particle_count < MAX_PARTICLES && rand() % 100 < 5) {
-            add_particle(window);
+            window_addParticle(window, minX, maxX, minY, maxY);
         }
 
         glfwSwapBuffers(window->handle);
