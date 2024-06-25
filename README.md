@@ -41,7 +41,7 @@ This repository leverages Git branches to create a system for coding practice. B
 | 3      | draw a circle and add velocity    | 094b23fe41bd322afbce7f1464904cfd5efd5cba   | Add delta time and gravity to the particle implementation                             |
 | 4      | add delta time and gravity        | d6006d28febe0ab3118d5643b150895ea9d2135e   | Add collision for the white box                                                       |
 | 5      | add collision detection for the box        | 24096b975322a9e352859f06eb744259b8b681b6   |  Add multiple particles                                                   |
-| 6      | add multiple particles       | b5cf94a8c6498f8b11f6a2517f180d844bc24f8d   |                                           |
+| 6      | add multiple particles       | 93e1583b5a96fa8b357342c7017a5d06cc160a52   |                              |
 
 
 
