@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
+#include <GLUT/glut.h>
 
-#define BOX_MARGIN 0.1f  
+#define BOX_MARGIN 0.125f  
 #define MAX_PARTICLES 100
 
 struct Window {
@@ -18,7 +19,7 @@ struct Window {
     char* title;
 };
 
-Window* window_create(int height, int width, char* title) {
+Window* window_create(int height, int width, char* title){
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         return NULL;
@@ -64,23 +65,52 @@ void window_destroy(Window* window) {
     free(window);
 }
 
+static float randomNumber(void) {
+    return (float)rand() / RAND_MAX;
+}
 
-static void window_addParticle(Window* window) {
+static void addParticle(Window* window) {
     if (window->particle_count >= MAX_PARTICLES) return;
 
-    float r = (float)rand() / RAND_MAX;
-    float g = (float)rand() / RAND_MAX;
-    float b = (float)rand() / RAND_MAX;
+    float r = randomNumber();
+    float g = randomNumber();
+    float b = randomNumber();
 
-    float x = window->box.minX + ((float)rand() / RAND_MAX) * (window->box.maxX - window->box.minX);
-    float y = window->box.minY + ((float)rand() / RAND_MAX) * (window->box.maxY - window->box.minY);
+    float x = window->box.minX + randomNumber() * (window->box.maxX - window->box.minX);
+    float y = window->box.minY + randomNumber() * (window->box.maxY - window->box.minY);
 
-    float vx = (float)rand() / RAND_MAX * 0.5f - 0.25f;
-    float vy = (float)rand() / RAND_MAX * 0.5f - 0.25f;
+    float vx = randomNumber() * 0.5f - 0.25f;
+    float vy = randomNumber() * 0.5f - 0.25f;
 
-    float radius = 0.02f + (float)rand() / RAND_MAX * 0.05f;
+    float radius = 0.02f + randomNumber() * 0.05f;
 
     window->particles[window->particle_count++] = particle_create(x, y, radius, r, g, b, vx, vy);
+}
+
+static void addParticleWithMouse(Window* window, double mouseX, double mouseY) {
+    if (window->particle_count >= MAX_PARTICLES) return;
+
+    float r = randomNumber();
+    float g = randomNumber();
+    float b = randomNumber();
+
+    float x = (float)(mouseX / window->width * 2.0 - 1.0);
+    float y = (float)(1.0 - mouseY / window->height * 2.0);
+
+    float vx = randomNumber() * 0.5f - 0.25f;
+    float vy = randomNumber() * 0.5f - 0.25f;
+
+    float radius = 0.02f + randomNumber() * 0.05f;
+
+    window->particles[window->particle_count++] = particle_create(x, y, radius, r, g, b, vx, vy);
+}
+
+void renderText(float x, float y, const char* text) {
+    glRasterPos2f(x, y);
+    while (*text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *text);
+        text++;
+    }
 }
 
 void window_loop(Window* window) {
@@ -104,11 +134,20 @@ void window_loop(Window* window) {
             }
         }
 
-        if (window->particle_count < MAX_PARTICLES && rand() % 100 < 5) {
-            window_addParticle(window);
+        if (glfwGetMouseButton(window->handle, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+            double mouseX, mouseY;
+            glfwGetCursorPos(window->handle, &mouseX, &mouseY);
+            addParticleWithMouse(window, mouseX, mouseY);
         }
+        // if (rand() % 100 < 5) addParticle(window);
+
+        // Convert particle count to string and render it
+        char particleCountText[50];
+        sprintf(particleCountText, "Particles: %d", window->particle_count);
+        renderText(-0.95f, 0.9f, particleCountText); // Adjust position as needed
 
         glfwSwapBuffers(window->handle);
         glfwPollEvents();
     }
 }
+

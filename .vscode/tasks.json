@@ -21,6 +21,8 @@
         "-framework",
         "OpenGL",
         "-framework",
+        "GLUT",           // Added GLUT framework
+        "-framework",
         "Cocoa",
         "-framework",
         "IOKit",
