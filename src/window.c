@@ -1,5 +1,6 @@
 #include "window.h"
 #include "particle.h"
+#include "box.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <GLFW/glfw3.h>
@@ -9,29 +10,30 @@
 
 struct Window {
     GLFWwindow* handle;
+    Box box;
+    Particle* particles[MAX_PARTICLES];
+    int particle_count;
     int width;
     int height;
     char* title;
-    Particle* particles[MAX_PARTICLES];
-    int particle_count;
 };
 
-Window* window_create(int height, int width, char* title){
-    if(!glfwInit()) {
+Window* window_create(int height, int width, char* title) {
+    if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");
         return NULL;
     }
 
     GLFWwindow* handle = glfwCreateWindow(width, height, title, NULL, NULL);
-    if(!handle) {
-        fprintf(stderr, "Failed to initialize GLFWwindow\n");
+    if (!handle) {
+        fprintf(stderr, "Failed to create GLFW window\n");
         return NULL;
     }
     glfwMakeContextCurrent(handle);
 
     Window* window = (Window*)malloc(sizeof(Window));
-    if(!window) {
-        fprintf(stderr, "Failed to initialize window structure\n");
+    if (!window) {
+        fprintf(stderr, "Failed to allocate memory for window structure\n");
         return NULL;
     }
 
@@ -40,7 +42,8 @@ Window* window_create(int height, int width, char* title){
     window->width = width;
     window->title = title;
     window->particle_count = 0;
-
+    window->box = (Box){-1.0f + BOX_MARGIN, 1.0f - BOX_MARGIN, -1.0f + BOX_MARGIN, 1.0f - BOX_MARGIN};
+    
     for (int i = 0; i < MAX_PARTICLES; ++i) {
         window->particles[i] = NULL;
     }
@@ -48,8 +51,8 @@ Window* window_create(int height, int width, char* title){
     return window;
 }
 
-void window_destroy(Window* window){
-    if(!window) return;
+void window_destroy(Window* window) {
+    if (!window) return;
 
     for (int i = 0; i < MAX_PARTICLES; ++i) {
         if (window->particles[i]) {
@@ -57,31 +60,20 @@ void window_destroy(Window* window){
         }
     }
 
-    window->height = 0;
-    window->width = 0;
     glfwDestroyWindow(window->handle);
     free(window);
 }
 
-static void window_drawBox(float minX, float maxX, float minY, float maxY) {
-    glColor3f(1.0f, 1.0f, 1.0f); // White color for the box
-    glBegin(GL_LINE_LOOP);
-    glVertex2f(minX, minY);
-    glVertex2f(maxX, minY);
-    glVertex2f(maxX, maxY);
-    glVertex2f(minX, maxY);
-    glEnd();
-}
 
-static void window_addParticle(Window* window, float minX, float maxX, float minY, float maxY) {
+static void window_addParticle(Window* window) {
     if (window->particle_count >= MAX_PARTICLES) return;
 
     float r = (float)rand() / RAND_MAX;
     float g = (float)rand() / RAND_MAX;
     float b = (float)rand() / RAND_MAX;
 
-    float x = minX + ((float)rand() / RAND_MAX) * (maxX - minX);
-    float y = minY + ((float)rand() / RAND_MAX) * (maxY - minY);
+    float x = window->box.minX + ((float)rand() / RAND_MAX) * (window->box.maxX - window->box.minX);
+    float y = window->box.minY + ((float)rand() / RAND_MAX) * (window->box.maxY - window->box.minY);
 
     float vx = (float)rand() / RAND_MAX * 0.5f - 0.25f;
     float vy = (float)rand() / RAND_MAX * 0.5f - 0.25f;
@@ -94,11 +86,6 @@ static void window_addParticle(Window* window, float minX, float maxX, float min
 void window_loop(Window* window) {
     if (!window) return;
 
-    float minX = -1.0f + BOX_MARGIN;
-    float maxX = 1.0f - BOX_MARGIN;
-    float minY = -1.0f + BOX_MARGIN;
-    float maxY = 1.0f - BOX_MARGIN;
-
     double lastTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window->handle)) {
@@ -108,18 +95,17 @@ void window_loop(Window* window) {
         double deltaTime = currentTime - lastTime;
         lastTime = currentTime;
 
-        window_drawBox(minX, maxX, minY, maxY);
+        box_draw(window->box);
 
         for (int i = 0; i < window->particle_count; ++i) {
             if (window->particles[i]) {
                 particle_draw(window->particles[i]);
-                particle_update(window->particles[i], deltaTime, minX, maxX, minY, maxY);
+                particle_update(window->particles[i], deltaTime, window->box);
             }
         }
 
-
         if (window->particle_count < MAX_PARTICLES && rand() % 100 < 5) {
-            window_addParticle(window, minX, maxX, minY, maxY);
+            window_addParticle(window);
         }
 
         glfwSwapBuffers(window->handle);

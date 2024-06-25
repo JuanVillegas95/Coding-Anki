@@ -1,4 +1,5 @@
 #include "particle.h"
+#include "box.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -12,7 +13,7 @@ struct Particle {
     float x, y;
     float radius;
     float r, g, b;
-    float vx, vy;  
+    float vx, vy;
 };
 
 Particle* particle_create(float x, float y, float radius, float r, float g, float b, float vx, float vy) {
@@ -31,31 +32,30 @@ Particle* particle_create(float x, float y, float radius, float r, float g, floa
     return particle;
 }
 
-void particle_destroy(Particle* particle){
-  if(!particle) return;
-  free(particle);
+void particle_destroy(Particle* particle) {
+    if (!particle) return;
+    free(particle);
 }
 
-void particle_draw(Particle* particle){
-  if(!particle) return;
+void particle_draw(Particle* particle) {
+    if (!particle) return;
 
-  glColor3f(particle->r,particle->g,particle->b);
-  glBegin(GL_TRIANGLE_FAN);
-  glVertex2f(particle->x,particle->y);
+    glColor3f(particle->r, particle->g, particle->b);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(particle->x, particle->y);
 
-  for(int i = 0; i<=STEPS; i++){
-    float angle = i * ( PI * 2.0f ) / STEPS;
-    glVertex2f(
-      particle->x + cos(angle) * particle->radius,
-      particle->y + sin(angle) * particle->radius
-    );
-  }
+    for (int i = 0; i <= STEPS; i++) {
+        float angle = i * (PI * 2.0f) / STEPS;
+        glVertex2f(
+            particle->x + cos(angle) * particle->radius,
+            particle->y + sin(angle) * particle->radius
+        );
+    }
 
-  glEnd();
+    glEnd();
 }
 
-
-void particle_update(Particle* particle, double deltaTime, float minX, float maxX, float minY, float maxY) {
+void particle_update(Particle* particle, double deltaTime, Box box) {
     if (!particle) return;
 
     // Update position with current velocity
@@ -64,20 +64,20 @@ void particle_update(Particle* particle, double deltaTime, float minX, float max
     particle->y += particle->vy * deltaTime;
 
     // Collision detection and response with the bounding box
-    if (particle->x - particle->radius < minX) {
-        particle->x = minX + particle->radius; // Correct position
+    if (particle->x - particle->radius < box.minX) {
+        particle->x = box.minX + particle->radius; // Correct position
         particle->vx *= -1; // Reverse velocity
     }
-    if (particle->x + particle->radius > maxX) {
-        particle->x = maxX - particle->radius; // Correct position
+    if (particle->x + particle->radius > box.maxX) {
+        particle->x = box.maxX - particle->radius; // Correct position
         particle->vx *= -1; // Reverse velocity
     }
-    if (particle->y - particle->radius < minY) {
-        particle->y = minY + particle->radius; // Correct position
+    if (particle->y - particle->radius < box.minY) {
+        particle->y = box.minY + particle->radius; // Correct position
         particle->vy *= -1; // Reverse velocity
     }
-    if (particle->y + particle->radius > maxY) {
-        particle->y = maxY - particle->radius; // Correct position
+    if (particle->y + particle->radius > box.maxY) {
+        particle->y = box.maxY - particle->radius; // Correct position
         particle->vy *= -1; // Reverse velocity
     }
 }
