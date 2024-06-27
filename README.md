@@ -9,9 +9,9 @@ This repository leverages Git branches to create a system for coding practice. B
 ### Problems
 - **Binary Search**
   - **Branch:** `data_structures`
-| Number | Problem                        | To-Implement                                      | Implementation                                                     |
-|--------|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------|
-| 1      | Binary Tree                        | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac  |3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac |
+| Number | Problem          | To-Implement                | Implementation                                                     |
+|--------|------------------|-----------------------------|---------------------------------------------------------------------|
+| 1      | Binary Tree      | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac  | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac |
 
 ### Projects
 1. **Particle simulator:** 
