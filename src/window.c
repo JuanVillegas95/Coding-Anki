@@ -69,33 +69,22 @@ static float randomNumber(void) {
     return (float)rand() / RAND_MAX;
 }
 
-static void addParticle(Window* window) {
+
+static void addParticle(Window* window, double* mouseX, double* mouseY) {
     if (window->particle_count >= MAX_PARTICLES) return;
 
     float r = randomNumber();
     float g = randomNumber();
     float b = randomNumber();
 
-    float x = window->box.minX + randomNumber() * (window->box.maxX - window->box.minX);
-    float y = window->box.minY + randomNumber() * (window->box.maxY - window->box.minY);
-
-    float vx = randomNumber() * 0.5f - 0.25f;
-    float vy = randomNumber() * 0.5f - 0.25f;
-
-    float radius = 0.02f + randomNumber() * 0.05f;
-
-    window->particles[window->particle_count++] = particle_create(x, y, radius, r, g, b, vx, vy);
-}
-
-static void addParticleWithMouse(Window* window, double mouseX, double mouseY) {
-    if (window->particle_count >= MAX_PARTICLES) return;
-
-    float r = randomNumber();
-    float g = randomNumber();
-    float b = randomNumber();
-
-    float x = (float)(mouseX / window->width * 2.0 - 1.0);
-    float y = (float)(1.0 - mouseY / window->height * 2.0);
+    float x, y;
+    if (mouseX && mouseY) {
+        x = (float)(*mouseX / window->width * 2.0 - 1.0);
+        y = (float)(1.0 - *mouseY / window->height * 2.0);
+    } else {
+        x = window->box.minX + randomNumber() * (window->box.maxX - window->box.minX);
+        y = window->box.minY + randomNumber() * (window->box.maxY - window->box.minY);
+    }
 
     float vx = randomNumber() * 0.5f - 0.25f;
     float vy = randomNumber() * 0.5f - 0.25f;
@@ -137,9 +126,10 @@ void window_loop(Window* window) {
         if (glfwGetMouseButton(window->handle, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
             double mouseX, mouseY;
             glfwGetCursorPos(window->handle, &mouseX, &mouseY);
-            addParticleWithMouse(window, mouseX, mouseY);
+            addParticle(window, &mouseX, &mouseY);
         }
-        // if (rand() % 100 < 5) addParticle(window);
+        // Uncomment this line if you want to add particles randomly over time
+        // if (rand() % 100 < 5) addParticle(window, NULL, NULL);
 
         // Convert particle count to string and render it
         char particleCountText[50];
@@ -150,4 +140,3 @@ void window_loop(Window* window) {
         glfwPollEvents();
     }
 }
-
