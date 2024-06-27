@@ -34,16 +34,19 @@ This repository leverages Git branches to create a system for coding practice. B
 - **Particle simulator:** 
   - **Branch:** `open-gl`
 
-| Number | Commit Message                    | SHA                                        | To-do                                                  |
-|--------|-----------------------------------|--------------------------------------------|---------------------------------------------------------------------------------------|
-| 1      | set up project                    | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac   | Implement a window .h and .c with the functions create, destroy, loop.                |
-| 2      | create a window                   | 9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8   | Implement a particle .h and .c with the functions create, destroy, draw and add velocity. |
-| 3      | draw a circle and add velocity    | 094b23fe41bd322afbce7f1464904cfd5efd5cba   | Add delta time and gravity to the particle implementation                             |
-| 4      | add delta time and gravity        | d6006d28febe0ab3118d5643b150895ea9d2135e   | Add collision for the white box                                                       |
-| 5      | add collision detection for the box        | 24096b975322a9e352859f06eb744259b8b681b6   |  Add multiple particles  and enapsulate the box behavior                     |
-| 6      | add multiple particles       | 93e1583b5a96fa8b357342c7017a5d06cc160a52   |  Add particle with mouse and particle counter                            |
-| 7      | Add particle with mouse and particle counter           | 4217b0110133b765426f93bb44a3adf80a8829ee   |     add particle collision                   |
-| 8      | add particle collision          | 221e0c25c7dade4eab3ce28d8a25a73adf5759d4   |                     |
+| Number | Commit Message                          | SHA                                       | To-do                                                               |
+|--------|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------|
+| 1      | Set up project                          | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac  | Implement window.h and window.c with functions: create, destroy, loop |
+| 2      | Create a window                         | 9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8  | Implement particle.h and particle.c with functions: create, destroy, draw, add velocity |
+| 3      | Draw a circle and add velocity          | 094b23fe41bd322afbce7f1464904cfd5efd5cba  | Add delta time and gravity to the particle implementation            |
+| 4      | Add delta time and gravity              | d6006d28febe0ab3118d5643b150895ea9d2135e  | Add collision detection for the white box                            |
+| 5      | Add collision detection for the box     | 24096b975322a9e352859f06eb744259b8b681b6  | Add multiple particles and encapsulate the box behavior              |
+| 6      | Add multiple particles                  | 93e1583b5a96fa8b357342c7017a5d06cc160a52  | Add particle with mouse and particle counter                         |
+| 7      | Add particle with mouse and counter     | 4217b0110133b765426f93bb44a3adf80a8829ee  | Add particle collision                                               |
+| 8      | Add particle collision                  | 221e0c25c7dade4eab3ce28d8a25a73adf5759d4  |                                                                     |
+### Projects
+- **Purrfect timing:** 
+  - **Branch:** `purrfect-timing`
 
 
 
