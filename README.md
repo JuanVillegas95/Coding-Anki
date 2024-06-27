@@ -42,7 +42,8 @@ This repository leverages Git branches to create a system for coding practice. B
 | 4      | add delta time and gravity        | d6006d28febe0ab3118d5643b150895ea9d2135e   | Add collision for the white box                                                       |
 | 5      | add collision detection for the box        | 24096b975322a9e352859f06eb744259b8b681b6   |  Add multiple particles  and enapsulate the box behavior                     |
 | 6      | add multiple particles       | 93e1583b5a96fa8b357342c7017a5d06cc160a52   |  Add particle with mouse and particle counter                            |
-| 7      | Add particle with mouse and particle counter           | 127e620df360a7db3d58cf60e1efd28bb330fa1c   |                        |
+| 7      | Add particle with mouse and particle counter           | 4217b0110133b765426f93bb44a3adf80a8829ee   |     add particle collision                   |
+| 8      | Add particle with mouse and particle counter           | 221e0c25c7dade4eab3ce28d8a25a73adf5759d4   |                     |
 
 
 
