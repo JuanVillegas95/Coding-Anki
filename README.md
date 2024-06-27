@@ -4,34 +4,17 @@ Repository for practicing and reinforcing coding problems using a spaced repetit
 ## Overview
 This repository leverages Git branches to create a system for coding practice. By revisiting specific branches and commits, I can repeatedly re-implement coding exercises and run tests to solidify my understanding and improve retention. Each branch represents a different area of study or topic, and each commit represents a specific step or exercise within that topic.
 
-## Commit Conventions
-### Problems
-- **Problem Commit:** `[problem] <topic>: <description>`
-- **Solution Commit:** `[solution] <topic>: <description>`
-
-### Projects
-- Normal commit messages are used for projects. To view a solution, simply go one commit ahead.
-
-## Example Workflow for Problems and Projects
-#### Branch: `algorithms`
-1. **Commit 1 (Problem):** `[problem] binary-search: added exercise with incomplete function`
-2. **Commit 2 (Solution):** `[solution] binary-search: implemented binary search function`
-#### Branch: `open-gl`
-1. **Commit 1:** `set up project`
-2. **Commit 2:** `create a window`
-3. **Commit 3:** `draw a circle`
-3. **Commit ...:** `...`
-   
 ## Existing Problems and Projects
 
 ### Problems
 - **Binary Search**
-  - **Branch:** `algorithms`
-  - **Problem Commit:** `[problem] binary-search: added exercise with incomplete function`
-  - **Solution Commit:** `[solution] binary-search: implemented binary search function`
+  - **Branch:** `data_structures`
+| Number | Problem                        | To-Implement                                      | Implementation                                                     |
+|--------|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------|
+| 1      | Binary Tree                        | 3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac  |3199f71f92e3e4174ef2e1c9999eb87f83cfe0ac |
 
 ### Projects
-- **Particle simulator:** 
+1. **Particle simulator:** 
   - **Branch:** `open-gl`
 
 | Number | Commit Message                          | SHA                                       | To-do                                                               |
@@ -44,8 +27,7 @@ This repository leverages Git branches to create a system for coding practice. B
 | 6      | Add multiple particles                  | 93e1583b5a96fa8b357342c7017a5d06cc160a52  | Add particle with mouse and particle counter                         |
 | 7      | Add particle with mouse and counter     | 4217b0110133b765426f93bb44a3adf80a8829ee  | Add particle collision                                               |
 | 8      | Add particle collision                  | 221e0c25c7dade4eab3ce28d8a25a73adf5759d4  |                                                                     |
-### Projects
-- **Purrfect timing:** 
+2. **Purrfect timing:** 
   - **Branch:** `purrfect-timing`
 
 
