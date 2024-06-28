@@ -7,7 +7,7 @@
 #include <GLUT/glut.h>
 
 #define BOX_MARGIN 0.125f  
-#define MAX_PARTICLES 100
+#define MAX_PARTICLES 10000
 
 struct Window {
     GLFWwindow* handle;
@@ -31,7 +31,7 @@ Window* window_create(int height, int width, char* title){
         return NULL;
     }
     glfwMakeContextCurrent(handle);
-
+    glfwSwapInterval(0);
     Window* window = (Window*)malloc(sizeof(Window));
     if (!window) {
         fprintf(stderr, "Failed to allocate memory for window structure\n");
@@ -69,7 +69,6 @@ static float randomNumber(void) {
     return (float)rand() / RAND_MAX;
 }
 
-
 static void addParticle(Window* window, double* mouseX, double* mouseY) {
     if (window->particle_count >= MAX_PARTICLES) return;
 
@@ -102,6 +101,22 @@ void renderText(float x, float y, const char* text) {
     }
 }
 
+double calculateFPS(double deltaTime) {
+    static double frames = 0;
+    static double fps = 0;
+    static double lastTime = 0;
+
+    frames++;
+    double currentTime = glfwGetTime();
+    if (currentTime - lastTime >= 1.0) {
+        fps = frames / (currentTime - lastTime);
+        lastTime = currentTime;
+        frames = 0;
+    }
+
+    return fps;
+}
+
 void window_loop(Window* window) {
     if (!window) return;
 
@@ -113,6 +128,8 @@ void window_loop(Window* window) {
         double currentTime = glfwGetTime();
         double deltaTime = currentTime - lastTime;
         lastTime = currentTime;
+
+        double fps = calculateFPS(deltaTime);
 
         box_draw(window->box);
 
@@ -135,6 +152,11 @@ void window_loop(Window* window) {
         char particleCountText[50];
         sprintf(particleCountText, "Particles: %d", window->particle_count);
         renderText(-0.95f, 0.9f, particleCountText); // Adjust position as needed
+
+        // Render FPS
+        char fpsText[50];
+        sprintf(fpsText, "FPS: %.2f", fps);
+        renderText(0.7f, 0.9f, fpsText); // Adjust position as needed
 
         glfwSwapBuffers(window->handle);
         glfwPollEvents();
