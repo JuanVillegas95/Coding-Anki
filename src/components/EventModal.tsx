@@ -1,120 +1,10 @@
 "use client";
 import React from "react";
-import styled from "styled-components";
-import Modal from './Modal';
-import { EventProps, DAYS } from './WeeklyCalendar';
+import Modal from '@/components/Modal';
+import { EventProps } from '@/utils/classes';
+import * as S from "@/styles/EventModal.styles"
+import * as CONST from "@/utils/constants"
 
-// Constants 
-const COLORS: Array<string> = ["gray", "orange", "pink", "purple", "brown", "blue"];
-
-// Styled Components
-const ModalContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  max-width: 100%;
-  overflow: auto;
-`;
-
-const TimeInput = styled.input.attrs({
-  type: 'time',
-  step: 60,
-})`
-  appearance: none;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  padding: 8px;
-  width: 100%; 
-  box-sizing: border-box; 
-`;
-
-const EventDayChecks = styled.input.attrs({
-  type: 'checkbox',
-})`
-`;
-
-const EventSettings = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  color: #fff; /* Assuming white text for visibility */
-
-  & > * {
-    margin: 5px 0;
-  }
-`;
-
-const InputTitle = styled.input.attrs({ placeholder: 'Title' })`
-  padding: 10px;
-  font-size: 1.2rem;
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const SelectColor = styled.select`
-  padding: 10px;
-  font-size: 1.2rem;
-  border: 2px solid #d3d3d3;
-  background-color: white;
-  color: #333;
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const InputDescription = styled.input.attrs({ placeholder: 'Description' })`
-  padding: 10px;
-  font-size: 1.2rem;
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const InputTimeContainer = styled.div`
-  display: flex;
-  gap: 10px;
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-`;
-
-const DayLabel = styled.label`
-  display: flex;
-  align-items: center;
-  color: black;
-  padding: 10px;
-  border-radius: 40%;
-`;
-
-const DayText = styled.span`
-  margin-left: 5px;
-`;
-
-const SaveButton = styled.button.attrs({ type: 'submit' })`
-  padding: 10px;
-  background-color: #4CAF50; /* Green background */
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  text-align: center;
-  flex: 1;
-`;
-
-const DeleteButton = styled.button`
-  padding: 10px;
-  background-color: #f44336; 
-  color: white;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  text-align: center;
-  flex: 1;
-`;
 
 const EventModal: React.FC<{
   isModalOpen: boolean;
@@ -136,29 +26,29 @@ const EventModal: React.FC<{
 
   return (
     <Modal show={isModalOpen} handleClose={handleModalClose}>
-      <ModalContent>
-        <EventSettings onSubmit={(e) => handleSubmit(e)}>
-          <InputTitle
+      <S.ModalContent>
+        <S.EventSettings onSubmit={(e) => handleSubmit(e)}>
+          <S.InputTitle
             value={title}
             onChange={(e) => handleEventChange("title", e.target.value)}
           />
 
-          <InputDescription
+          <S.InputDescription
             value={description}
             onChange={(e) => handleEventChange("description", e.target.value)}
           />
 
-          <SelectColor
+          <S.SelectColor
             value={color}
             onChange={(e) => handleEventChange("color", e.target.value)}
           >
-            {COLORS.map((color: string, i: number) => 
+            {CONST.COLORS.map((color: string, i: number) => 
               <option key={i} value={color}>{color}</option>
             )}
-          </SelectColor>
+          </S.SelectColor>
 
-          <InputTimeContainer>
-            <TimeInput
+          <S.InputTimeContainer>
+            <S.TimeInput
               value={`${startTime.hours.toString().padStart(2, '0')}:${startTime.minutes.toString().padStart(2, '0')}`}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':').map(Number);
@@ -166,28 +56,28 @@ const EventModal: React.FC<{
               }}
             />
 
-            <TimeInput
+            <S.TimeInput
               value={`${endTime.hours.toString().padStart(2, '0')}:${endTime.minutes.toString().padStart(2, '0')}`}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':').map(Number);
                 handleEventChange("endTime", { hours, minutes });
               }}
             />
-          </InputTimeContainer>
+          </S.InputTimeContainer>
 
-          <ButtonsContainer>
-            {DAYS.map((day, i) => (
-              <DayLabel key={i}>
-                <EventDayChecks />
-                <DayText>{day.charAt(0)}</DayText>
-              </DayLabel>
+          <S.ButtonsContainer>
+            {CONST.DAYS.map((day, i) => (
+              <S.DayLabel key={i}>
+                <S.EventDayChecks />
+                <S.DayText>{day.charAt(0)}</S.DayText>
+              </S.DayLabel>
             ))}
-          </ButtonsContainer>
+          </S.ButtonsContainer>
 
-          <SaveButton>Save</SaveButton>
-          <DeleteButton onClick={() => deleteEvent(currentEvent)}>Delete</DeleteButton>
-        </EventSettings>
-      </ModalContent>
+          <S.SaveButton>Save</S.SaveButton>
+          <S.DeleteButton onClick={() => deleteEvent(currentEvent)}>Delete</S.DeleteButton>
+        </S.EventSettings>
+      </S.ModalContent>
     </Modal>
   );
 };

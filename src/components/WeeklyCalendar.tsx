@@ -1,202 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect } from "react";
-import styled from "styled-components";
-import { v4 as uuidv4 } from 'uuid';
+import * as CONST from "@/utils/constants"
+import * as S from "@/styles/WeeklyCalendar.styles"
+import { EventProps } from "@/utils/classes"
 import EventModal from './EventModal';
 
-export class EventProps {
-  id: string;
-  date: Date;
-  startTime: { hours: number; minutes: number };
-  endTime: { hours: number; minutes: number };
-  title: string;
-  description: string;
-  height: number;
-  color: string;
 
-  constructor(
-    date: Date,
-    startTime: { hours: number; minutes: number },
-    endTime: { hours: number; minutes: number } = {hours: 0, minutes: 0 },
-    title: string = "",
-    description: string = "",
-    height: number = 0,
-    color: string = "gray"
-  ) {
-    this.id = uuidv4();
-    this.date = date;
-    this.startTime = { hours: startTime.hours, minutes: startTime.minutes };
-    this.endTime = { hours: endTime.hours, minutes:endTime.minutes };
-    this.title = title;
-    this.description = description;
-    this.height = height;
-    this.color = color;
-  }
-}
-
-// Constants
-const HOUR_WIDTH: number = 40;
-const HOUR_HEIGHT: number = 50;
-const HEADER_HEIGHT: number = 60;
-const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
-export const DAYS: Array<string> = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-
-// Styled Components
-const Container = styled.div`
-  width: 90%;
-  max-width: 1200px;
-  height: 80vh;
-  margin: 0 50px;
-  border-radius: 2%;
-  background-color: white;
-
-  display: grid;
-  grid-template-rows: ${HEADER_HEIGHT}px ${DAYS_OF_THE_WEEK_HEIGHT}px 1fr;
-`;
-
-const Header = styled.div`
-  padding: 5px;
-  box-shadow: 0 .2px 0 0 slategray;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-const Title = styled.h2`
-  text-align: left; 
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-  position: relative;
-  display: inline-block;
-  margin-bottom: 10px;
-
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    border-bottom: 2px dashed #A0A0A0; 
-    margin-top: 5px; 
-  }
-`;
-
-const Buttons = styled.div`
-  text-align: right; 
-`;
-
-const DaysOfTheWeek = styled.div`
-  align-items: center; 
-
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-left: ${HOUR_WIDTH}px;
-`;
-
-const Day = styled.div`
-  text-align: center; 
-`;
-
-const Main = styled.div`
-  position: relative;
-  overflow-y: scroll;
-
-  display: grid;
-  grid-template-columns: ${HOUR_WIDTH}px 1fr;
-`;
-
-const AsideTime = styled.div`
-  text-align: center; 
-  align-items: center; 
-  justify-items: center; 
-`;
-
-const Hour = styled.div`
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  height: ${HOUR_HEIGHT}px;
-`;
-
-const DayColumn = styled.div`
-  position: relative;
-`;
-
-const Events = styled.div`
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-`;
-
-const Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
-  position: absolute;
-  z-index: 40;
-  width: calc(100% - 5px);
-  left: 2.5px;
-  top: ${({ $fromTop }) => $fromTop}px;
-  background: green;
-  margin: 0;
-  height: ${({ $height }) => $height}px;
-  border: 1px solid var(--primary-${({ $color }) => $color});
-  background-color: var(--secondary-${({ $color }) => $color});
-  border-width: 2px;
-  border-radius: 0.5rem;
-  padding: 5px; /* Adjust padding if necessary */
-
-  white-space: normal; /* Ensure text wrapping */
-  overflow: hidden; /* Prevent overflow */
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  strong {
-    display: block;
-  }
-`;
-
-
-const HourLine = styled.div<{ $fromTop: number }>`
-  position: absolute;
-  margin-left: 5px;
-  z-index: 2;
-  width: calc(100% - 5px);
-  top: ${({ $fromTop }) => $fromTop}px;
-  color: red; 
-  font-size: 15px; 
-  display: flex;
-  align-items: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  pointer-events: none;
-`;
-
-const LineAfterHour = styled.div`
-  flex: 1;
-  height: 1px;
-  background-color: red; 
-`;
-
-const HourLineDot = styled.div<{ $fromTop: number }>`
-  position: absolute;
-  width: 10px; 
-  height: 10px; 
-  border-radius: 50%; 
-  background-color: orange; 
-  top: ${({ $fromTop }) => $fromTop}px;
-  left: calc(50% - 5px);
-  transform: translateX(-50%);
-`;
-
-const Cell = styled.div`
-  height: calc(${HOUR_HEIGHT}px / 2);
-  box-shadow: .2px .2px 0 0 slategray;
-`;
-
-// Main
 const WeeklyCalendar: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [events, setEvents] = useState<EventProps[]>([]);
@@ -241,7 +51,7 @@ const WeeklyCalendar: React.FC = () => {
     const newHeight = calculateEventHeight(currentEvent.startTime, { hours: endHour, minutes: endMinutes });
 
     // Ensure minimum height for the event
-    if (newHeight < (30 / 60) * HOUR_HEIGHT) return;
+    if (newHeight < (30 / 60) * CONST.HOUR_HEIGHT) return;
 
     setCurrentEvent({
       ...currentEvent,
@@ -260,7 +70,7 @@ const WeeklyCalendar: React.FC = () => {
     if (e.button !== 0 || !currentEvent) return;
   
     // Ensure the event duration is at least 30 minutes
-    const durationInMinutes: number = currentEvent.height / HOUR_HEIGHT * 60;
+    const durationInMinutes: number = currentEvent.height / CONST.HOUR_HEIGHT * 60;
     if (durationInMinutes < 30) {
       deleteEvent(currentEvent);
       setCurrentEvent(null);
@@ -325,29 +135,29 @@ const WeeklyCalendar: React.FC = () => {
   
 
   return (
-    <Container>
-      <Header>
-        <Title>Header</Title>
-        <Buttons>Hi</Buttons>
-      </Header>
-      <DaysOfTheWeek>{DAYS.map((day, i) => <Day key={i}>{day}</Day>)}</DaysOfTheWeek>
-      <Main>
-        <AsideTime>{range(24).map((hour, i) => <Hour key={i}>{hour}</Hour>)}</AsideTime>
-        <Events onMouseMove={(e) => handleOnMouseMove(e)}>
-          {DAYS.map((day, i) => {
+    <S.Container>
+      <S.Header>
+        <S.Title>Header</S.Title>
+        <S.Buttons>Hi</S.Buttons>
+      </S.Header>
+      <S.DaysOfTheWeek>{CONST.DAYS.map((day, i) => <S.Day key={i}>{day}</S.Day>)}</S.DaysOfTheWeek>
+      <S.Main>
+        <S.AsideTime>{range(24).map((hour, i) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
+        <S.Events onMouseMove={(e) => handleOnMouseMove(e)}>
+          {CONST.DAYS.map((day, i) => {
             const isToday = areDatesTheSame(addDateBy(getMonday(), i), currentTime);
             return (
-              <DayColumn
+              <S.DayColumn
                 key={i}
                 onMouseDown={(e) => handleMouseDown(e, addDateBy(getMonday(), i))}
                 onMouseUp={(e) => handleMouseUp(e)}
               >
-                {Array.from({ length: 48 }, (_, j) => <Cell key={j} />)} 
+                {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)} 
 
                 {events
                   .filter(event => areDatesTheSame(event.date, addDateBy(getMonday(), i)))
                   .map((event, j) => (
-                    <Event
+                    <S.Event
                       key={j}
                       $height={event.height}
                       $fromTop={getFromTop(event.startTime.hours, event.startTime.minutes)}
@@ -358,20 +168,20 @@ const WeeklyCalendar: React.FC = () => {
                       {String(event.endTime.hours).padStart(2, '0')}:{String(event.endTime.minutes).padStart(2, '0')} <br />
                       <strong>{event.title}</strong> <br />
                       {event.description}
-                    </Event>
+                    </S.Event>
                   ))
                 }
 
-                {isToday && <HourLineDot $fromTop={getFromTop(currentTime.getHours(), currentTime.getMinutes())} />}
-              </DayColumn>
+                {isToday && <S.HourLineDot $fromTop={getFromTop(currentTime.getHours(), currentTime.getMinutes())} />}
+              </S.DayColumn>
             );
           })}
-        </Events>
-        <HourLine $fromTop={getFromTop(currentTime.getHours(), currentTime.getMinutes())}>
+        </S.Events>
+        <S.HourLine $fromTop={getFromTop(currentTime.getHours(), currentTime.getMinutes())}>
           {currentTime.getHours()}:{currentTime.getMinutes()}
-          <LineAfterHour />
-        </HourLine>
-      </Main>
+          <S.LineAfterHour />
+        </S.HourLine>
+      </S.Main>
 
       <EventModal
         handleEventChange={handleEventChange}
@@ -381,7 +191,8 @@ const WeeklyCalendar: React.FC = () => {
         currentEvent={currentEvent}
         deleteEvent={deleteEvent}
       />
-    </Container>
+      
+    </S.Container>
   );
 };
 
@@ -406,19 +217,19 @@ const getMonday = (): Date => {
   return new Date(today.setDate(diff));
 };
 
-const getFromTop = (hours: number, minutes: number): number => hours * HOUR_HEIGHT + (minutes / 60) * HOUR_HEIGHT;
+const getFromTop = (hours: number, minutes: number): number => hours * CONST.HOUR_HEIGHT + (minutes / 60) * CONST.HOUR_HEIGHT;
 
 const calculateEventHeight = (startTime: { hours: number, minutes: number }, endTime: { hours: number, minutes: number }): number => {
   const startInMinutes = startTime.hours * 60 + startTime.minutes;
   const endInMinutes = endTime.hours * 60 + endTime.minutes;
   const durationInMinutes = endInMinutes - startInMinutes;
-  return (durationInMinutes / 60) * HOUR_HEIGHT;
+  return (durationInMinutes / 60) * CONST.HOUR_HEIGHT;
 };
 
 const calculateEventTime = (mouseInitialPositionY: number, mainTop: number): [number, number] => {
   const yPos = mouseInitialPositionY - mainTop;
-  const startHour = Math.floor(yPos / HOUR_HEIGHT);
-  const startMinutes = Math.floor(((yPos % HOUR_HEIGHT) / HOUR_HEIGHT) * 60);
+  const startHour = Math.floor(yPos / CONST.HOUR_HEIGHT);
+  const startMinutes = Math.floor(((yPos % CONST.HOUR_HEIGHT) / CONST.HOUR_HEIGHT) * 60);
   return [startHour, startMinutes];
 };
 
@@ -427,9 +238,9 @@ const detectCollision = (newEvent: EventProps, events: EventProps[]): boolean =>
   for (const event of events) {
     if (areDatesTheSame(newEvent.date, event.date)) {
       const newEventStart = newEvent.startTime.hours * 60 + newEvent.startTime.minutes;
-      const newEventEnd = newEventStart + (newEvent.height / HOUR_HEIGHT) * 60;
+      const newEventEnd = newEventStart + (newEvent.height / CONST.HOUR_HEIGHT) * 60;
       const eventStart = event.startTime.hours * 60 + event.startTime.minutes;
-      const eventEnd = eventStart + event.height / HOUR_HEIGHT * 60;
+      const eventEnd = eventStart + event.height / CONST.HOUR_HEIGHT * 60;
 
       if ((newEventStart < eventEnd && newEventEnd > eventStart) ||
         (eventStart < newEventEnd && eventEnd > newEventStart)) {
