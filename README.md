@@ -33,7 +33,7 @@ This repository leverages Git branches to create a system for coding practice. B
     
 | Number | Commit Message                          | SHA                                       | To-do                                                               |
 |--------|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------|
-| 1      | Starting point                        | 59c2518f07c1f459031e66699df31e5abc11922b  |  | Implement a handling for the form sumbit
+| 1      | Starting point                        | 33cdc0e0c10154d4ccd1048d0ac864c8fed37d37  |  | Implement a handling for the form sumbit
 | 2      | Create a window                         | 9c8a10f7a11c8e0b5dadce5d4f4d1dec96c65fa8  | Implement particle.h and particle.c with functions: create, destroy, draw, add 
 
 
