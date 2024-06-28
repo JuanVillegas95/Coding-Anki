@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import * as CONST from "@/utils/constants"
 import * as S from "@/styles/WeeklyCalendar.styles"
-import { EventProps } from "@/utils/classes"
+import { Event } from "@/utils/classes"
 import EventModal from './EventModal';
 
 
 const WeeklyCalendar: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
-  const [events, setEvents] = useState<EventProps[]>([]);
-  const [currentEvent, setCurrentEvent] = useState<EventProps | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const WeeklyCalendar: React.FC = () => {
     const topOffset: number = currentTarget.getBoundingClientRect().top;
     const [startHour, startMinutes]: [number, number] = calculateEventTime(clientY, topOffset);
 
-    const newEvent = new EventProps(date, { hours: startHour, minutes: startMinutes });
+    const newEvent = new Event(date, { hours: startHour, minutes: startMinutes });
 
     if (!detectCollision(newEvent, events)) {
       setEvents(prevEvents => [...prevEvents, newEvent]);
@@ -86,12 +86,12 @@ const WeeklyCalendar: React.FC = () => {
     setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? currentEvent : event));
   };
 
-  const deleteEvent = (eventToDelete: EventProps): void => {
+  const deleteEvent = (eventToDelete: Event): void => {
     setEvents(events.filter(event => event.id !== eventToDelete.id));
     setIsModalOpen(false);
   };
 
-  const handleEventClick = (event: EventProps): void => {
+  const handleEventClick = (event: Event): void => {
     setCurrentEvent(event);
     setIsModalOpen(true);
   };
@@ -102,7 +102,7 @@ const WeeklyCalendar: React.FC = () => {
   };
 
 
-  const handleEventChange = (key: keyof EventProps, value: any): void => {
+  const handleEventChange = (key: keyof Event, value: any): void => {
     if (!currentEvent) return;
   
     let updatedEvent = { ...currentEvent, [key]: value };
@@ -234,7 +234,7 @@ const calculateEventTime = (mouseInitialPositionY: number, mainTop: number): [nu
 };
 
 
-const detectCollision = (newEvent: EventProps, events: EventProps[]): boolean => {
+const detectCollision = (newEvent: Event, events: Event[]): boolean => {
   for (const event of events) {
     if (areDatesTheSame(newEvent.date, event.date)) {
       const newEventStart = newEvent.startTime.hours * 60 + newEvent.startTime.minutes;

@@ -1,4 +1,3 @@
-import * as CONST from "@/utils/constants"
 import styled from "styled-components";
 
 const ModalContent = styled.div`

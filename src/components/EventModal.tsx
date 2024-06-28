@@ -1,18 +1,18 @@
 "use client";
 import React from "react";
 import Modal from '@/components/Modal';
-import { EventProps } from '@/utils/classes';
+import { Event } from '@/utils/classes';
 import * as S from "@/styles/EventModal.styles"
 import * as CONST from "@/utils/constants"
 
 
 const EventModal: React.FC<{
   isModalOpen: boolean;
-  currentEvent: EventProps | null;
-  deleteEvent: (event: EventProps) => void;
+  currentEvent: Event | null;
+  deleteEvent: (event: Event) => void;
   updateCurrentEvent: () => void;
   handleModalClose: () => void;
-  handleEventChange: (key: keyof EventProps, value: any) => void;
+  handleEventChange: (key: keyof Event, value: any) => void;
 }> = ({ isModalOpen, currentEvent, deleteEvent, updateCurrentEvent, handleModalClose, handleEventChange }) => {
 
   if (!currentEvent) return null;

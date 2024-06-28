@@ -1,7 +1,7 @@
 // Weekly Calendar
 import { v4 as uuidv4 } from 'uuid';
 
-class EventProps {
+class Event {
   id: string;
   date: Date;
   startTime: { hours: number; minutes: number };
@@ -31,4 +31,4 @@ class EventProps {
   }
 }
 
-export { EventProps };
+export { Event };

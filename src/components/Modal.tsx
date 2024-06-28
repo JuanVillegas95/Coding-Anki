@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import CloseX from "@/svg/close-x.svg";
+import CloseX from "../../public/svg/close-x.svg";
 import Image from 'next/image';
 
 
