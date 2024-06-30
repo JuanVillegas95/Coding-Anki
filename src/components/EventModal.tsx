@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import Modal from '@/components/Modal';
 import { Event } from '@/utils/classes';
 import * as S from "@/styles/EventModal.styles"
@@ -12,10 +12,10 @@ const EventModal: React.FC<{
   deleteEvent: (event: Event) => void;
   updateCurrentEvent: () => void;
   handleModalClose: () => void;
-  handleEventChange: (key: keyof Event, value: any) => void;
-}> = ({ isModalOpen, currentEvent, deleteEvent, updateCurrentEvent, handleModalClose, handleEventChange }) => {
+  setCurrentEvent: Dispatch<SetStateAction<Event | null>>;
+}> = ({ isModalOpen, currentEvent, deleteEvent, updateCurrentEvent, handleModalClose, setCurrentEvent }) => {
 
-  if (!currentEvent) return null;
+  if (!currentEvent) return;
   const { title, description, color, startTime, endTime } = currentEvent;
 
   const handleSubmit = (e: React.FormEvent): void => {
@@ -24,23 +24,22 @@ const EventModal: React.FC<{
     handleModalClose();
   };
 
+
+  
   return (
     <Modal show={isModalOpen} handleClose={handleModalClose}>
       <S.ModalContent>
         <S.EventSettings onSubmit={(e) => handleSubmit(e)}>
           <S.InputTitle
             value={title}
-            onChange={(e) => handleEventChange("title", e.target.value)}
           />
 
           <S.InputDescription
             value={description}
-            onChange={(e) => handleEventChange("description", e.target.value)}
           />
 
           <S.SelectColor
             value={color}
-            onChange={(e) => handleEventChange("color", e.target.value)}
           >
             {CONST.COLORS.map((color: string, i: number) => 
               <option key={i} value={color}>{color}</option>
@@ -52,7 +51,6 @@ const EventModal: React.FC<{
               value={`${startTime.hours.toString().padStart(2, '0')}:${startTime.minutes.toString().padStart(2, '0')}`}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':').map(Number);
-                handleEventChange("startTime", { hours, minutes });
               }}
             />
 
@@ -60,7 +58,6 @@ const EventModal: React.FC<{
               value={`${endTime.hours.toString().padStart(2, '0')}:${endTime.minutes.toString().padStart(2, '0')}`}
               onChange={(e) => {
                 const [hours, minutes] = e.target.value.split(':').map(Number);
-                handleEventChange("endTime", { hours, minutes });
               }}
             />
           </S.InputTimeContainer>

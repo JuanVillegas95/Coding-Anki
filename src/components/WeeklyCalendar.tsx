@@ -100,15 +100,6 @@ const WeeklyCalendar: React.FC = () => {
     setCurrentEvent(null);
     setIsModalOpen(false);
   };
-
-
-  const handleEventChange = (key: keyof Event, value: any): void => {
-    if (!currentEvent) return;
-  
-  
-    setCurrentEvent({ ...currentEvent, [key]: value });
-  };
-  
   
 
   return (
@@ -161,12 +152,12 @@ const WeeklyCalendar: React.FC = () => {
       </S.Main>
 
       <EventModal
-        handleEventChange={handleEventChange}
         handleModalClose={handleModalClose}
         updateCurrentEvent={updateCurrentEvent}
         isModalOpen={isModalOpen}
         currentEvent={currentEvent}
         deleteEvent={deleteEvent}
+        setCurrentEvent={setCurrentEvent}
       />
       
     </S.Container>
