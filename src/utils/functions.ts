@@ -1,4 +1,5 @@
-import * as CONST from "@/utils/constants";
+import * as C from "@/utils/constants";
+import { Time, Event } from "@/utils/classes"
 
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
@@ -20,12 +21,24 @@ const getMonday = (): Date => {
   return new Date(today.setDate(diff));
 };
 
-const getFromTop = (hours: number, minutes: number): number => hours * CONST.HOUR_HEIGHT + (minutes / 60) * CONST.HOUR_HEIGHT;
+const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HEIGHT + (minutes / 60) * C.HOUR_HEIGHT;
+
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+  const { clientY, currentTarget } = e;
+  const topOffset = currentTarget.getBoundingClientRect().top;
+  const yPos = clientY - topOffset;
+  const startHour = Math.floor(yPos / C.HOUR_HEIGHT);
+  const startMinutes = Math.floor(((yPos % C.HOUR_HEIGHT) / C.HOUR_HEIGHT) * 60);
+  return new Time(startHour,startMinutes);
+};
+
+
 
 export {
   range,
   areDatesTheSame,
   addDateBy,
   getMonday,
-  getFromTop
+  getFromTop,
+  calculateEventTime
 };

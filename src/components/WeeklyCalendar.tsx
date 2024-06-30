@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 import React, { useState, useEffect, useRef} from "react";
-import * as CONST from "@/utils/constants"
+import * as C from "@/utils/constants"
 import * as F from "@/utils/functions"
 import * as S from "@/styles/WeeklyCalendar.styles"
 import { Event } from "@/utils/classes"
@@ -48,11 +48,11 @@ const WeeklyCalendar: React.FC = () => {
         <S.Title>Header</S.Title>
         <S.Buttons>Hi</S.Buttons>
       </S.Header>
-      <S.DaysOfTheWeek>{CONST.DAYS.map((day, i) => <S.Day key={i}>{day}</S.Day>)}</S.DaysOfTheWeek>
+      <S.DaysOfTheWeek>{C.DAYS.map((day, i) => <S.Day key={i}>{day}</S.Day>)}</S.DaysOfTheWeek>
       <S.Main>
         <S.AsideTime>{F.range(24).map((hour, i) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
         <S.Events onMouseMove={(e) => handleOnMouseMove(e)}>
-          {CONST.DAYS.map((day, i) => {
+          {C.DAYS.map((day, i) => {
             const isToday = F.areDatesTheSame(F.addDateBy(F.getMonday(), i), currentTime);
             return (
               <S.DayColumn

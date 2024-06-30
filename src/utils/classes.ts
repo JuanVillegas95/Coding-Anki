@@ -1,11 +1,20 @@
-// Weekly Calendar
 import { v4 as uuidv4 } from 'uuid';
+
+class Time {
+  hours: number;
+  minutes: number;
+
+  constructor(hours: number, minutes: number) {
+    this.hours = hours;
+    this.minutes = minutes;
+  }
+}
 
 class Event {
   id: string;
   date: Date;
-  startTime: { hours: number; minutes: number };
-  endTime: { hours: number; minutes: number };
+  startTime: Time;
+  endTime: Time;
   title: string;
   description: string;
   height: number;
@@ -13,8 +22,8 @@ class Event {
 
   constructor(
     date: Date,
-    startTime: { hours: number; minutes: number },
-    endTime: { hours: number; minutes: number } = {hours: 0, minutes: 0 },
+    startTime: Time,
+    endTime: Time = new Time(0, 0),
     title: string = "",
     description: string = "",
     height: number = 0,
@@ -22,8 +31,8 @@ class Event {
   ) {
     this.id = uuidv4();
     this.date = date;
-    this.startTime = { hours: startTime.hours, minutes: startTime.minutes };
-    this.endTime = { hours: endTime.hours, minutes:endTime.minutes };
+    this.startTime = startTime;
+    this.endTime = endTime;
     this.title = title;
     this.description = description;
     this.height = height;
@@ -31,4 +40,4 @@ class Event {
   }
 }
 
-export { Event };
+export { Event, Time };
