@@ -105,31 +105,8 @@ const WeeklyCalendar: React.FC = () => {
   const handleEventChange = (key: keyof Event, value: any): void => {
     if (!currentEvent) return;
   
-    let updatedEvent = { ...currentEvent, [key]: value };
   
-    if (key === "startTime" || key === "endTime") {
-      const startTime = key === "startTime" ? value : updatedEvent.startTime;
-      const endTime = key === "endTime" ? value : updatedEvent.endTime;
-  
-      const startInMinutes = startTime.hours * 60 + startTime.minutes;
-      const endInMinutes = endTime.hours * 60 + endTime.minutes;
-  
-      if (startInMinutes >= endInMinutes) {
-        alert("Start time cannot be greater than or equal to end time.");
-        return;
-      }
-  
-      updatedEvent.height = calculateEventHeight(startTime, endTime);
-    }
-  
-    const hasCollision = detectCollision(updatedEvent, events.filter(event => event.id !== currentEvent.id));
-  
-    if (hasCollision) {
-      alert("There is already an event scheduled for this time.");
-      return;
-    }
-  
-    setCurrentEvent(updatedEvent);
+    setCurrentEvent({ ...currentEvent, [key]: value });
   };
   
   
