@@ -23,7 +23,14 @@ const getMonday = (): Date => {
 
 const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HEIGHT + (minutes / 60) * C.HOUR_HEIGHT;
 
-
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+  const { clientY, currentTarget } = e;
+  const topOffset = currentTarget.getBoundingClientRect().top;
+  const yPos = clientY - topOffset;
+  const hour = Math.floor(yPos / C.HOUR_HEIGHT);
+  const minutes = Math.floor(((yPos % C.HOUR_HEIGHT) / C.HOUR_HEIGHT) * 60);
+  return new Time(hour,minutes);
+};
 
 export {
   range,
@@ -31,4 +38,5 @@ export {
   addDateBy,
   getMonday,
   getFromTop,
+  calculateEventTime,
 };
