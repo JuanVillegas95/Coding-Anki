@@ -8,9 +8,8 @@ import EventModal from './EventModal';
 
 
 const WeeklyCalendar: React.FC = () => {
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [events, setEvents] = useState<Event[]>([]);
-  const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
+  const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -24,80 +23,20 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
     e.preventDefault();
-
-    if (e.button !== 0) return; // Only proceed for left mouse button
-
-    const { clientY, currentTarget } = e;
-    const topOffset: number = currentTarget.getBoundingClientRect().top;
-    const [startHour, startMinutes]: [number, number] = calculateEventTime(clientY, topOffset);
-
-    const newEvent = new Event(date, { hours: startHour, minutes: startMinutes });
-
-    if (!detectCollision(newEvent, events)) {
-      setEvents(prevEvents => [...prevEvents, newEvent]);
-      setCurrentEvent(newEvent);
-    }
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
 
-    // Only proceed for left mouse button and if currentEvent is not null
-    if (e.button !== 0 || !currentEvent) return;
-
-    const { clientY, currentTarget } = e;
-    const topOffset = currentTarget.getBoundingClientRect().top;
-    const [endHour, endMinutes] = calculateEventTime(clientY, topOffset);
-    const newHeight = calculateEventHeight(currentEvent.startTime, { hours: endHour, minutes: endMinutes });
-
-    // Ensure minimum height for the event
-    if (newHeight < (30 / 60) * CONST.HOUR_HEIGHT) return;
-
-    setCurrentEvent({
-      ...currentEvent,
-      height: newHeight,
-      endTime: { hours: endHour, minutes: endMinutes }
-    });
-
-    // Check for collision with other events except the last one
-    if (!detectCollision(currentEvent, events.slice(0, -1))) updateCurrentEvent();
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
-  
-    // Only proceed for left mouse button and if currentEvent is not null
-    if (e.button !== 0 || !currentEvent) return;
-  
-    // Ensure the event duration is at least 30 minutes
-    const durationInMinutes: number = currentEvent.height / CONST.HOUR_HEIGHT * 60;
-    if (durationInMinutes < 30) {
-      deleteEvent(currentEvent);
-      setCurrentEvent(null);
-      alert("Events must be at least 30 minutes long.");
-      return;
-    }
-  
-    setIsModalOpen(true);
+
   };
 
-  const updateCurrentEvent = (): void => {
-    if(!currentEvent) return;
-    setEvents(prevEvents => prevEvents.map(event => event.id === currentEvent.id ? currentEvent : event));
-  };
-
-  const deleteEvent = (eventToDelete: Event): void => {
-    setEvents(events.filter(event => event.id !== eventToDelete.id));
-    setIsModalOpen(false);
-  };
-
-  const handleEventClick = (event: Event): void => {
-    setCurrentEvent(event);
-    setIsModalOpen(true);
-  };
 
   const handleModalClose = (): void => {
-    setCurrentEvent(null);
     setIsModalOpen(false);
   };
   
@@ -130,7 +69,6 @@ const WeeklyCalendar: React.FC = () => {
                       $height={event.height}
                       $fromTop={getFromTop(event.startTime.hours, event.startTime.minutes)}
                       $color={event.color}
-                      onClick={() => handleEventClick(event)}
                     >
                       {String(event.startTime.hours).padStart(2, '0')}:{String(event.startTime.minutes).padStart(2, '0')}<span>-</span>
                       {String(event.endTime.hours).padStart(2, '0')}:{String(event.endTime.minutes).padStart(2, '0')} <br />
@@ -153,11 +91,7 @@ const WeeklyCalendar: React.FC = () => {
 
       <EventModal
         handleModalClose={handleModalClose}
-        updateCurrentEvent={updateCurrentEvent}
         isModalOpen={isModalOpen}
-        currentEvent={currentEvent}
-        deleteEvent={deleteEvent}
-        setCurrentEvent={setCurrentEvent}
       />
       
     </S.Container>

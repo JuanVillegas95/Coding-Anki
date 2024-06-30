@@ -8,19 +8,12 @@ import * as CONST from "@/utils/constants"
 
 const EventModal: React.FC<{
   isModalOpen: boolean;
-  currentEvent: Event | null;
-  deleteEvent: (event: Event) => void;
-  updateCurrentEvent: () => void;
   handleModalClose: () => void;
-  setCurrentEvent: Dispatch<SetStateAction<Event | null>>;
-}> = ({ isModalOpen, currentEvent, deleteEvent, updateCurrentEvent, handleModalClose, setCurrentEvent }) => {
+}> = ({ isModalOpen, handleModalClose }) => {
 
-  if (!currentEvent) return;
-  const { title, description, color, startTime, endTime } = currentEvent;
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
-    updateCurrentEvent();
     handleModalClose();
   };
 
@@ -31,15 +24,12 @@ const EventModal: React.FC<{
       <S.ModalContent>
         <S.EventSettings onSubmit={(e) => handleSubmit(e)}>
           <S.InputTitle
-            value={title}
           />
 
           <S.InputDescription
-            value={description}
           />
 
           <S.SelectColor
-            value={color}
           >
             {CONST.COLORS.map((color: string, i: number) => 
               <option key={i} value={color}>{color}</option>
@@ -48,17 +38,9 @@ const EventModal: React.FC<{
 
           <S.InputTimeContainer>
             <S.TimeInput
-              value={`${startTime.hours.toString().padStart(2, '0')}:${startTime.minutes.toString().padStart(2, '0')}`}
-              onChange={(e) => {
-                const [hours, minutes] = e.target.value.split(':').map(Number);
-              }}
             />
 
             <S.TimeInput
-              value={`${endTime.hours.toString().padStart(2, '0')}:${endTime.minutes.toString().padStart(2, '0')}`}
-              onChange={(e) => {
-                const [hours, minutes] = e.target.value.split(':').map(Number);
-              }}
             />
           </S.InputTimeContainer>
 
@@ -72,7 +54,7 @@ const EventModal: React.FC<{
           </S.ButtonsContainer>
 
           <S.SaveButton>Save</S.SaveButton>
-          <S.DeleteButton onClick={() => deleteEvent(currentEvent)}>Delete</S.DeleteButton>
+          <S.DeleteButton>Delete</S.DeleteButton>
         </S.EventSettings>
       </S.ModalContent>
     </Modal>
