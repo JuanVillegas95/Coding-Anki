@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef} from "react";
 import * as CONST from "@/utils/constants"
 import * as F from "@/utils/functions"
 import * as S from "@/styles/WeeklyCalendar.styles"
@@ -9,6 +9,8 @@ import EventModal from './EventModal';
 
 
 const WeeklyCalendar: React.FC = () => {
+  const [events, setEvent] = useState<Map<string, Event>>(new Map());
+  const eventId = useRef<string>("");
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
