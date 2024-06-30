@@ -13,26 +13,20 @@ class Time {
 class Event {
   id: string;
   date: Date;
-  startTime: Time;
-  endTime: Time;
   title: string;
   description: string;
   height: number;
   color: string;
 
   constructor(
-    date: Date,
-    startTime: Time,
-    endTime: Time = new Time(0, 0),
+    date: Date = new Date(),
     title: string = "",
     description: string = "",
+    color: string = "gray",
     height: number = 0,
-    color: string = "gray"
   ) {
     this.id = uuidv4();
     this.date = date;
-    this.startTime = startTime;
-    this.endTime = endTime;
     this.title = title;
     this.description = description;
     this.height = height;

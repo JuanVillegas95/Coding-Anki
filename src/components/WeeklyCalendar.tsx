@@ -5,12 +5,14 @@ import * as C from "@/utils/constants"
 import * as F from "@/utils/functions"
 import * as S from "@/styles/WeeklyCalendar.styles"
 import { Event } from "@/utils/classes"
-import EventModal from './EventModal';
+import EventModal from "@/components/EventModal";
+import HourLine from "@/components/HourLine";
+
 
 
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvent] = useState<Map<string, Event>>(new Map());
-  const eventId = useRef<string>("");
+  const event = useRef<Event>(new Event());
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -25,6 +27,8 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
     e.preventDefault();
+    if(e.button !== 0) return;
+
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -67,12 +71,8 @@ const WeeklyCalendar: React.FC = () => {
             );
           })}
         </S.Events>
-        <S.HourLine $fromTop={F.getFromTop(currentTime.getHours(), currentTime.getMinutes())}>
-          {currentTime.getHours()}:{currentTime.getMinutes()}
-          <S.LineAfterHour />
-        </S.HourLine>
+        <HourLine currentTime={currentTime}/>
       </S.Main>
-
       <EventModal
         handleModalClose={handleModalClose}
         isModalOpen={isModalOpen}

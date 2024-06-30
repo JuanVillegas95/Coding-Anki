@@ -1,5 +1,6 @@
 import * as C from "@/utils/constants";
 import { Time, Event } from "@/utils/classes"
+import React from "react";
 
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
@@ -23,14 +24,19 @@ const getMonday = (): Date => {
 
 const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HEIGHT + (minutes / 60) * C.HOUR_HEIGHT;
 
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time =>{
+  // Get the distance from the event to the mouse in pixels
   const { clientY, currentTarget } = e;
-  const topOffset = currentTarget.getBoundingClientRect().top;
-  const yPos = clientY - topOffset;
-  const hour = Math.floor(yPos / C.HOUR_HEIGHT);
-  const minutes = Math.floor(((yPos % C.HOUR_HEIGHT) / C.HOUR_HEIGHT) * 60);
-  return new Time(hour,minutes);
-};
+  const topOffset: number = currentTarget.getBoundingClientRect().top;
+  const posY: number = clientY - topOffset;
+
+  // Get the hours and minutes 
+  const hours: number = Math.floor(posY / C.HOUR_HEIGHT);
+  const minutes: number = Math.floor((posY % C.HOUR_HEIGHT) / C.HOUR_HEIGHT) * 60;
+  
+  return new Time(hours,minutes)
+}
 
 export {
   range,
@@ -40,3 +46,4 @@ export {
   getFromTop,
   calculateEventTime,
 };
+
