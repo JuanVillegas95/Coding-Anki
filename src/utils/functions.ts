@@ -25,6 +25,20 @@ const getMonday = (): Date => {
 const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HEIGHT + (minutes / 60) * C.HOUR_HEIGHT;
 
 
+const generate24HourIntervals = (startingTime: Time): string[] => {
+  const formatTimeUnit = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
+  
+  const { hours, minutes } = startingTime
+  const hoursArray: string[] = [];
+  for (let i = 0; i < 24; i++) {
+    const hour = (hours + i) % 24;
+    const hourFormatted = formatTimeUnit(hour);
+    const minutesFormatted = formatTimeUnit(minutes);
+    hoursArray.push(`${hourFormatted}:${minutesFormatted}`);
+  }
+
+  return hoursArray;
+};
 
 
 
