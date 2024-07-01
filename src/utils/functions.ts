@@ -26,14 +26,18 @@ const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HE
 
 
 const generate24HourIntervals = (startingTime: Time): string[] => {
+  // Helper function to give format to our units
   const formatTimeUnit = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
   
+  // Deconstruct startingTime and initializing array of strings
   const { hours, minutes } = startingTime
   const hoursArray: string[] = [];
+
+  // Pushing formatted hours to the array
   for (let i = 0; i < 24; i++) {
-    const hour = (hours + i) % 24;
-    const hourFormatted = formatTimeUnit(hour);
-    const minutesFormatted = formatTimeUnit(minutes);
+    const hour: number = (hours + i) % 24; // Capping the hours
+    const hourFormatted: string= formatTimeUnit(hour);
+    const minutesFormatted: string = formatTimeUnit(minutes);
     hoursArray.push(`${hourFormatted}:${minutesFormatted}`);
   }
 
@@ -49,5 +53,6 @@ export {
   getMonday,
   getFromTop,
   generate24HourIntervals,
+  calculateEventTime
 };
 
