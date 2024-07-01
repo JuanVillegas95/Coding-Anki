@@ -30,14 +30,10 @@ const WeeklyCalendar: React.FC = () => {
     // Do not continue if it's not the left mouse click button
     if(e.button !== 0) return;
 
-    // Calculate the time-start based on the mouse position...
-    const time: Time = F.calculateEventTime(e);
-    date.setHours(time.hours, time.minutes);
+    const start: Time = F.calculateEventTime(e);
+    const newEvent: Event = new Event(date,start);
 
-    // Create a new event and if it has a collision returns
-    const newEvent: Event = new Event(date);
-
-    if(detectCollision(newEvent,events)) return;
+    if(F.isEventTimeConflict(newEvent,events)) return;
 
     // Set the current event
     event.current = newEvent;

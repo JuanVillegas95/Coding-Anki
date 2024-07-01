@@ -24,7 +24,7 @@ const getMonday = (): Date => {
 
 const getFromTop = (hours: number, minutes: number): number => hours * C.HOUR_HEIGHT + (minutes / 60) * C.HOUR_HEIGHT;
 
-
+// Calculate the time-start based on the mouse position...
 const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time =>{
   // Get the distance from the event to the mouse in pixels
   const { clientY, currentTarget } = e;
@@ -38,6 +38,9 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Ti
   return new Time(hours,minutes)
 }
 
+
+
+
 export {
   range,
   areDatesTheSame,
@@ -45,5 +48,6 @@ export {
   getMonday,
   getFromTop,
   calculateEventTime,
+  isEventTimeConflict,
 };
 

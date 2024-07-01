@@ -4,7 +4,7 @@ class Time {
   hours: number;
   minutes: number;
 
-  constructor(hours: number, minutes: number) {
+  constructor(hours: number = 0, minutes: number = 0) {
     this.hours = hours;
     this.minutes = minutes;
   }
@@ -13,24 +13,22 @@ class Time {
 class Event {
   id: string;
   date: Date;
+  start: Time;
+  end: Time;
   title: string;
   description: string;
   height: number;
   color: string;
 
-  constructor(
-    date: Date = new Date(),
-    title: string = "",
-    description: string = "",
-    color: string = "gray",
-    height: number = 0,
-  ) {
+  constructor( date: Date = new Date(), start: Time = new Time()) {
     this.id = uuidv4();
     this.date = date;
-    this.title = title;
-    this.description = description;
-    this.height = height;
-    this.color = color;
+    this.start = start;
+    this.end = new Time(0,0);
+    this.title = "";
+    this.description = "";
+    this.color = "gray";
+    this.height = 0;
   }
 }
 
