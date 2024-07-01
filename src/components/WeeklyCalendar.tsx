@@ -14,6 +14,7 @@ const WeeklyCalendar: React.FC = () => {
   const [events, setEvent] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(new Event());
   const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [startingTime, setStartingTime] = useState<Time>(new Time(4,30));
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -29,14 +30,6 @@ const WeeklyCalendar: React.FC = () => {
     e.preventDefault();
     // Do not continue if it's not the left mouse click button
     if(e.button !== 0) return;
-
-    const start: Time = F.calculateEventTime(e);
-    const newEvent: Event = new Event(date,start);
-
-    if(F.isEventTimeConflict(newEvent,events)) return;
-
-    // Set the current event
-    event.current = newEvent;
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -62,7 +55,7 @@ const WeeklyCalendar: React.FC = () => {
       </S.Header>
       <S.DaysOfTheWeek>{C.DAYS.map((day, i) => <S.Day key={i}>{day}</S.Day>)}</S.DaysOfTheWeek>
       <S.Main>
-        <S.AsideTime>{F.range(24).map((hour, i) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
+        <S.AsideTime>{F.generate24HourIntervals(startingTime).map((hour: string, i: number) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
         <S.Events onMouseMove={(e) => handleOnMouseMove(e)}>
           {C.DAYS.map((day, i) => {
             const isToday = F.areDatesTheSame(F.addDateBy(F.getMonday(), i), currentTime);
@@ -89,5 +82,7 @@ const WeeklyCalendar: React.FC = () => {
     </S.Container>
   );
 };
+
+
 
 export default WeeklyCalendar;
