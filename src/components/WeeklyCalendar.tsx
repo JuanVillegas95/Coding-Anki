@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef} from "react";
 import * as C from "@/utils/constants"
 import * as F from "@/utils/functions"
 import * as S from "@/styles/WeeklyCalendar.styles"
-import { Event } from "@/utils/classes"
+import { Event, Time } from "@/utils/classes"
 import EventModal from "@/components/EventModal";
 import HourLine from "@/components/HourLine";
 
@@ -27,8 +27,20 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
     e.preventDefault();
+    // Do not continue if it's not the left mouse click button
     if(e.button !== 0) return;
 
+    // Calculate the time-start based on the mouse position...
+    const time: Time = F.calculateEventTime(e);
+    date.setHours(time.hours, time.minutes);
+
+    // Create a new event and if it has a collision returns
+    const newEvent: Event = new Event(date);
+
+    if(detectCollision(newEvent,events)) return;
+
+    // Set the current event
+    event.current = newEvent;
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {

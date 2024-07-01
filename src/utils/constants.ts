@@ -1,6 +1,6 @@
 // Weekly Calendar
 const HOUR_WIDTH: number = 40;
-const HOUR_HEIGHT: number = 50;
+const HOUR_HEIGHT: number = 50; // Quantity of pixels that corresponds to an hour
 const HEADER_HEIGHT: number = 60;
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
 const DAYS: Array<string> = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
