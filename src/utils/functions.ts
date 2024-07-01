@@ -38,7 +38,21 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Ti
   return new Time(hours,minutes)
 }
 
+const isEventTimeConflict = (newEvent: Event, events: Map<string, Event>): boolean => {
+  const eventsOnSameDay = Array.from(events.values()).filter(event => areDatesTheSame(event.date, newEvent.date));
 
+  for (const event of eventsOnSameDay) {
+    const eventStartMinutes = event.start.hours * 60 + event.start.minutes;
+    const eventEndMinutes = event.end.hours * 60 + event.end.minutes;
+    const newEventStartMinutes = newEvent.start.hours * 60 + newEvent.start.minutes;
+
+    if (newEventStartMinutes >= eventStartMinutes && newEventStartMinutes <= eventEndMinutes) {
+      return true;
+    }
+  }
+
+  return false;
+};
 
 
 export {
