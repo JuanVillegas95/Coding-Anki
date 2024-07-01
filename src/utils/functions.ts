@@ -44,7 +44,27 @@ const generate24HourIntervals = (startingTime: Time): string[] => {
   return hoursArray;
 };
 
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, startingTime: Time): Time => {
+  // Deconstruct startingTime
+  const { hours, minutes } = startingTime;
+  
+  // Get the distance from the event to the mouse in pixels
+  const { clientY, currentTarget } = e;
+  const topOffset: number = currentTarget.getBoundingClientRect().top;
+  const posY: number = clientY - topOffset;
 
+  // Get the minutes from the top of the calendar
+  const totalMinutesFromTop: number = Math.floor((posY / C.HOUR_HEIGHT) * 60);
+
+  // Calculate the event time in minutes from the starting time
+  const totalEventMinutes: number = hours * 60 + minutes + totalMinutesFromTop;
+
+  // Convert totalEventMinutes to hours and minutes
+  const eventHours: number = Math.floor(totalEventMinutes / 60);
+  const eventMinutes: number = totalEventMinutes % 60;
+
+  return new Time(eventHours, eventMinutes);
+}
 
 export {
   range,
