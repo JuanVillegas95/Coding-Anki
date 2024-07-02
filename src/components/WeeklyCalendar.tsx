@@ -14,7 +14,7 @@ const WeeklyCalendar: React.FC = () => {
   const [events, setEvent] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(new Event());
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [startingTime, setStartingTime] = useState<Time>(new Time(4,30));
+  const [calendarStartTime, setCalendarStartTime] = useState<Time>(new Time(4,30));
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const WeeklyCalendar: React.FC = () => {
     // Do not continue if it's not the left mouse click button
     if(e.button !== 0) return;
 
-    const start: Time = F.calculateEventTime(e,startingTime);
+    const start: Time = F.calculateEventTime(e,calendarStartTime);
     const newEvent: Event = new Event(date,start);
 
     if(F.isEventOverlapping(newEvent,events)) return;
@@ -42,6 +42,14 @@ const WeeklyCalendar: React.FC = () => {
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
 
+    // If the ref of the event property start is as a new Time object means it's not correct
+    if(e.button !== 0 && event.current.start === new Time()) return;
+
+    const end: Time = F.calculateEventTime(e,calendarStartTime);
+    event.current.end = end;
+    
+    if(F.getEventDuration(event.current) < 30) return;
+    
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -62,7 +70,7 @@ const WeeklyCalendar: React.FC = () => {
       </S.Header>
       <S.DaysOfTheWeek>{C.DAYS.map((day, i) => <S.Day key={i}>{day}</S.Day>)}</S.DaysOfTheWeek>
       <S.Main>
-        <S.AsideTime>{F.generate24HourIntervals(startingTime).map((hour: string, i: number) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
+        <S.AsideTime>{F.generate24HourIntervals(calendarStartTime).map((hour: string, i: number) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
         <S.Events onMouseMove={(e) => handleOnMouseMove(e)}>
           {C.DAYS.map((day, i) => {
             const currentTime: Time = new Time(currentDate.getHours(),currentDate.getMinutes());
@@ -76,12 +84,12 @@ const WeeklyCalendar: React.FC = () => {
               >
                 {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)} 
 
-                {isToday && <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime, startingTime)} />}
+                {isToday && <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime, calendarStartTime)} />}
               </S.DayColumn>
             );
           })}
         </S.Events>
-        <HourLine currentDate={currentDate} startingTime={startingTime}/>
+        <HourLine currentDate={currentDate} calendarStartTime={calendarStartTime}/>
       </S.Main>
       <EventModal
         handleModalClose={handleModalClose}

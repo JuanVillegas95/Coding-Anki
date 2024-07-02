@@ -24,20 +24,21 @@ const getMonday = (): Date => {
 
 
 // Calculates the top offset in pixels units given the starting time and the time where it starts the event aka currentTime
-const calculateTopOffset = (currentTime: Time, startingTime: Time): number => { 
-  const startMinutes = startingTime.hours * 60 + startingTime.minutes;
-  const currentMinutes = currentTime.hours * 60 + currentTime.minutes;
-  const totalMinutes = currentMinutes - startMinutes; // Calculate how many minutes have passed from startingTime
+const calculateTopOffset = (currentTime: Time, calendarStartTime: Time): number => { 
+  const startMinutes: number = calendarStartTime.hours * 60 + calendarStartTime.minutes;
+  const currentMinutes: number = currentTime.hours * 60 + currentTime.minutes;
+  const totalMinutes: number = currentMinutes - startMinutes; // Calculate how many minutes have passed from calendarStartTime to currentTime
   return (totalMinutes / 60) * C.HOUR_HEIGHT; // Convert minutes to hours and then scale it for the height unit
 };
 
+
 //  Generates an array of 24-hour formatted time intervals starting from a given time.
-const generate24HourIntervals = (startingTime: Time): string[] => {
+const generate24HourIntervals = (calendarStartTime: Time): string[] => {
   // Helper function to give format to our units
   const formatTimeUnit = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
   
-  // Deconstruct startingTime and initializing array of strings
-  const { hours, minutes } = startingTime
+  // Deconstruct calendarStartTime and initializing array of strings
+  const { hours, minutes } = calendarStartTime
   const hoursArray: string[] = [];
 
   // Pushing formatted hours to the array
@@ -52,9 +53,9 @@ const generate24HourIntervals = (startingTime: Time): string[] => {
 };
 
 // Calculates the time of an event based on the mouse click position relative to a calendar.
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, startingTime: Time): Time => {
-  // Deconstruct startingTime
-  const { hours, minutes } = startingTime;
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, calendarStartTime: Time): Time => {
+  // Deconstruct calendarStartTime
+  const { hours, minutes } = calendarStartTime;
   
   // Get the distance from the event to the mouse in pixels
   const { clientY, currentTarget } = e;
@@ -102,6 +103,7 @@ const isEventOverlapping = (newEvent: Event, events: Map<string, Event>): boolea
   return false; // No conflicts
 };
 
+
 export {
   range,
   areDatesTheSame,
@@ -111,5 +113,6 @@ export {
   generate24HourIntervals,
   calculateEventTime,
   isEventOverlapping,
+  getEventDuration,
 };
 
