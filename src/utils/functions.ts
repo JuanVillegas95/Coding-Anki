@@ -110,15 +110,7 @@ const getEventDuration = ({ start, end }: Event): number => {
   return endTotalMinutes - startTotalMinutes;
 };
 
-const calculateEventHeight = (event: Event): number => {
-  // Get the duration of the event in minutes
-  const durationMinutes = getEventDuration(event);
 
-  // Convert the duration to pixels using the HOUR_HEIGHT constant
-  const height = (durationMinutes / 60) * C.HOUR_HEIGHT;
-
-  return height;
-};
 
 
 export {
