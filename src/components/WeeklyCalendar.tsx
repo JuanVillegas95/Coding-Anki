@@ -13,13 +13,13 @@ import HourLine from "@/components/HourLine";
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvent] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(new Event());
-  const [currentTime, setCurrentTime] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [startingTime, setStartingTime] = useState<Time>(new Time(4,30));
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentDate(new Date());
     }, 60000);
 
     return () => clearInterval(interval);
@@ -65,7 +65,9 @@ const WeeklyCalendar: React.FC = () => {
         <S.AsideTime>{F.generate24HourIntervals(startingTime).map((hour: string, i: number) => <S.Hour key={i}>{hour}</S.Hour>)}</S.AsideTime>
         <S.Events onMouseMove={(e) => handleOnMouseMove(e)}>
           {C.DAYS.map((day, i) => {
-            const isToday = F.areDatesTheSame(F.addDateBy(F.getMonday(), i), currentTime);
+            const currentTime: Time = new Time(currentDate.getHours(),currentDate.getMinutes());
+
+            const isToday = F.areDatesTheSame(F.addDateBy(F.getMonday(), i), currentDate);
             return (
               <S.DayColumn
                 key={i}
@@ -74,12 +76,12 @@ const WeeklyCalendar: React.FC = () => {
               >
                 {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)} 
 
-                {isToday && <S.HourLineDot $fromTop={F.getFromTop(currentTime.getHours(), currentTime.getMinutes())} />}
+                {isToday && <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime, startingTime)} />}
               </S.DayColumn>
             );
           })}
         </S.Events>
-        <HourLine currentTime={currentTime}/>
+        <HourLine currentDate={currentDate} startingTime={startingTime}/>
       </S.Main>
       <EventModal
         handleModalClose={handleModalClose}

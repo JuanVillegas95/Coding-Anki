@@ -1,8 +1,9 @@
 import * as S from "@/styles/WeeklyCalendar.styles"
 import * as F from "@/utils/functions"
+import { Time } from "@/utils/classes"
 
-const HourLine: React.FC<{ currentTime: Date }> = ({ currentTime }) => <S.HourLine $fromTop={F.getFromTop(currentTime.getHours(), currentTime.getMinutes())}>
-    {currentTime.getHours()}:{currentTime.getMinutes()}
+const HourLine: React.FC<{ currentDate: Date, startingTime: Time }> = ({ currentDate, startingTime }) => <S.HourLine $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(),currentDate.getMinutes()),startingTime)}>
+    {currentDate.getHours()}:{currentDate.getMinutes()}
     <S.LineAfterHour />
   </S.HourLine>
 
