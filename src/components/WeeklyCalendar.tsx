@@ -31,8 +31,12 @@ const WeeklyCalendar: React.FC = () => {
     // Do not continue if it's not the left mouse click button
     if(e.button !== 0) return;
 
-    console.log(F.calculateEventTime(e,startingTime))
+    const start: Time = F.calculateEventTime(e,startingTime);
+    const newEvent: Event = new Event(date,start);
 
+    if(F.isEventOverlapping(newEvent,events)) return;
+
+    event.current = newEvent;
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {

@@ -66,6 +66,33 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, sta
   return new Time(eventHours, eventMinutes);
 }
 
+const isEventOverlapping = (newEvent: Event, events: Map<string, Event>): boolean => {
+  const { date: newDate, start: newStart } = newEvent;
+
+  // Filter events that share the same date
+  const sameDateEvents: Event[] = Array.from(events.values()).filter(({ date }) =>
+    areDatesTheSame(date, newDate)
+  );
+
+  // Check for overlapping events
+  for (const { start, end } of sameDateEvents) {
+    // Convert time to minutes;
+    const newEventStartMinutes = newStart.hours * 60 + newStart.minutes;
+
+    const eventStartMinutes = start.hours * 60 + start.minutes;
+    const eventEndMinutes = end.hours * 60 + end.minutes;
+
+    // Check if new event starts within the boundaries of another event
+    if (newEventStartMinutes >= eventStartMinutes && 
+        newEventStartMinutes < eventEndMinutes
+      ) { 
+      return true; // There is a conflict
+    }
+  }
+
+  return false; // No conflicts
+};
+
 export {
   range,
   areDatesTheSame,
@@ -73,6 +100,7 @@ export {
   getMonday,
   getFromTop,
   generate24HourIntervals,
-  calculateEventTime
+  calculateEventTime,
+  isEventOverlapping,
 };
 
