@@ -11,7 +11,7 @@ import HourLine from "@/components/HourLine";
 
 
 const WeeklyCalendar: React.FC = () => {
-  const [events, setEvent] = useState<Map<string, Event>>(new Map());
+  const [events, setEvents] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(new Event());
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [calendarStartTime, setCalendarStartTime] = useState<Time>(new Time(4,30));
@@ -32,11 +32,9 @@ const WeeklyCalendar: React.FC = () => {
     if(e.button !== 0) return;
 
     const start: Time = F.calculateEventTime(e,calendarStartTime);
-    const newEvent: Event = new Event(date,start);
+    if(F.isEventOverlapping(date, start, events)) return;
 
-    if(F.isEventOverlapping(newEvent,events)) return;
-
-    event.current = newEvent;
+    event.current = new Event(date,start);
   };
 
   const handleOnMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -46,9 +44,12 @@ const WeeklyCalendar: React.FC = () => {
     if(e.button !== 0 && event.current.start === new Time()) return;
 
     event.current.end =  F.calculateEventTime(e,calendarStartTime);
-    if(F.getEventDuration(event.current) < 30) return;
     
-    event.current.height =  F.calculateEventHeight();
+    if(F.getEventDuration(event.current) < 30 && 
+      F.isEventOverlapping(event.current.date, event.current.end, events)) 
+    return;
+    
+    event.current.height =  F.calculateEventHeight(event.current);
 
 
   };
