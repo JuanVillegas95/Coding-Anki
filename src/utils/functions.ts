@@ -22,12 +22,8 @@ const getMonday = (): Date => {
   return new Date(today.setDate(diff));
 };
 
-const calculateTopOffset = (currentTime: Time, startingTime: Time): number => {
-  const startMinutes = startingTime.hours * 60 + startingTime.minutes;
-  const currentMinutes = currentTime.hours * 60 + currentTime.minutes;
-  const totalMinutes = currentMinutes - startMinutes;
-  return (totalMinutes / 60) * C.HOUR_HEIGHT;
-};
+
+
 
 const generate24HourIntervals = (startingTime: Time): string[] => {
   // Helper function to give format to our units
