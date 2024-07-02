@@ -104,11 +104,22 @@ const isEventOverlapping = (newEvent: Event, events: Map<string, Event>): boolea
 };
 
 const getEventDuration = ({ start, end }: Event): number => {
-  const startTotalMinutes = start.hours * 60 + start.minutes;
-  const endTotalMinutes = end.hours * 60 + end.minutes;
+  const startTotalMinutes: number = start.hours * 60 + start.minutes;
+  const endTotalMinutes: number = end.hours * 60 + end.minutes;
 
   return endTotalMinutes - startTotalMinutes;
 };
+
+const calculateEventHeight = (event: Event): number => {
+  // Get the duration of the event in minutes
+  const durationMinutes = getEventDuration(event);
+
+  // Convert the duration to pixels using the HOUR_HEIGHT constant
+  const height = (durationMinutes / 60) * C.HOUR_HEIGHT;
+
+  return height;
+};
+
 
 export {
   range,
@@ -120,5 +131,6 @@ export {
   calculateEventTime,
   isEventOverlapping,
   getEventDuration,
+  calculateEventHeight,
 };
 

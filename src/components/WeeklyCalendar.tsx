@@ -45,11 +45,12 @@ const WeeklyCalendar: React.FC = () => {
     // If the ref of the event property start is as a new Time object means it's not correct
     if(e.button !== 0 && event.current.start === new Time()) return;
 
-    const end: Time = F.calculateEventTime(e,calendarStartTime);
-    event.current.end = end;
-    
+    event.current.end =  F.calculateEventTime(e,calendarStartTime);
     if(F.getEventDuration(event.current) < 30) return;
     
+    event.current.height =  F.calculateEventHeight();
+
+
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
