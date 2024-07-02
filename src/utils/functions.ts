@@ -103,6 +103,12 @@ const isEventOverlapping = (newEvent: Event, events: Map<string, Event>): boolea
   return false; // No conflicts
 };
 
+const getEventDuration = ({ start, end }: Event): number => {
+  const startTotalMinutes = start.hours * 60 + start.minutes;
+  const endTotalMinutes = end.hours * 60 + end.minutes;
+
+  return endTotalMinutes - startTotalMinutes;
+};
 
 export {
   range,
