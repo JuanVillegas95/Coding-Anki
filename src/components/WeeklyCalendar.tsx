@@ -88,17 +88,14 @@ const WeeklyCalendar: React.FC = () => {
               const dayDate = F.addDateBy(mondayDate, i);
               const isToday = F.areDatesTheSame(dayDate, currentDate);
 
-              const handleDayMouseDown = (e) => handleMouseDown(e, dayDate);
-              const handleDayMouseUp = (e) => handleMouseUp(e);
-
               const filteredEvents = Array.from(events.values())
                 .filter(event => F.areDatesTheSame(event.date, dayDate));
 
               return (
                 <S.DayColumn
                   key={i}
-                  onMouseDown={handleDayMouseDown}
-                  onMouseUp={handleDayMouseUp}
+                  onMouseDown={(e) => handleMouseDown(e, dayDate)}
+                  onMouseUp={(e) => handleMouseUp(e)}
                 >
                   {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)}
                   {filteredEvents.map(({ id, height, start, end, color, title, description }) => (
