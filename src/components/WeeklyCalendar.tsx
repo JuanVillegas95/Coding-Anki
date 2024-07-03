@@ -44,11 +44,11 @@ const WeeklyCalendar: React.FC = () => {
     e.preventDefault();
 
     // If the ref of the event property start is as a new Time object means it's not correct
-    if (e.button !== 0 && event.current.start === new Time()) return;
+    if (e.button !== 0 && event.current.start === new Time(-1,-1)) return;
 
     event.current.end = F.calculateEventTime(e, calendarStartTime);
     const eventDuration: Time = F.getEventDuration(event.current);
-    const isOverlapping = F.isEventOverlapping(
+    const isOverlapping: boolean = F.isEventOverlapping(
       event.current.date,
       event.current.end,
       events
@@ -58,6 +58,7 @@ const WeeklyCalendar: React.FC = () => {
 
     event.current.height = F.calculateEventHeight(event.current);
 
+    setEvents(prevEvents => new Map([...prevEvents, [event.current.id, event.current]]));
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
