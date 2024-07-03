@@ -44,8 +44,8 @@ const WeeklyCalendar: React.FC = () => {
     if(e.button !== 0 && event.current.start === new Time()) return;
 
     event.current.end =  F.calculateEventTime(e,calendarStartTime);
-    
-    if(F.getEventDuration(event.current) < 30 && 
+    const eventDuration: Time = F.getEventDuration(event.current)
+    if(eventDuration.minutes< 30 && 
       F.isEventOverlapping(event.current.date, event.current.end, events)) 
     return;
     

@@ -1,6 +1,12 @@
 import * as C from "@/utils/constants";
-import { Time, Event } from "@/utils/classes"
+import { Time, Event } from "@/utils/classes";
 import React from "react";
+
+// Utility functions
+const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours to minutes
+const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
+const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels using a constant that represent an hour
+
 
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
@@ -22,15 +28,13 @@ const getMonday = (): Date => {
   return new Date(today.setDate(diff));
 };
 
-
 // Calculates the top offset in pixels units given the starting time and the time where it starts the event aka currentTime
 const calculateTopOffset = (currentTime: Time, calendarStartTime: Time): number => { 
-  const startMinutes: number = calendarStartTime.hours * 60 + calendarStartTime.minutes;
-  const currentMinutes: number = currentTime.hours * 60 + currentTime.minutes;
+  const startMinutes: number = hoursToMinutes(calendarStartTime.hours) + calendarStartTime.minutes;
+  const currentMinutes: number = hoursToMinutes(currentTime.hours) + currentTime.minutes;
   const totalMinutes: number = currentMinutes - startMinutes; // Calculate how many minutes have passed from calendarStartTime to currentTime
-  return (totalMinutes / 60) * C.HOUR_HEIGHT; // Convert minutes to hours and then scale it for the height unit
+  return hoursToHeight(minutesToHours(totalMinutes)); // Convert minutes to hours and then scale it for the height unit
 };
-
 
 //  Generates an array of 24-hour formatted time intervals starting from a given time.
 const generate24HourIntervals = (calendarStartTime: Time): string[] => {
@@ -38,13 +42,13 @@ const generate24HourIntervals = (calendarStartTime: Time): string[] => {
   const formatTimeUnit = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
   
   // Deconstruct calendarStartTime and initializing array of strings
-  const { hours, minutes } = calendarStartTime
+  const { hours, minutes } = calendarStartTime;
   const hoursArray: string[] = [];
 
   // Pushing formatted hours to the array
   for (let i = 0; i < 24; i++) {
     const hour: number = (hours + i) % 24; // Capping the hours
-    const hourFormatted: string= formatTimeUnit(hour);
+    const hourFormatted: string = formatTimeUnit(hour);
     const minutesFormatted: string = formatTimeUnit(minutes);
     hoursArray.push(`${hourFormatted}:${minutesFormatted}`);
   }
@@ -66,18 +70,17 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, cal
   const totalMinutesFromTop: number = Math.floor((posY / C.HOUR_HEIGHT) * 60);
 
   // Calculate the event time in minutes from the starting time
-  const totalEventMinutes: number = hours * 60 + minutes + totalMinutesFromTop;
+  const totalEventMinutes: number = hoursToMinutes(hours) + minutes + totalMinutesFromTop;
 
   // Convert totalEventMinutes to hours and minutes
   const eventHours: number = Math.floor(totalEventMinutes / 60);
   const eventMinutes: number = totalEventMinutes % 60;
 
   return new Time(eventHours, eventMinutes);
-}
+};
 
 // Checks if a new event overlaps with any existing events on the same date.
 const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Event>): boolean => {
-
   // Filter events that share the same date
   const sameDateEvents: Event[] = Array.from(events.values()).filter(({ date }) =>
     areDatesTheSame(date, newDate)
@@ -86,10 +89,10 @@ const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Ev
   // Check for overlapping events
   for (const { start, end } of sameDateEvents) {
     // Convert time to minutes;
-    const newEventStartMinutes = newTime.hours * 60 + newTime.minutes;
+    const newEventStartMinutes = hoursToMinutes(newTime.hours) + newTime.minutes;
 
-    const eventStartMinutes = start.hours * 60 + start.minutes;
-    const eventEndMinutes = end.hours * 60 + end.minutes;
+    const eventStartMinutes = hoursToMinutes(start.hours) + start.minutes;
+    const eventEndMinutes = hoursToMinutes(end.hours) + end.minutes;
 
     // Check if new event starts within the boundaries of another event
     if (newEventStartMinutes >= eventStartMinutes && 
@@ -102,19 +105,33 @@ const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Ev
   return false; // No conflicts
 };
 
-const getEventDuration = ({ start, end }: Event): number => {
-  const startTotalMinutes: number = start.hours * 60 + start.minutes;
-  const endTotalMinutes: number = end.hours * 60 + end.minutes;
 
-  return endTotalMinutes - startTotalMinutes;
+const getEventDuration = ({ start, end }: Event): Time => {
+  // Convert start and end times to total minutes from midnight
+  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
+  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
+
+  // Calculate the total duration in minutes
+  const totalDuration: number = endTotalMinutes - startTotalMinutes;
+
+  // Convert total duration from minutes to hours and remaining minutes
+  const totalDurationHours: number = Math.floor(minutesToHours(totalDuration));
+  const totalDurationMinutes: number = totalDuration % 60;
+
+  // Return the total duration as a Time object
+  return new Time(totalDurationHours, totalDurationMinutes);
 };
+
 
 const calculateEventHeight = (event: Event): number => {
   // Get the duration of the event in minutes
-  const durationMinutes = getEventDuration(event);
+  const duration: Time = getEventDuration(event);
 
-  // Convert the duration to pixels using the HOUR_HEIGHT constant
-  const height = (durationMinutes / 60) * C.HOUR_HEIGHT;
+  // Convert the duration to total hours
+  const totalHours = duration.hours + (duration.minutes / 60);
+
+  // Convert the total hours to pixels using the HOUR_HEIGHT constant
+  const height = hoursToHeight(totalHours);
 
   return height;
 };
@@ -131,5 +148,7 @@ export {
   isEventOverlapping,
   getEventDuration,
   calculateEventHeight,
+  hoursToMinutes,
+  minutesToHours,
+  hoursToHeight,
 };
-
