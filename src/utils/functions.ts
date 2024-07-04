@@ -95,21 +95,7 @@ const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Ev
 };
 
 
-const getEventDuration = ({ start, end }: Event): Time => {
-  // Convert start and end times to total minutes from midnight
-  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
-  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
 
-  // Calculate the total duration in minutes
-  const totalDuration: number = endTotalMinutes - startTotalMinutes;
-
-  // Convert total duration from minutes to hours and remaining minutes
-  const totalDurationHours: number = Math.floor(minutesToHours(totalDuration));
-  const totalDurationMinutes: number = totalDuration % 60;
-
-  // Return the total duration as a Time object
-  return new Time(totalDurationHours, totalDurationMinutes);
-};
 
 
 const calculateEventHeight = (event: Event): number => {
