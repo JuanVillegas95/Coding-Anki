@@ -52,6 +52,24 @@ const generate24HourIntervals = (): string[] => {
   return hoursArray;
 };
 
+// Calculates the time of an event based on the mouse click position relative to a calendar.
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+  // Deconstruct calendarStartTime
+  
+  // Get the distance from the event to the mouse in pixels
+  const { clientY, currentTarget } = e;
+  const topOffset: number = currentTarget.getBoundingClientRect().top;
+  const posY: number = clientY - topOffset;
+
+  // Get the minutes from the top of the calendar
+  const totalMinutesFromTop: number = Math.floor((posY / C.HOUR_HEIGHT) * 60);
+
+  // Convert totalEventMinutes to hours and minutes
+  const eventHours: number = Math.floor(totalMinutesFromTop / 60);
+  const eventMinutes: number = totalMinutesFromTop % 60;
+
+  return new Time(eventHours, eventMinutes);
+};
 
 // Checks if a new event overlaps with any existing events on the same date.
 const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Event>): boolean => {
