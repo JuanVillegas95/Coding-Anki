@@ -125,14 +125,6 @@ const calculateEventHeight = (event: Event): number => {
   return height;
 };
 
-const isEndBeforeStart = ({ start, end }: Event): boolean => {
-  // Convert start and end times to total minutes from midnight
-  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
-  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
-
-  // Return whether the end time is less than the start time
-  return endTotalMinutes <= startTotalMinutes;
-};
 
 const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
   // Filter events that share the same date
