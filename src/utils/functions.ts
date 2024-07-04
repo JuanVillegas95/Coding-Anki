@@ -112,7 +112,18 @@ const getEventDuration = ({ start, end }: Event): Time => {
 };
 
 
+const calculateEventHeight = (event: Event): number => {
+  // Get the duration of the event in minutes
+  const duration: Time = getEventDuration(event);
 
+  // Convert the duration to total hours
+  const totalHours = duration.hours + (duration.minutes / 60);
+
+  // Convert the total hours to pixels using the HOUR_HEIGHT constant
+  const height = hoursToHeight(totalHours);
+
+  return height;
+};
 
 const isEndBeforeStart = ({ start, end }: Event): boolean => {
   // Convert start and end times to total minutes from midnight
