@@ -13,4 +13,5 @@ int main(int argc, const char** argv){
 
     window_destroy(window);
     return 0;
+    
 }
