@@ -7,12 +7,9 @@ import EventModal from "@/components/EventModal";
 import HourLine from "@/components/HourLine";
 
 const WeeklyCalendar: React.FC = () => {
-  const [events, setEvents] = useState<Map<string, Event>>(
-    new Map([["a", new Event(new Date('2024-07-03'), new Time(13, 0))]])
-  );
+  const [events, setEvents] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(new Event());
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [calendarStartTime, setCalendarStartTime] = useState<Time>(new Time(4, 30));
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
@@ -26,35 +23,27 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
     e.preventDefault();
-    if (e.button !== 0) return;
+    if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
     setIsMouseDown(true);
 
-    const start: Time = F.calculateEventTime(e, calendarStartTime);
-    const isOverlapping = F.isEventOverlapping(date, start, events);
-    if (isOverlapping) return;
+    const eventTime: Time = F.calculateEventTime(e);
+    const eventOverlapping = F.isEventOverlapping(date, eventTime, events);
+    if (eventOverlapping) return;
 
-    event.current = new Event(date, start);
+    event.current = new Event(date, eventTime);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
     if (!isMouseDown) return;
 
-    event.current.end = F.calculateEventTime(e, calendarStartTime);
+    event.current.end = F.calculateEventTime(e);
     const eventDuration: Time = F.getEventDuration(event.current);
-    const isEventColliding: boolean = F.isEventColliding(
-      event.current.date,
-      event.current,
-      events,
-      calendarStartTime
-    );
+    const endBeforeStart: boolean= F.isEndBeforeStart(event.current);
+    const eventColliding: boolean= F.isEventColliding(event.current,events);
 
-    const isEndBefore: boolean= F.isEndBeforeStart(event.current);
-    if (eventDuration.minutes < 30 ||
-        isEventColliding ||
-        isEndBefore
-    ) return;
+    if (eventDuration.minutes < C.MAX_DURATION_MINUTES || endBeforeStart ) return;
 
     event.current.height = F.calculateEventHeight(event.current);
 
@@ -63,6 +52,7 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
+    event.current = new Event();
     setIsMouseDown(false);
   };
 
@@ -83,7 +73,7 @@ const WeeklyCalendar: React.FC = () => {
       </S.DaysOfTheWeek>
       <S.Main>
         <S.AsideTime>
-          {F.generate24HourIntervals(calendarStartTime).map((hour: string, i: number) => (
+          {F.generate24HourIntervals().map((hour: string, i: number) => (
             <S.Hour key={i}>{hour}</S.Hour>
           ))}
         </S.AsideTime>
@@ -103,14 +93,13 @@ const WeeklyCalendar: React.FC = () => {
                 onMouseDown={(e) => handleMouseDown(e, dayDate)}
                 onMouseUp={handleMouseUp}
               >
-                {Array.from({ length: 48 }, (_, j) => (
-                  <S.Cell key={j} />
-                ))}
+                {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)}
+
                 {filteredEvents.map(({ id, height, start, end, color, title, description }) => (
                   <S.Event
                     key={id}
                     $height={height}
-                    $fromTop={F.calculateTopOffset(start, calendarStartTime)}
+                    $fromTop={F.calculateTopOffset(start)}
                     $color={color}
                   >
                     {String(start.hours).padStart(2, "0")}:{String(start.minutes).padStart(2, "0")}
@@ -121,13 +110,13 @@ const WeeklyCalendar: React.FC = () => {
                   </S.Event>
                 ))}
                 {isToday && (
-                  <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime, calendarStartTime)} />
+                  <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />
                 )}
               </S.DayColumn>
             );
           })}
         </S.Events>
-        <HourLine currentDate={currentDate} calendarStartTime={calendarStartTime} />
+        <HourLine currentDate={currentDate} />
       </S.Main>
       <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} />
     </S.Container>
