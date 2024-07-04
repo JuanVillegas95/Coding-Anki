@@ -163,7 +163,6 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 
 
 
-
 export {
   range,
   areDatesTheSame,

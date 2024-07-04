@@ -38,6 +38,7 @@ const WeeklyCalendar: React.FC = () => {
     e.preventDefault();
     if (!isMouseDown) return;
 
+    
     event.current.end = F.calculateEventTime(e);
     const eventDuration: Time = F.getEventDuration(event.current);
     const endBeforeStart: boolean= F.isEndBeforeStart(event.current);
@@ -52,8 +53,8 @@ const WeeklyCalendar: React.FC = () => {
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
-    event.current = new Event();
     setIsMouseDown(false);
+    event.current = new Event();
   };
 
   const handleModalClose = (): void => {
