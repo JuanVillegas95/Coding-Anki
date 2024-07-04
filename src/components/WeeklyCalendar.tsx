@@ -43,7 +43,7 @@ const WeeklyCalendar: React.FC = () => {
     const endBeforeStart: boolean= F.isEndBeforeStart(event.current);
     const eventColliding: boolean= F.isEventColliding(event.current,events);
 
-    if (eventDuration.minutes < C.MAX_DURATION_MINUTES || endBeforeStart ) return;
+    if (eventDuration.minutes < C.MAX_DURATION_MINUTES || endBeforeStart || eventColliding) return;
 
     event.current.height = F.calculateEventHeight(event.current);
 

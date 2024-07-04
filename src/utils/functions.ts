@@ -134,31 +134,8 @@ const isEndBeforeStart = ({ start, end }: Event): boolean => {
   return endTotalMinutes <= startTotalMinutes;
 };
 
-const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
-  // Filter events that share the same date
-  const sameDateEvents: Event[] = Array.from(events.values()).filter(({ date }) =>
-    areDatesTheSame(date, newEvent.date)
-  );
 
-  // Convert new event's start and end times to total minutes
-  const newEventStartMinutes = (hoursToMinutes(newEvent.start.hours) + newEvent.start.minutes)
-  const newEventEndMinutes = (hoursToMinutes(newEvent.end.hours) + newEvent.end.minutes) 
 
-  // Check for overlapping events
-  for (const { start, end, id } of sameDateEvents) {
-    if(newEvent.id === id) continue;
-    // Convert existing event's start and end times to total minutes
-    const eventStartMinutes = (hoursToMinutes(start.hours) + start.minutes) 
-    const eventEndMinutes = (hoursToMinutes(end.hours) + end.minutes)
-
-    // Check if new event overlaps with existing event
-    if (newEventStartMinutes < newEventEndMinutes ||
-        newEventEndMinutes > eventStartMinutes
-    ) return true; // There is a conflict
-  }
-
-  return false; // No conflicts
-};
 
 
 
