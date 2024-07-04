@@ -40,7 +40,17 @@ const calculateTopOffset = (currentTime: Time): number => {
   return hoursToHeight(minutesToHours(currentMinutes));
 };
 
+//  Generates an array of 24-hour formatted time intervals
+const generate24HourIntervals = (): string[] => {
+  const hoursArray: string[] = [];
+  // Pushing formatted hours to the array
+  for (let i = 0; i < 24; i++) {
+    const hourFormatted: string = (i < 10 ? `0${i}` : `${i}`);
+    hoursArray.push(`${hourFormatted}:00`);
+  }
 
+  return hoursArray;
+};
 
 // Calculates the time of an event based on the mouse click position relative to a calendar.
 const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
