@@ -7,7 +7,6 @@ const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours 
 const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
 const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels using a constant that represent an hour
 
-
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
 const areDatesTheSame = (first: Date, second: Date): boolean =>
@@ -32,8 +31,12 @@ const getMonday = (): Date => {
 const calculateTopOffset = (currentTime: Time, calendarStartTime: Time): number => { 
   const startMinutes: number = hoursToMinutes(calendarStartTime.hours) + calendarStartTime.minutes;
   const currentMinutes: number = hoursToMinutes(currentTime.hours) + currentTime.minutes;
-  const totalMinutes: number = currentMinutes - startMinutes; // Calculate how many minutes have passed from calendarStartTime to currentTime
-  return hoursToHeight(minutesToHours(totalMinutes)); // Convert minutes to hours and then scale it for the height unit
+
+  // Calculate how many minutes have passed from calendarStartTime to 
+  const totalMinutes: number = currentMinutes - startMinutes;currentTime
+
+   // Convert minutes to hours and then scale it for the height unit
+  return hoursToHeight(minutesToHours(totalMinutes));
 };
 
 //  Generates an array of 24-hour formatted time intervals starting from a given time.
@@ -136,6 +139,46 @@ const calculateEventHeight = (event: Event): number => {
   return height;
 };
 
+const isEndBeforeStart = ({ start, end }: Event): boolean => {
+  // Convert start and end times to total minutes from midnight
+  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
+  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
+
+  // Return whether the end time is less than the start time
+  return endTotalMinutes <= startTotalMinutes;
+};
+
+const isEventColliding = (newDate: Date, newEvent: Event, events: Map<string, Event>, calendarStartTime: Time): boolean => {
+  // Filter events that share the same date
+  const sameDateEvents: Event[] = Array.from(events.values()).filter(({ date }) =>
+    areDatesTheSame(date, newDate)
+  );
+
+  // Convert calendar start time to minutes from midnight
+  const calendarStartMinutes = hoursToMinutes(calendarStartTime.hours) + calendarStartTime.minutes;
+
+  // Convert new event's start and end times to total minutes from calendar start time
+  const newEventStartMinutes = (hoursToMinutes(newEvent.start.hours) + newEvent.start.minutes) - calendarStartMinutes;
+  const newEventEndMinutes = (hoursToMinutes(newEvent.end.hours) + newEvent.end.minutes) - calendarStartMinutes;
+
+  // Check for overlapping events
+  for (const { start, end } of sameDateEvents) {
+    // Convert existing event's start and end times to total minutes from calendar start time
+    const eventStartMinutes = (hoursToMinutes(start.hours) + start.minutes) - calendarStartMinutes;
+    const eventEndMinutes = (hoursToMinutes(end.hours) + end.minutes) - calendarStartMinutes;
+
+    // Check if new event overlaps with existing event
+    if (
+      (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes)
+    ) {
+      return true; // There is a conflict
+    }
+  }
+
+  return false; // No conflicts
+};
+
+
 
 export {
   range,
@@ -151,4 +194,6 @@ export {
   hoursToMinutes,
   minutesToHours,
   hoursToHeight,
+  isEndBeforeStart,
+  isEventColliding,
 };
