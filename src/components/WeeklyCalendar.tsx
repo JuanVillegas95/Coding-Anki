@@ -27,27 +27,30 @@ const WeeklyCalendar: React.FC = () => {
 
     setIsMouseDown(true);
 
-    const eventTime: Time = F.calculateEventTime(e);
-    const eventOverlapping = F.isEventOverlapping(date, eventTime, events);
+    const newEventStart: Time = F.calculateEventStart(e);
+    const eventOverlapping = F.isEventOverlapping(date, newEventStart, events);
     if (eventOverlapping) return;
 
-    event.current = new Event(date, eventTime);
+    event.current = new Event(date, newEventStart);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
-    if (!isMouseDown) return;
 
-    
-    event.current.end = F.calculateEventTime(e);
-    const eventDuration: Time = F.getEventDuration(event.current);
-    const endBeforeStart: boolean= F.isEndBeforeStart(event.current);
-    const eventColliding: boolean= F.isEventColliding(event.current,events);
+    if(!isMouseDown) return;
 
-    if (eventDuration.minutes < C.MAX_DURATION_MINUTES || endBeforeStart || eventColliding) return;
+    const newEvent: Event = new Event(event.current.date,event.current.start);
+    newEvent.height = F.calculateEventHeight(e, newEvent);
+    newEvent.end = F.calculateEventEnd(newEvent);
 
-    event.current.height = F.calculateEventHeight(event.current);
+    const newEventDuration: Time = F.getEventDuration(newEvent);
+    const endBeforeStart: boolean= F.isEndBeforeStart(newEvent);
+    const eventColliding: boolean= F.isEventColliding(newEvent,events,event.current.id);
 
+    if (endBeforeStart || eventColliding || newEventDuration.minutes < 30) return;
+
+    event.current.height = newEvent.height
+    event.current.end = newEvent.end
     setEvents((prevEvents) => new Map([...prevEvents, [event.current.id, event.current]]));
   };
 
@@ -78,7 +81,7 @@ const WeeklyCalendar: React.FC = () => {
             <S.Hour key={i}>{hour}</S.Hour>
           ))}
         </S.AsideTime>
-        <S.Events onMouseMove={handleMouseMove}>
+        <S.Events onMouseMove={handleMouseMove} onMouseLeave={()=>setIsMouseDown(false)}>
           {C.DAYS.map((day, i) => {
             const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
             const mondayDate = F.getMonday();
