@@ -120,7 +120,7 @@ const getEventDuration = ({ start, end }: Event, ): Time => {
   return new Time(totalDurationHours, totalDurationMinutes);
 };
 
-// Calulate the eventHeight based on the mouse position and the Start Time
+// Calculate the eventHeight based on the mouse position and the Start Time
 const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, newEvent: Event): number => {
   // Get the distance from the event to the mouse in pixels
   const { clientY, currentTarget } = e;
@@ -142,7 +142,7 @@ const isEndBeforeStart = ({ start, end }: Event): boolean => {
   return endTotalMinutes <= startTotalMinutes;
 };
 
-const isEventColliding = (newEvent: Event, events: Map<string, Event>, currentEventId: string): boolean => {
+const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
   // Filter events that share the same date
   const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
 
@@ -152,7 +152,7 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>, currentEv
 
   // Check for overlapping events
   for (const { start, end, id } of sameDateEvents) {
-    if (currentEventId === id) continue;
+    if (newEvent.id === id) continue;
     // Convert existing event's start and end times to total minutes
     const eventStartMinutes = hoursToMinutes(start.hours) + start.minutes;
     const eventEndMinutes = hoursToMinutes(end.hours) + end.minutes;
@@ -169,6 +169,20 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>, currentEv
   return false; // No conflicts
 };
 
+const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
+
+  const newEventDuration: Time = getEventDuration(newEvent);
+  if(newEventDuration.minutes < C.MAX_DURATION_MINUTES) return false
+
+  const endBeforeStart: boolean= isEndBeforeStart(newEvent);
+  if(endBeforeStart) return false
+
+  const eventColliding: boolean= isEventColliding(newEvent,events);
+  if(eventColliding) return false
+
+  if(newEvent.start.hours === -1 && newEvent.start.minutes === -1) return false;
+  return true;
+}
 
 
 export {
@@ -180,12 +194,7 @@ export {
   generate24HourIntervals,
   calculateEventStart,
   isEventOverlapping,
-  getEventDuration,
   calculateEventHeight,
-  hoursToMinutes,
-  minutesToHours,
-  hoursToHeight,
-  isEndBeforeStart,
-  isEventColliding,
-  calculateEventEnd
+  calculateEventEnd,
+  isNewEventValid,
 };

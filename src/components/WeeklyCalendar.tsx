@@ -8,7 +8,7 @@ import HourLine from "@/components/HourLine";
 
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvents] = useState<Map<string, Event>>(new Map());
-  const event = useRef<Event>(new Event());
+  const event = useRef<Event>(C.NULL_EVENT);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
@@ -30,8 +30,8 @@ const WeeklyCalendar: React.FC = () => {
     const newEventStart: Time = F.calculateEventStart(e);
     const eventOverlapping = F.isEventOverlapping(date, newEventStart, events);
     if (eventOverlapping) return;
-
     event.current = new Event(date, newEventStart);
+
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -42,12 +42,11 @@ const WeeklyCalendar: React.FC = () => {
     const newEvent: Event = new Event(event.current.date,event.current.start);
     newEvent.height = F.calculateEventHeight(e, newEvent);
     newEvent.end = F.calculateEventEnd(newEvent);
+    newEvent.id = event.current.id;
 
-    const newEventDuration: Time = F.getEventDuration(newEvent);
-    const endBeforeStart: boolean= F.isEndBeforeStart(newEvent);
-    const eventColliding: boolean= F.isEventColliding(newEvent,events,event.current.id);
+    const newEventValid: Boolean= F.isNewEventValid(newEvent,events);
 
-    if (endBeforeStart || eventColliding || newEventDuration.minutes < 30) return;
+    if (!newEventValid) return;
 
     event.current.height = newEvent.height
     event.current.end = newEvent.end
@@ -57,11 +56,17 @@ const WeeklyCalendar: React.FC = () => {
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
     setIsMouseDown(false);
-    event.current = new Event();
-  };
 
-  const handleModalClose = (): void => {
-    setIsModalOpen(false);
+    const newEventValid: Boolean= F.isNewEventValid(event.current,events);
+    if (!newEventValid) {
+      setEvents((prevEvents) => {
+        const updatedEvents = new Map(prevEvents);
+        updatedEvents.delete(event.current.id);
+        return updatedEvents;
+      });
+    }
+
+    event.current = C.NULL_EVENT;
   };
 
   return (
@@ -85,7 +90,7 @@ const WeeklyCalendar: React.FC = () => {
           {C.DAYS.map((day, i) => {
             const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
             const mondayDate = F.getMonday();
-            const dayDate = F.addDateBy(mondayDate, i);
+            const dayDate: Date = F.addDateBy(mondayDate, i);
             const isToday = F.areDatesTheSame(dayDate, currentDate);
             const filteredEvents = Array.from(events.values()).filter((event) =>
               F.areDatesTheSame(event.date, dayDate)
@@ -122,7 +127,7 @@ const WeeklyCalendar: React.FC = () => {
         </S.Events>
         <HourLine currentDate={currentDate} />
       </S.Main>
-      <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} />
+      {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
     </S.Container>
   );
 };
