@@ -41,7 +41,15 @@ const calculateTopOffset = (time: Time): number => {
   return hoursToHeight(totalHours);
 }
 
+// Formats the unit into decimal format
+const formatTime = (unit: number): string => (( unit < 10 ) ? `0${unit}` : `${unit}`)
 
+//  Generates an array of 24-hour formatted time intervals
+const generate24HourIntervals = (): string[] => {
+  const timeArray: string[] = [];
+  for(let i = 0; i<24; i++) timeArray.push(`${formatTime(i)}:00`);
+  return timeArray;
+} 
 
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
   // Get the distance from the event to the mouse in pixels
