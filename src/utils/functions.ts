@@ -34,19 +34,14 @@ const getMostRecentMonday = (): Date => {
   return today;
 }
 
+// Calculates the top offset in pixels units given the time.
+const calculateTopOffset = (time: Time): number => {
+  const totalMinutes: number = hoursToMinutes(time.hours) + time.minutes;
+  const totalHours: number = minutesToHours(totalMinutes);
+  return hoursToHeight(totalHours);
+}
 
 
-//  Generates an array of 24-hour formatted time intervals
-const generate24HourIntervals = (): string[] => {
-  const hoursArray: string[] = [];
-  // Pushing formatted hours to the array
-  for (let i = 0; i < 24; i++) {
-    const hourFormatted: string = (i < 10 ? `0${i}` : `${i}`);
-    hoursArray.push(`${hourFormatted}:00`);
-  }
-
-  return hoursArray;
-};
 
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
   // Get the distance from the event to the mouse in pixels
