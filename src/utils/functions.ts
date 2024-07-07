@@ -24,16 +24,11 @@ const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getMonth() === second.getMonth() &&
   first.getDate() === second.getDate();
 
-
+// Adds a specified number of days to the given date.
 const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(date.getDate() + count));
 
 
-const getMonday = (): Date => {
-  const today = new Date();
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(today.setDate(diff));
-};
+
 
 // Calculates the top offset in pixels units given the starting time and the time where it starts the event aka currentTime
 const calculateTopOffset = (currentTime: Time): number => { 
@@ -191,7 +186,7 @@ export {
   range,
   areDatesTheSame,
   addDateBy,
-  getMonday,
+  getMostRecentMonday,
   calculateTopOffset,
   generate24HourIntervals,
   calculateEventStart,

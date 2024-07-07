@@ -92,7 +92,7 @@ const WeeklyCalendar: React.FC = () => {
         <S.Cells onMouseMove={handleMouseMove} onMouseLeave={()=>setIsMouseDown(false)}>
           {C.DAYS.map((day, i) => {
             const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
-            const mondayDate = F.getMonday();
+            const mondayDate = F.getMostRecentMonday();
             const dayDate: Date = F.addDateBy(mondayDate, i);
             const isToday = F.areDatesTheSame(dayDate, currentDate);
             const filteredEvents = Array.from(events.values()).filter((event) =>
