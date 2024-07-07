@@ -27,13 +27,16 @@ const areDatesTheSame = (first: Date, second: Date): boolean =>
 // Adds a specified number of days to the given date.
 const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(date.getDate() + count));
 
-
-
+// Returns the most recent Monday
+const getMostRecentMonday = (): Date => {
+  const today = new Date();
+  today.setDate(today.getDate() - (today.getDay() + 6) % 7 );
+  return today;
+}
 
 // Calculates the top offset in pixels units given the starting time and the time where it starts the event aka currentTime
 const calculateTopOffset = (currentTime: Time): number => { 
   const currentMinutes: number = hoursToMinutes(currentTime.hours) + currentTime.minutes;
-
    // Convert minutes to hours and then scale it for the height unit
   return hoursToHeight(minutesToHours(currentMinutes));
 };
