@@ -3,8 +3,7 @@ import { Time, Event } from "@/utils/classes";
 import React from "react";
 
 // Utility functions
-
-
+const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours to minutes
 
 const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
 const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels using a constant that represent an hour
