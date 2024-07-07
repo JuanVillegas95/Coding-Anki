@@ -82,38 +82,12 @@ const DayColumn = styled.div`
   position: relative;
 `;
 
-const Events = styled.div`
+const Cells = styled.div`
   position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 `;
 
-const Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
-  position: absolute;
-  z-index: 40;
-  width: calc(100% - 5px);
-  left: 2.5px;
-  top: ${({ $fromTop }) => $fromTop}px;
-  background: green;
-  margin: 0;
-  height: ${({ $height }) => $height}px;
-  border: 1px solid var(--primary-${({ $color }) => $color});
-  background-color: var(--secondary-${({ $color }) => $color});
-  border-width: 2px;
-  border-radius: 0.5rem;
-  padding: 5px; /* Adjust padding if necessary */
-
-  white-space: normal; /* Ensure text wrapping */
-  overflow: hidden; /* Prevent overflow */
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  strong {
-    display: block;
-  }
-`;
 
 
 const HourLine = styled.div<{ $fromTop: number }>`
@@ -164,8 +138,7 @@ export {
   AsideTime,
   Hour,
   DayColumn,
-  Events,
-  Event,
+  Cells,
   HourLine,
   LineAfterHour,
   HourLineDot,

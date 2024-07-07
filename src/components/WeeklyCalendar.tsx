@@ -5,6 +5,7 @@ import * as S from "@/styles/WeeklyCalendar.styles";
 import { Event, Time } from "@/utils/classes";
 import EventModal from "@/components/EventModal";
 import HourLine from "@/components/HourLine";
+import Events from "./Events";
 
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvents] = useState<Map<string, Event>>(new Map());
@@ -50,6 +51,7 @@ const WeeklyCalendar: React.FC = () => {
 
     event.current.height = newEvent.height
     event.current.end = newEvent.end
+
     setEvents((prevEvents) => new Map([...prevEvents, [event.current.id, event.current]]));
   };
 
@@ -58,6 +60,7 @@ const WeeklyCalendar: React.FC = () => {
     setIsMouseDown(false);
 
     const newEventValid: Boolean= F.isNewEventValid(event.current,events);
+
     if (!newEventValid) {
       setEvents((prevEvents) => {
         const updatedEvents = new Map(prevEvents);
@@ -86,7 +89,7 @@ const WeeklyCalendar: React.FC = () => {
             <S.Hour key={i}>{hour}</S.Hour>
           ))}
         </S.AsideTime>
-        <S.Events onMouseMove={handleMouseMove} onMouseLeave={()=>setIsMouseDown(false)}>
+        <S.Cells onMouseMove={handleMouseMove} onMouseLeave={()=>setIsMouseDown(false)}>
           {C.DAYS.map((day, i) => {
             const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
             const mondayDate = F.getMonday();
@@ -104,27 +107,13 @@ const WeeklyCalendar: React.FC = () => {
               >
                 {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)}
 
-                {filteredEvents.map(({ id, height, start, end, color, title, description }) => (
-                  <S.Event
-                    key={id}
-                    $height={height}
-                    $fromTop={F.calculateTopOffset(start)}
-                    $color={color}
-                  >
-                    {String(start.hours).padStart(2, "0")}:{String(start.minutes).padStart(2, "0")}
-                    <span>-</span>
-                    {String(end.hours).padStart(2, "0")}:{String(end.minutes).padStart(2, "0")} <br />
-                    <strong>{title}</strong> <br />
-                    {description}
-                  </S.Event>
-                ))}
-                {isToday && (
-                  <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />
-                )}
+                <Events events={filteredEvents} />
+                
+                {isToday && <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />}
               </S.DayColumn>
             );
           })}
-        </S.Events>
+        </S.Cells>
         <HourLine currentDate={currentDate} />
       </S.Main>
       {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}

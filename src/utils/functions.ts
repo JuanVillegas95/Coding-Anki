@@ -3,7 +3,9 @@ import { Time, Event } from "@/utils/classes";
 import React from "react";
 
 // Utility functions
-const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours to minutes
+
+
+
 const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
 const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels using a constant that represent an hour
 const getSameDateEvents = (events: Map<any, Event>, newDate: Date): Event[] => {
@@ -170,7 +172,6 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 };
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
-
   const newEventDuration: Time = getEventDuration(newEvent);
   if(newEventDuration.minutes < C.MAX_DURATION_MINUTES) return false
 
@@ -180,9 +181,9 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false
 
-  if(newEvent.start.hours === -1 && newEvent.start.minutes === -1) return false;
   return true;
 }
+
 
 
 export {
