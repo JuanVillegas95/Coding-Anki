@@ -15,19 +15,17 @@ const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT;
 // Converts the map into an array returning only the events with the same date
 const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
+// Creates an array of n size;
+const range = (size: number): number[] => [...Array(size).keys()]
 
-const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
-
+// Validates if two dates are in the same day
 const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getFullYear() === second.getFullYear() &&
   first.getMonth() === second.getMonth() &&
   first.getDate() === second.getDate();
 
-const addDateBy = (date: Date, count: number): Date => { 
-  const d = new Date(date);
-  d.setDate(d.getDate() + count);
-  return d;
-};
+
+
 
 const getMonday = (): Date => {
   const today = new Date();
