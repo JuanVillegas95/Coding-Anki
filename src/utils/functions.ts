@@ -5,14 +5,9 @@ import React from "react";
 // Utility functions
 const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours to minutes
 const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
+const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels
 
-const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels using a constant that represent an hour
 
-const getSameDateEvents = (events: Map<any, Event>, newDate: Date): Event[] => {
-  return Array.from(events.values()).filter(({ date }) => 
-    areDatesTheSame(date, newDate)
-  );
-};
 
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
