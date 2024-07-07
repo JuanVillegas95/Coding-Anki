@@ -3,10 +3,17 @@ import { Time, Event } from "@/utils/classes";
 import React from "react";
 
 // Utility functions
-const hoursToMinutes = (hours: number): number => hours * 60; // Converts hours to minutes
-const minutesToHours = (minutes: number): number => minutes / 60; // Converts minutes to hours
-const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; // Converts hours (including fractional hours from minutes) to height in pixels
+// Converts hours to minutes
+const hoursToMinutes = (hours: number): number => hours * 60; 
 
+// Converts minutes to hours
+const minutesToHours = (minutes: number): number => minutes / 60; 
+
+// Converts hours (including fractional hours from minutes) to height in pixels
+const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; 
+
+// Converts the map into an array returning only the events with the same date
+const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
 
 const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
