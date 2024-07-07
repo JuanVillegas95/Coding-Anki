@@ -16,7 +16,6 @@ const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT;
 const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
 
-const range = (keyCount: number): number[] => [...Array(keyCount).keys()];
 
 const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getFullYear() === second.getFullYear() &&
