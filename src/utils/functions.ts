@@ -12,6 +12,8 @@ const minutesToHours = (minutes: number): number => minutes / 60;
 // Converts hours (including fractional hours from minutes) to height in pixels
 const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; 
 
+
+
 // Converts the map into an array returning only the events with the same date
 const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
