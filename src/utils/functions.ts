@@ -25,6 +25,7 @@ const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getDate() === second.getDate();
 
 
+const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(date.getDate() + count));
 
 
 const getMonday = (): Date => {
