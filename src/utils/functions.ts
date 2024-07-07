@@ -34,12 +34,7 @@ const getMostRecentMonday = (): Date => {
   return today;
 }
 
-// Calculates the top offset in pixels units given the starting time and the time where it starts the event aka currentTime
-const calculateTopOffset = (currentTime: Time): number => { 
-  const currentMinutes: number = hoursToMinutes(currentTime.hours) + currentTime.minutes;
-   // Convert minutes to hours and then scale it for the height unit
-  return hoursToHeight(minutesToHours(currentMinutes));
-};
+
 
 //  Generates an array of 24-hour formatted time intervals
 const generate24HourIntervals = (): string[] => {
