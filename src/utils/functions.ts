@@ -69,6 +69,8 @@ const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): T
   return new Time(startingHour, startingMinutes);
 }
 
+// Checks if a new event overlaps with any existing events on the same date.
+
 // Calculate the eventHeight based on the mouse position and the Start Time
 const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, { start }: Event): number =>{
   const { clientY, currentTarget } = e;
@@ -95,28 +97,7 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
   return new Time(eventHours, eventMinutes);
 };
 
-// Checks if a new event overlaps with any existing events on the same date.
-const isEventOverlapping = (newDate: Date, newTime: Time, events: Map<string, Event>): boolean => {
-  // Filter events that share the same date
-  const sameDateEvents: Event[] = getSameDateEvents(events, newDate);
-  // Check for overlapping events
-  for (const { start, end } of sameDateEvents) {
-    // Convert time to minutes;
-    const newEventStartMinutes = hoursToMinutes(newTime.hours) + newTime.minutes;
 
-    const eventStartMinutes = hoursToMinutes(start.hours) + start.minutes;
-    const eventEndMinutes = hoursToMinutes(end.hours) + end.minutes;
-
-    // Check if new event starts within the boundaries of another event
-    if (newEventStartMinutes >= eventStartMinutes && 
-        newEventStartMinutes < eventEndMinutes
-      ) { 
-      return true; // There is a conflict
-    }
-  }
-
-  return false; // No conflicts
-};
 
 const getEventDuration = ({ start, end }: Event, ): Time => {
   // Convert start and end times to total minutes from midnight
