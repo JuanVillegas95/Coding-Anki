@@ -107,29 +107,14 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
   return new Time(hourEnd,minutesEnd);
 }
 
-const getEventDuration = ({ start, end }: Event, ): Time => {
-  // Convert start and end times to total minutes from midnight
-  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
-  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
+// Calculates the event duration
 
-  // Calculate the total duration in minutes
-  const totalDuration: number = endTotalMinutes - startTotalMinutes;
-
-  // Convert total duration from minutes to hours and remaining minutes
-  const totalDurationHours: number = Math.floor(minutesToHours(totalDuration));
-  const totalDurationMinutes: number = totalDuration % 60;
-
-  // Return the total duration as a Time object
-  return new Time(totalDurationHours, totalDurationMinutes);
-};
 
 
 const isEndBeforeStart = ({ start, end }: Event): boolean => {
-  // Convert start and end times to total minutes from midnight
   const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
   const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
 
-  // Return whether the end time is less than the start time
   return endTotalMinutes <= startTotalMinutes;
 };
 
