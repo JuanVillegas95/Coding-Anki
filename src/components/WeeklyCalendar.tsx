@@ -29,7 +29,7 @@ const WeeklyCalendar: React.FC = () => {
     setIsMouseDown(true);
 
     const newEventStart: Time = F.calculateEventStart(e);
-    const eventOverlapping = F.isEventOverlapping(date, newEventStart, events);
+    const eventOverlapping = F.isEventOverlapping(events, date, newEventStart, );
     if (eventOverlapping) return;
     event.current = new Event(date, newEventStart);
 
