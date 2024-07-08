@@ -15,6 +15,10 @@ const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT;
 // Convert pixels to hours (including fractional hours from minutes)
 const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
 
+// Convert time in minutes;
+const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
+
+
 // Converts the map into an array returning only the events with the same date
 const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
@@ -39,7 +43,7 @@ const getMostRecentMonday = (): Date => {
 
 // Calculates the top offset in pixels units given the time.
 const calculateTopOffset = (time: Time): number => {
-  const totalMinutes: number = hoursToMinutes(time.hours) + time.minutes;
+  const totalMinutes: number = timeToMinutes(time);
   const totalHours: number = minutesToHours(totalMinutes);
   return hoursToHeight(totalHours);
 }
@@ -97,7 +101,7 @@ const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, {
 
 // Calculates the  end time of an event based the height and start time
 const calculateEventEnd = ({ start, height }: Event): Time => {
-  const totalMinutesStart: number = hoursToMinutes(start.hours) + start.minutes;
+  const totalMinutesStart: number = timeToMinutes(start);
   const totalMinutesHeight: number = Math.floor(hoursToMinutes(pixelsToHours(height)));
   const totalMinutes: number = totalMinutesStart + totalMinutesHeight;
 
@@ -109,8 +113,8 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
 
 // Calculates the event duration
 const getEventDuration = ({ start, end }: Event): Time => {
-  const totalStartMinutes: number = hoursToMinutes(start.hours) + start.minutes;
-  const totalEndMinutes: number = hoursToMinutes(end.hours) + end.minutes;
+  const totalStartMinutes: number = timeToMinutes(start);
+  const totalEndMinutes: number = timeToMinutes(end);
 
   const eventTotalMinutes: number = totalEndMinutes - totalStartMinutes;
   
@@ -120,40 +124,13 @@ const getEventDuration = ({ start, end }: Event): Time => {
   return new Time(eventHours,eventMinutes);
 }
 
-
 const isEndBeforeStart = ({ start, end }: Event): boolean => {
-  const startTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
-  const endTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
+  const startTotalMinutes: number = timeToMinutes(start);
+  const endTotalMinutes: number = timeToMinutes(end);
 
   return endTotalMinutes <= startTotalMinutes;
 };
 
-const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
-  // Filter events that share the same date
-  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
-
-  // Convert new event's start and end times to total minutes
-  const newEventStartMinutes = hoursToMinutes(newEvent.start.hours) + newEvent.start.minutes;
-  const newEventEndMinutes = hoursToMinutes(newEvent.end.hours) + newEvent.end.minutes;
-
-  // Check for overlapping events
-  for (const { start, end, id } of sameDateEvents) {
-    if (newEvent.id === id) continue;
-    // Convert existing event's start and end times to total minutes
-    const eventStartMinutes = hoursToMinutes(start.hours) + start.minutes;
-    const eventEndMinutes = hoursToMinutes(end.hours) + end.minutes;
-
-    // Check if new event overlaps with existing event
-    if (
-      (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) ||
-      (newEventStartMinutes >= eventStartMinutes && newEventStartMinutes < eventEndMinutes)
-    ) {
-      return true; // There is a conflict
-    }
-  }
-
-  return false; // No conflicts
-};
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
   const newEventDuration: Time = getEventDuration(newEvent);
