@@ -54,7 +54,11 @@ const formatTime = (unit: number): string => (( unit < 10 ) ? `0${unit}` : `${un
 //  Generates an array of 24-hour formatted time intervals
 const generate24HourIntervals = (): string[] => {
   const timeArray: string[] = [];
-  for(let i = 0; i<24; i++) timeArray.push(`${formatTime(i)}:00`);
+  for(let i = 0; i<24; i++) {
+    const formattedTime: string = formatTime(i);
+    timeArray.push(`${formattedTime}:00`);
+    timeArray.push(`${formattedTime}:30`);
+  }
   return timeArray;
 } 
 
@@ -146,6 +150,7 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 
   return false; 
 };
+
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
   const newEventDuration: Time = getEventDuration(newEvent);

@@ -3,10 +3,10 @@ import * as C from "@/utils/constants";
 import * as F from "@/utils/functions";
 import * as S from "@/styles/WeeklyCalendar.styles";
 import { Event, Time } from "@/utils/classes";
-import EventModal from "@/components/EventModal";
-import HourLine from "@/components/HourLine";
-import Events from "./Events";
+import Modal from "./Modal";
 
+
+// WEEKLY CALENDAR COMPONENT
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvents] = useState<Map<string, Event>>(new Map());
   const event = useRef<Event>(C.NULL_EVENT);
@@ -121,4 +121,95 @@ const WeeklyCalendar: React.FC = () => {
   );
 };
 
+
+// EVENTS COMPONENT
+const Events: React.FC<{ events: Event[] }> = ({ events }) => {
+  return (
+    <div>
+      {events.map(({ id, height, start, end, color, title, description }) => {
+        const formatTime = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`)
+        const startHours: string = formatTime(start.hours);
+        const startMinutes: string = formatTime(start.minutes);
+        const endHours: string = formatTime(end.hours);
+        const endMinutes: string = formatTime(end.minutes);
+
+        return(
+        <S.Event
+          key={id}
+          $height={height}
+          $fromTop={F.calculateTopOffset(start)}
+          $color={color}
+        >
+          {startHours}:{startMinutes}
+          <span>-</span>
+          {endHours}:{endMinutes} <br />
+          <strong>{title}</strong> <br />
+          {description}
+        </S.Event>)
+      })}
+    </div>
+  );
+};
+
+
+// HOUR LINE COMPONENT
+const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => (
+  <S.HourLine $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}>
+    {currentDate.getHours()}:{currentDate.getMinutes()}
+    <S.LineAfterHour />
+  </S.HourLine>)
+
+
+// EVENT MODAL COMPONENT
+const EventModal: React.FC<{
+  isModalOpen: boolean;
+  handleModalClose: () => void;
+}> = ({ isModalOpen, handleModalClose }) => {
+
+  const handleSubmit = (e: React.FormEvent): void => {
+    e.preventDefault();
+    handleModalClose();
+  };
+  
+  return (
+    <Modal show={isModalOpen} handleClose={handleModalClose}>
+      <S.ModalContent>
+        <S.EventSettings onSubmit={(e) => handleSubmit(e)}>
+          <S.InputTitle
+          />
+
+          <S.InputDescription
+          />
+
+          <S.SelectColor
+          >
+            {C.COLORS.map((color: string, i: number) => 
+              <option key={i} value={color}>{color}</option>
+            )}
+          </S.SelectColor>
+
+          <S.InputTimeContainer>
+            <S.TimeInput
+            />
+
+            <S.TimeInput
+            />
+          </S.InputTimeContainer>
+
+          <S.ButtonsContainer>
+            {C.DAYS.map((day, i) => (
+              <S.DayLabel key={i}>
+                <S.EventDayChecks />
+                <S.DayText>{day.charAt(0)}</S.DayText>
+              </S.DayLabel>
+            ))}
+          </S.ButtonsContainer>
+
+          <S.SaveButton>Save</S.SaveButton>
+          <S.DeleteButton>Delete</S.DeleteButton>
+        </S.EventSettings>
+      </S.ModalContent>
+    </Modal>
+  );
+};
 export default WeeklyCalendar;
