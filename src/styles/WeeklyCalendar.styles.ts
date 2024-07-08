@@ -1,8 +1,7 @@
-import * as CONST from "@/utils/constants"
+import * as C from "@/utils/constants"
 import styled from "styled-components";
 
-// WEEKLY CALENDAR STYLES
-const Container = styled.div`
+const GridContainer = styled.div`
   width: 90%;
   max-width: 1200px;
   height: 80vh;
@@ -11,15 +10,23 @@ const Container = styled.div`
   background-color: white;
 
   display: grid;
-  // First row has fixed size;
 
-  grid-template-rows: ${CONST.HEADER_HEIGHT}px ${CONST.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
+  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
+  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
+  grid-template-areas: "header header" "aside subheader" "aside main";
+
+    /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 `;
 
-
-// HEADER STYLES START
-
 const Header = styled.div`
+  grid-area: header;
   padding: 5px;
   box-shadow: 0 .2px 0 0 slategray;
 
@@ -28,82 +35,76 @@ const Header = styled.div`
   align-items: center;
 `;
 
-const Title = styled.h2`
-  text-align: left; 
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-  position: relative;
-  display: inline-block;
-  margin-bottom: 10px;
 
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    border-bottom: 2px dashed #A0A0A0; 
-    margin-top: 5px; 
-  }
-`;
-
-const Buttons = styled.div`
-  text-align: right; 
-`;
-
-// HEADER STYLES END
-
-// DAYS OF THE WEEK STYLES START
-const DaysOfTheWeek = styled.div`
-  align-items: center; 
-
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-left: ${CONST.HOUR_WIDTH}px;
-`;
-
-const Day = styled.div`
-  text-align: center; 
-`;
-
-// DAYS OF THE WEEK  STYLES END
-
-
-// MAIN STYLES START
-const Main = styled.div`
-  position: relative;
-  overflow-y: scroll;
-
-  display: grid;
-  grid-template-columns: ${CONST.HOUR_WIDTH}px 1fr;
-`;
-
-const AsideTime = styled.div`
+const Aside = styled.div`
+  grid-area: aside;
   text-align: center; 
   align-items: center; 
   justify-items: center; 
+  margin-top: ${C.HEADER_HEIGHT}px;
+  overflow-y: scroll;
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 `;
 
-const Hour = styled.div`
+const SubHeader = styled.div`
+  grid-area: subheader;
+
+  align-items: center; 
+
   font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  height: ${CONST.HOUR_HEIGHT}px;
+  font-weight: 600; 
+
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
 `;
 
-const DayColumn = styled.div`
+const S_Day = styled.div`
+  text-align: center; 
+`;
+
+
+const Main = styled.div`
+  grid-area: main;
+
+  position: relative;
+  overflow-y: scroll;
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+
+`;
+
+
+const A_Hour = styled.div`
+  font-family: 'Poppins', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500; 
+  height: ${C.HOUR_HEIGHT/2}px;
+`;
+
+const M_DayColumn = styled.div`
   position: relative;
 `;
 
-const Cells = styled.div`
+const M_Cells = styled.div`
   position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 `;
 
-
-
-const HourLine = styled.div<{ $fromTop: number }>`
+const H_HourLine = styled.div<{ $fromTop: number }>`
   position: absolute;
   margin-left: 5px;
   z-index: 2;
@@ -118,13 +119,13 @@ const HourLine = styled.div<{ $fromTop: number }>`
   pointer-events: none;
 `;
 
-const LineAfterHour = styled.div`
+const H_LineAfterHour = styled.div`
   flex: 1;
   height: 1px;
   background-color: red; 
 `;
 // MAIN STYLES END
-const HourLineDot = styled.div<{ $fromTop: number }>`
+const M_HourLineDot = styled.div<{ $fromTop: number }>`
   position: absolute;
   width: 10px; 
   height: 10px; 
@@ -135,13 +136,13 @@ const HourLineDot = styled.div<{ $fromTop: number }>`
   transform: translateX(-50%);
 `;
 
-const Cell = styled.div`
-  height: calc(${CONST.HOUR_HEIGHT}px / 2);
+const M_Cell = styled.div`
+  height: calc(${C.HOUR_HEIGHT}px / 2);
   box-shadow: .2px .2px 0 0 slategray;
 `;
 
 // EVENT STYLES
-const Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
+const E_Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
   position: absolute;
   z-index: 40;
   width: calc(100% - 5px);
@@ -172,12 +173,6 @@ const Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
   }
 `;
 
-export {
-  Event
-};
-
-
-// EVENT MODAL STYLES
 const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
@@ -286,6 +281,27 @@ const DeleteButton = styled.button`
   flex: 1;
 `;
 
+const H_Title = styled.h2`
+  text-align: left; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; 
+  position: relative;
+  display: inline-block;
+  margin-bottom: 10px;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    border-bottom: 2px dashed #A0A0A0; 
+    margin-top: 5px; 
+  }
+`;
+
+const H_Buttons = styled.div`
+  text-align: right; 
+`;
+
 export {
   ModalContent,
   TimeInput,
@@ -300,19 +316,20 @@ export {
   DayText,
   SaveButton,
   DeleteButton,
-  Container,
+  GridContainer,
   Header,
-  Title,
-  Buttons,
-  DaysOfTheWeek,
-  Day,
+  Aside,
+  SubHeader,
   Main,
-  AsideTime,
-  Hour,
-  DayColumn,
-  Cells,
-  HourLine,
-  LineAfterHour,
-  HourLineDot,
-  Cell,
+  H_Title,
+  H_Buttons,
+  A_Hour,
+  S_Day,
+  M_DayColumn,
+  M_Cells,
+  H_HourLine,
+  H_LineAfterHour,
+  M_HourLineDot,
+  M_Cell,
+  E_Event
 };

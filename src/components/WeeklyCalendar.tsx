@@ -5,19 +5,96 @@ import * as S from "@/styles/WeeklyCalendar.styles";
 import { Event, Time } from "@/utils/classes";
 import Modal from "./Modal";
 
-
 // WEEKLY CALENDAR COMPONENT
 const WeeklyCalendar: React.FC = () => {
   const [events, setEvents] = useState<Map<string, Event>>(new Map());
-  const event = useRef<Event>(C.NULL_EVENT);
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+  const event = useRef<Event>(C.NULL_EVENT);
+  const mainRef = useRef<HTMLDivElement>(null);
+  const asideRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const main = mainRef.current;
+    const aside = asideRef.current;
+
+    if (main && aside) {
+      const handleScroll = () => {
+        if (aside) {
+          aside.scrollTop = main.scrollTop;
+        }
+      };
+
+      main.addEventListener("scroll", handleScroll);
+
+      return () => {
+        main.removeEventListener("scroll", handleScroll);
+      };
+    }
+  }, []);
+
+  return (
+    <S.GridContainer>
+      <Header />
+      <Aside asideRef={asideRef} />
+      <SubHeader />
+      <Main
+        mainRef={mainRef}
+        event={event}
+        events={events}
+        setIsMouseDown={setIsMouseDown}
+        setEvents={setEvents}
+        isMouseDown={isMouseDown}
+      />
+      {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
+    </S.GridContainer>
+  );
+};
+
+const Header: React.FC = () => {
+  return (
+    <S.Header>
+      <S.H_Title>Header</S.H_Title>
+      <S.H_Buttons>Hi</S.H_Buttons>
+    </S.Header>
+  );
+};
+
+const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement> }> = ({ asideRef }) => {
+  return (
+    <S.Aside ref={asideRef}>
+      {F.generate24HourIntervals().map((hour: string, i: number) => (
+        <S.A_Hour key={i}>{hour}</S.A_Hour>
+      ))}
+    </S.Aside>
+  );
+};
+
+const SubHeader: React.FC = () => {
+  return (
+    <S.SubHeader>
+      {C.DAYS.map((day, i) => (
+        <S.S_Day key={i}>{day}</S.S_Day>
+      ))}
+    </S.SubHeader>
+  );
+};
+
+const Main: React.FC<{
+  mainRef: React.RefObject<HTMLDivElement>;
+  event: React.MutableRefObject<Event>;
+  events: Map<string, Event>;
+  setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
+  setIsMouseDown: React.Dispatch<React.SetStateAction<boolean>>;
+  isMouseDown: boolean;
+}> = ({ mainRef, event, events, setEvents, setIsMouseDown, isMouseDown }) => {
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentDate(new Date());
     }, 60000);
+
 
     return () => clearInterval(interval);
   }, []);
@@ -29,28 +106,27 @@ const WeeklyCalendar: React.FC = () => {
     setIsMouseDown(true);
 
     const newEventStart: Time = F.calculateEventStart(e);
-    const eventOverlapping = F.isEventOverlapping(events, date, newEventStart, );
+    const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
     if (eventOverlapping) return;
     event.current = new Event(date, newEventStart);
-
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
 
-    if(!isMouseDown) return;
+    if (!isMouseDown) return;
 
-    const newEvent: Event = new Event(event.current.date,event.current.start);
+    const newEvent: Event = new Event(event.current.date, event.current.start);
     newEvent.height = F.calculateEventHeight(e, newEvent);
     newEvent.end = F.calculateEventEnd(newEvent);
     newEvent.id = event.current.id;
 
-    const newEventValid: Boolean= F.isNewEventValid(newEvent,events);
+    const newEventValid: boolean = F.isNewEventValid(newEvent, events);
 
     if (!newEventValid) return;
 
-    event.current.height = newEvent.height
-    event.current.end = newEvent.end
+    event.current.height = newEvent.height;
+    event.current.end = newEvent.end;
 
     setEvents((prevEvents) => new Map([...prevEvents, [event.current.id, event.current]]));
   };
@@ -59,7 +135,7 @@ const WeeklyCalendar: React.FC = () => {
     e.preventDefault();
     setIsMouseDown(false);
 
-    const newEventValid: Boolean= F.isNewEventValid(event.current,events);
+    const newEventValid: boolean = F.isNewEventValid(event.current, events);
 
     if (!newEventValid) {
       setEvents((prevEvents) => {
@@ -73,129 +149,99 @@ const WeeklyCalendar: React.FC = () => {
   };
 
   return (
-    <S.Container>
-      <S.Header>
-        <S.Title>Header</S.Title>
-        <S.Buttons>Hi</S.Buttons>
-      </S.Header>
-      <S.DaysOfTheWeek>
-        {C.DAYS.map((day, i) => (
-          <S.Day key={i}>{day}</S.Day>
-        ))}
-      </S.DaysOfTheWeek>
-      <S.Main>
-        <S.AsideTime>
-          {F.generate24HourIntervals().map((hour: string, i: number) => (
-            <S.Hour key={i}>{hour}</S.Hour>
-          ))}
-        </S.AsideTime>
-        <S.Cells onMouseMove={handleMouseMove} onMouseLeave={()=>setIsMouseDown(false)}>
-          {C.DAYS.map((day, i) => {
-            const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
-            const mondayDate = F.getMostRecentMonday();
-            const dayDate: Date = F.addDateBy(mondayDate, i);
-            const isToday = F.areDatesTheSame(dayDate, currentDate);
-            const filteredEvents = Array.from(events.values()).filter((event) =>
-              F.areDatesTheSame(event.date, dayDate)
-            );
+    <S.Main ref={mainRef}>
+      <S.M_Cells onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
+        {C.DAYS.map((day, i) => {
+          const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
+          const mondayDate = F.getMostRecentMonday();
+          const dayDate: Date = F.addDateBy(mondayDate, i);
+          const isToday = F.areDatesTheSame(dayDate, currentDate);
+          const filteredEvents = Array.from(events.values()).filter((event) =>
+            F.areDatesTheSame(event.date, dayDate)
+          );
 
-            return (
-              <S.DayColumn
-                key={i}
-                onMouseDown={(e) => handleMouseDown(e, dayDate)}
-                onMouseUp={handleMouseUp}
-              >
-                {Array.from({ length: 48 }, (_, j) => <S.Cell key={j} />)}
+          return (
+            <S.M_DayColumn
+              key={i}
+              onMouseDown={(e) => handleMouseDown(e, dayDate)}
+              onMouseUp={handleMouseUp}
+            >
+              {Array.from({ length: 48 }, (_, j) => (
+                <S.M_Cell key={j} />
+              ))}
 
-                <Events events={filteredEvents} />
-                
-                {isToday && <S.HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />}
-              </S.DayColumn>
-            );
-          })}
-        </S.Cells>
-        <HourLine currentDate={currentDate} />
-      </S.Main>
-      {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
-    </S.Container>
+              <Events events={filteredEvents} />
+
+              {isToday && <S.M_HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />}
+            </S.M_DayColumn>
+          );
+        })}
+      </S.M_Cells>
+      <HourLine currentDate={currentDate} />
+    </S.Main>
   );
 };
 
-
-// EVENTS COMPONENT
 const Events: React.FC<{ events: Event[] }> = ({ events }) => {
   return (
     <div>
       {events.map(({ id, height, start, end, color, title, description }) => {
-        const formatTime = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`)
+        const formatTime = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
         const startHours: string = formatTime(start.hours);
         const startMinutes: string = formatTime(start.minutes);
         const endHours: string = formatTime(end.hours);
         const endMinutes: string = formatTime(end.minutes);
 
-        return(
-        <S.Event
-          key={id}
-          $height={height}
-          $fromTop={F.calculateTopOffset(start)}
-          $color={color}
-        >
-          {startHours}:{startMinutes}
-          <span>-</span>
-          {endHours}:{endMinutes} <br />
-          <strong>{title}</strong> <br />
-          {description}
-        </S.Event>)
+        return (
+          <S.E_Event
+            key={id}
+            $height={height}
+            $fromTop={F.calculateTopOffset(start)}
+            $color={color}
+          >
+            {startHours}:{startMinutes}
+            <span>-</span>
+            {endHours}:{endMinutes} <br />
+            <strong>{title}</strong> <br />
+            {description}
+          </S.E_Event>
+        );
       })}
     </div>
   );
 };
 
-
-// HOUR LINE COMPONENT
 const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => (
-  <S.HourLine $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}>
+  <S.H_HourLine $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}>
     {currentDate.getHours()}:{currentDate.getMinutes()}
-    <S.LineAfterHour />
-  </S.HourLine>)
+    <S.H_LineAfterHour />
+  </S.H_HourLine>
+);
 
-
-// EVENT MODAL COMPONENT
 const EventModal: React.FC<{
   isModalOpen: boolean;
   handleModalClose: () => void;
 }> = ({ isModalOpen, handleModalClose }) => {
-
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
     handleModalClose();
   };
-  
+
   return (
     <Modal show={isModalOpen} handleClose={handleModalClose}>
       <S.ModalContent>
-        <S.EventSettings onSubmit={(e) => handleSubmit(e)}>
-          <S.InputTitle
-          />
-
-          <S.InputDescription
-          />
-
-          <S.SelectColor
-          >
-            {C.COLORS.map((color: string, i: number) => 
+        <S.EventSettings onSubmit={handleSubmit}>
+          <S.InputTitle />
+          <S.InputDescription />
+          <S.SelectColor>
+            {C.COLORS.map((color: string, i: number) => (
               <option key={i} value={color}>{color}</option>
-            )}
+            ))}
           </S.SelectColor>
-
           <S.InputTimeContainer>
-            <S.TimeInput
-            />
-
-            <S.TimeInput
-            />
+            <S.TimeInput />
+            <S.TimeInput />
           </S.InputTimeContainer>
-
           <S.ButtonsContainer>
             {C.DAYS.map((day, i) => (
               <S.DayLabel key={i}>
@@ -204,7 +250,6 @@ const EventModal: React.FC<{
               </S.DayLabel>
             ))}
           </S.ButtonsContainer>
-
           <S.SaveButton>Save</S.SaveButton>
           <S.DeleteButton>Delete</S.DeleteButton>
         </S.EventSettings>
@@ -212,4 +257,5 @@ const EventModal: React.FC<{
     </Modal>
   );
 };
+
 export default WeeklyCalendar;
