@@ -20,7 +20,7 @@ const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.
 
 
 // Converts the map into an array returning only the events with the same date
-const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => 
+const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
 // Creates an array of n size;
 const range = (size: number): number[] => [...Array(size).keys()]
