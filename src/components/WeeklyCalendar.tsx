@@ -14,7 +14,21 @@ const WeeklyCalendar: React.FC = () => {
   const mainRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLDivElement>(null);
 
+  const handleAsideScroll = () => {
+    if (asideRef.current && mainRef.current) {
+      mainRef.current.scrollTop = asideRef.current.scrollTop;
+    }
+  };
 
+  const handleMainScroll = () => {
+    if (asideRef.current && mainRef.current) {
+      const sidebarMaxScrollTop = asideRef.current.scrollHeight - asideRef.current.clientHeight;
+      if (mainRef.current.scrollTop > sidebarMaxScrollTop) {
+        mainRef.current.scrollTop = sidebarMaxScrollTop;
+      }
+      asideRef.current.scrollTop = mainRef.current.scrollTop;
+    }
+  };
 
 
   return (
