@@ -36,9 +36,7 @@ const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(dat
 
 // Returns the most recent Monday
 const getMostRecentMonday = (): Date => {
-  const today = new Date();
-  today.setDate(today.getDate() - (today.getDay() + 6) % 7 );
-  return today;
+
 }
 
 // Calculates the top offset in pixels units given the time.
