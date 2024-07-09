@@ -118,15 +118,7 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
 
 // Calculates the event duration
 const getEventDuration = ({ start, end }: Event): Time => {
-  const totalStartMinutes: number = timeToMinutes(start);
-  const totalEndMinutes: number = timeToMinutes(end);
 
-  const eventTotalMinutes: number = totalEndMinutes - totalStartMinutes;
-  
-  const eventHours: number = Math.floor(minutesToHours(eventTotalMinutes));
-  const eventMinutes: number = eventTotalMinutes % 60;
-
-  return new Time(eventHours,eventMinutes);
 }
 
 const isEndBeforeStart = ({ start, end }: Event): boolean => {
