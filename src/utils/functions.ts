@@ -137,7 +137,19 @@ const isEndBeforeStart = ({ start, end }: Event): boolean => {
 };
 
 const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
+  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
+  const newEventStartMinutes = timeToMinutes(newEvent.start);
+  const newEventEndMinutes = timeToMinutes(newEvent.end);
 
+  for (const { start, end, id } of sameDateEvents) {
+    if (newEvent.id === id) continue;
+    const eventStartMinutes = timeToMinutes(start);
+    const eventEndMinutes = timeToMinutes(end);
+
+    if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) return true; 
+  }
+
+  return false; 
 };
 
 
