@@ -14,32 +14,34 @@ const WeeklyCalendar: React.FC = () => {
   const mainRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const main = mainRef.current;
-    const aside = asideRef.current;
-
-    if (main && aside) {
-      const handleScroll = () => {
-        if (aside) {
-          aside.scrollTop = main.scrollTop;
-        }
-      };
-
-      main.addEventListener("scroll", handleScroll);
-
-      return () => {
-        main.removeEventListener("scroll", handleScroll);
-      };
+  const handleAsideScroll = () => {
+    if (asideRef.current && mainRef.current) {
+      mainRef.current.scrollTop = asideRef.current.scrollTop;
     }
-  }, []);
+  };
+
+  const handleMainScroll = () => {
+    if (asideRef.current && mainRef.current) {
+      const sidebarMaxScrollTop = asideRef.current.scrollHeight - asideRef.current.clientHeight;
+      if (mainRef.current.scrollTop > sidebarMaxScrollTop) {
+        mainRef.current.scrollTop = sidebarMaxScrollTop;
+      }
+      asideRef.current.scrollTop = mainRef.current.scrollTop;
+    }
+  };
+
 
   return (
     <S.GridContainer>
       <Header />
-      <Aside asideRef={asideRef} />
+      <Aside 
+        asideRef={asideRef} 
+        handleAsideScroll={handleAsideScroll}
+        />
       <SubHeader />
       <Main
         mainRef={mainRef}
+        handleMainScroll={handleMainScroll}
         event={event}
         events={events}
         setIsMouseDown={setIsMouseDown}
@@ -60,11 +62,11 @@ const Header: React.FC = () => {
   );
 };
 
-const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement> }> = ({ asideRef }) => {
+const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideScroll: () => void}> = ({ asideRef, handleAsideScroll }) => {
   return (
-    <S.Aside ref={asideRef}>
+    <S.Aside ref={asideRef} onScroll={handleAsideScroll}>
       {F.generate24HourIntervals().map((hour: string, i: number) => (
-        <S.A_Hour key={i}>{hour}</S.A_Hour>
+        <S.A_Hour key={i} $marginBottom={i === 0 ? 2.5 : 0}  >{hour}</S.A_Hour>
       ))}
     </S.Aside>
   );
@@ -82,12 +84,13 @@ const SubHeader: React.FC = () => {
 
 const Main: React.FC<{
   mainRef: React.RefObject<HTMLDivElement>;
+  handleMainScroll: () => void;
   event: React.MutableRefObject<Event>;
   events: Map<string, Event>;
   setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
   setIsMouseDown: React.Dispatch<React.SetStateAction<boolean>>;
   isMouseDown: boolean;
-}> = ({ mainRef, event, events, setEvents, setIsMouseDown, isMouseDown }) => {
+}> = ({ mainRef, handleMainScroll, event, events, setEvents, setIsMouseDown, isMouseDown }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -149,7 +152,7 @@ const Main: React.FC<{
   };
 
   return (
-    <S.Main ref={mainRef}>
+    <S.Main ref={mainRef} onScroll={handleMainScroll}>
       <S.M_Cells onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
         {C.DAYS.map((day, i) => {
           const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());

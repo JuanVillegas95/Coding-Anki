@@ -3,9 +3,9 @@ import styled from "styled-components";
 
 const GridContainer = styled.div`
   width: 90%;
-  max-width: 1200px;
-  height: 80vh;
-  margin: 0 50px;
+  max-width: 1400px;
+  height: 90vh;
+  margin: 0 30px;
   border-radius: 2%;
   background-color: white;
 
@@ -87,11 +87,12 @@ const Main = styled.div`
 `;
 
 
-const A_Hour = styled.div`
+const A_Hour  = styled.div<{ $marginBottom: number }>`
   font-family: 'Poppins', sans-serif;
   font-size: 12.5px;
   font-weight: 500; 
   height: ${C.HOUR_HEIGHT/2}px;
+  margin-bottom: ${({ $marginBottom }) => $marginBottom|| 0}px;
 `;
 
 const M_DayColumn = styled.div`
@@ -106,7 +107,6 @@ const M_Cells = styled.div`
 
 const H_HourLine = styled.div<{ $fromTop: number }>`
   position: absolute;
-  margin-left: 5px;
   z-index: 2;
   width: calc(100% - 5px);
   top: ${({ $fromTop }) => $fromTop}px;
