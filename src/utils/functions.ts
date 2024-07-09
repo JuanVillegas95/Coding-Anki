@@ -4,19 +4,19 @@ import React from "react";
 
 // Utility functions
 // Converts hours to minutes
-const hoursToMinutes = (hours: number): number => 
+const hoursToMinutes = (hours: number): number => hours * 60; 
 
 // Converts minutes to hours
-const minutesToHours = (minutes: number): number => 
+const minutesToHours = (minutes: number): number => minutes / 60; 
 
 // Converts hours (including fractional hours from minutes) to height in pixels
-const hoursToHeight = (hours: number): number => 
+const hoursToPixels = (hours: number): number => hours * C.HOUR_HEIGHT; 
 
 // Convert pixels to hours (including fractional hours from minutes)
-const pixelsToHours = (pixels: number): number => 
+const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
 
 // Convert time in minutes;
-const timeToMinutes = (time: Time): number => 
+const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
 
 
 // Converts the map into an array returning only the events with the same date
@@ -45,7 +45,7 @@ const getMostRecentMonday = (): Date => {
 const calculateTopOffset = (time: Time): number => {
   const totalMinutes: number = timeToMinutes(time);
   const totalHours: number = minutesToHours(totalMinutes);
-  return hoursToHeight(totalHours);
+  return hoursToPixels(totalHours);
 }
 
 // Formats the unit into decimal format
@@ -57,7 +57,7 @@ const generate24HourIntervals = (): string[] => {
   for(let i = 0; i<24; i++) {
     const formattedTime: string = formatTime(i);
     timeArray.push(`${formattedTime}:00`);
-    timeArray.push(`${formattedTime}:30`);
+    timeArray.push(`${formattedTime}:0`);
   }
   return timeArray;
 } 
@@ -98,7 +98,7 @@ const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, {
   const distanceFromTop: number = clientY - topOffset;
 
   const totalHourStart: number= start.hours + minutesToHours(start.minutes);
-  const distanceFromStart: number = hoursToHeight(totalHourStart);
+  const distanceFromStart: number = hoursToPixels(totalHourStart);
 
   return distanceFromTop - distanceFromStart
 }
