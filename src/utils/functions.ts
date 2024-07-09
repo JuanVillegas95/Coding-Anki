@@ -43,9 +43,9 @@ const getMostRecentMonday = (): Date => {
 
 // Calculates the top offset in pixels units given the time.
 const calculateTopOffset = (time: Time): number => {
-  const totalMinutes: number = timeToMinutes(time);
-  const totalHours: number = minutesToHours(totalMinutes);
-  return hoursToPixels(totalHours);
+  const totalTimeMinutes = timeToMinutes(time);
+  const totalTimeHours = minutesToHours(totalTimeMinutes);
+  return hoursToPixels(totalTimeHours);
 }
 
 // Formats the unit into decimal format
@@ -64,18 +64,9 @@ const generate24HourIntervals = (): string[] => {
 
 // Calculates the start time of an event based on a mouse click position.
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
-  const { clientY, currentTarget } = e;
-  const topOffset: number = currentTarget.getBoundingClientRect().top;
-  const distanceFromTop: number = clientY - topOffset;
-  
-  const totalHours: number = pixelsToHours(distanceFromTop);
-  const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
-  
-  const startingHour: number = Math.floor(minutesToHours(totalMinutes));
-  const startingMinutes: number = totalMinutes % 60;
 
-  return new Time(startingHour, startingMinutes);
 }
+
 
 // Checks if a new event overlaps with any existing events on the same date.
 const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, minutes }: Time) => {
