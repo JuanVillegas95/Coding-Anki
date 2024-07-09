@@ -106,7 +106,14 @@ const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, {
 
 // Calculates the  end time of an event based the height and start time
 const calculateEventEnd = ({ start, height }: Event): Time => {
+  const totalMinutesStart: number = timeToMinutes(start);
+  const totalMinutesHeight: number = Math.floor(hoursToMinutes(pixelsToHours(height)));
+  const totalMinutes: number = totalMinutesStart + totalMinutesHeight;
 
+  const hourEnd: number = Math.floor(minutesToHours(totalMinutes));
+  const minutesEnd: number  = totalMinutes % 60;
+  
+  return new Time(hourEnd,minutesEnd);
 }
 
 // Calculates the event duration
