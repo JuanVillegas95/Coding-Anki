@@ -152,7 +152,6 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
   return false; 
 };
 
-
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
   const newEventDuration: Time = getEventDuration(newEvent);
   if(newEventDuration.minutes < C.MAX_DURATION_MINUTES) return false
@@ -165,7 +164,6 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
 
   return true;
 }
-
 
 
 export {
