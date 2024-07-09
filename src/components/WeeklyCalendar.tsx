@@ -141,7 +141,11 @@ const Main: React.FC<{
     const newEventValid: boolean = F.isNewEventValid(event.current, events);
 
     if (!newEventValid) {
-
+      setEvents((prevEvents) => {
+        const updatedEvents = new Map(prevEvents);
+        updatedEvents.delete(event.current.id);
+        return updatedEvents;
+      });
     }
 
     event.current = C.NULL_EVENT;
