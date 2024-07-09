@@ -64,7 +64,17 @@ const generate24HourIntervals = (): string[] => {
 
 // Calculates the start time of an event based on a mouse click position.
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+  const { clientY, currentTarget } = e;
+  const topOffset: number = currentTarget.getBoundingClientRect().top;
+  const distanceFromTop: number = clientY - topOffset;
+  
+  const totalHours: number = pixelsToHours(distanceFromTop);
+  const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
+  
+  const startingHour: number = Math.floor(minutesToHours(totalMinutes));
+  const startingMinutes: number = totalMinutes % 60;
 
+  return new Time(startingHour, startingMinutes);
 }
 
 
