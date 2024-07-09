@@ -32,7 +32,7 @@ const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getDate() === second.getDate();
 
 // Adds a specified number of days to the given date.
-const addDateBy = (date: Date, count: number): Date =>
+const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(date.getDate() + count));
 
 // Returns the most recent Monday
 const getMostRecentMonday = (): Date => {
