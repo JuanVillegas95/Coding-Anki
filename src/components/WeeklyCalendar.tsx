@@ -131,7 +131,7 @@ const Main: React.FC<{
     event.current.height = newEvent.height;
     event.current.end = newEvent.end;
 
-    setEvents((prevEvents) => new Map([...prevEvents, [event.current.id, event.current]]));
+
   };
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
