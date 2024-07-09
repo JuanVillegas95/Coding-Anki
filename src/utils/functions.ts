@@ -4,19 +4,19 @@ import React from "react";
 
 // Utility functions
 // Converts hours to minutes
-const hoursToMinutes = (hours: number): number => hours * 60; 
+const hoursToMinutes = (hours: number): number => 
 
 // Converts minutes to hours
-const minutesToHours = (minutes: number): number => minutes / 60; 
+const minutesToHours = (minutes: number): number => 
 
 // Converts hours (including fractional hours from minutes) to height in pixels
-const hoursToHeight = (hours: number): number => hours * C.HOUR_HEIGHT; 
+const hoursToHeight = (hours: number): number => 
 
 // Convert pixels to hours (including fractional hours from minutes)
-const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
+const pixelsToHours = (pixels: number): number => 
 
 // Convert time in minutes;
-const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
+const timeToMinutes = (time: Time): number => 
 
 
 // Converts the map into an array returning only the events with the same date
