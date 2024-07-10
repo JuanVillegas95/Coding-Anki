@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import WeeklyCalendar from "../components/WeeklyCalendar";
+import CalendarHub from "@/components/CalendarHub"
 import { createGlobalStyle } from "styled-components";
 import styled from "styled-components";
 
@@ -23,7 +23,7 @@ export default function Home() {
     <>
       <GlobalStyle />
       <Container>
-        <WeeklyCalendar />
+        <CalendarHub />
       </Container>
     </>
   );

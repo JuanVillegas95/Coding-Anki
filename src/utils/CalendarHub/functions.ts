@@ -1,5 +1,5 @@
-import * as C from "@/utils/constants";
-import { Time, Event } from "@/utils/classes";
+import * as C from "@/utils/CalendarHub/constants";
+import { Time, Event } from "@/utils/CalendarHub/classes";
 import React from "react";
 
 // Utility functions
@@ -57,14 +57,14 @@ const generate24HourIntervals = (): string[] => {
   for(let i = 0; i<24; i++) {
     const formattedTime: string = formatTime(i);
     timeArray.push(`${formattedTime}:00`);
-    timeArray.push(`${formattedTime}:0`);
+    timeArray.push(`${formattedTime}:30`);
   }
   return timeArray;
 } 
 
 // Calculates the start time of an event based on a mouse click position.
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
-  const { clientY, currentTarget } = e;
+  const { clientY, currentTarget } = e; l
   const topOffset: number = currentTarget.getBoundingClientRect().top;
   const distanceFromTop: number = clientY - topOffset;
   

@@ -1,4 +1,4 @@
-import * as C from "@/utils/constants"
+import * as C from "@/utils/CalendarHub/constants"
 import styled from "styled-components";
 
 const GridContainer = styled.div`
@@ -27,12 +27,28 @@ const GridContainer = styled.div`
 
 const Header = styled.div`
   grid-area: header;
-  padding: 5px;
+  padding: 10px;
   box-shadow: 0 .2px 0 0 slategray;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin: 10px;
+`;
+
+const HEADER_Title = styled.input`
+  text-align: left; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; 
+
+
+  &::after {
+    content: '';
+    display: block;
+    width: 100%;
+    border-bottom: 2px dashed #A0A0A0; 
+    margin-top: 5px; 
+  }
 `;
 
 
@@ -92,7 +108,7 @@ const A_Hour  = styled.div<{ $marginBottom: number }>`
   font-size: 12.5px;
   font-weight: 500; 
   height: ${C.HOUR_HEIGHT/2}px;
-  margin-bottom: ${({ $marginBottom }) => $marginBottom|| 0}px;
+  margin-bottom: ${({ $marginBottom }) => $marginBottom}px;
 `;
 
 const M_DayColumn = styled.div`
@@ -281,26 +297,7 @@ const DeleteButton = styled.button`
   flex: 1;
 `;
 
-const H_Title = styled.h2`
-  text-align: left; 
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-  position: relative;
-  display: inline-block;
-  margin-bottom: 10px;
 
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    border-bottom: 2px dashed #A0A0A0; 
-    margin-top: 5px; 
-  }
-`;
-
-const H_Buttons = styled.div`
-  text-align: right; 
-`;
 
 export {
   ModalContent,
@@ -321,8 +318,7 @@ export {
   Aside,
   SubHeader,
   Main,
-  H_Title,
-  H_Buttons,
+  HEADER_Title,
   A_Hour,
   S_Day,
   M_DayColumn,

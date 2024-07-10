@@ -1,26 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
-import * as C from "@/utils/constants";
-import * as F from "@/utils/functions";
-import * as S from "@/styles/WeeklyCalendar.styles";
-import { Event, Time } from "@/utils/classes";
+import * as C from "@/utils/CalendarHub/constants";
+import * as F from "@/utils/CalendarHub/functions";
+import * as S from "@/styles/CalendarHub.styles";
+import { Event, Time, Calendar } from "@/utils/CalendarHub/classes";
 import Modal from "./Modal";
 
 // WEEKLY CALENDAR COMPONENT
-const WeeklyCalendar: React.FC = () => {
-  const [events, setEvents] = useState<Map<string, Event>>(new Map());
+const CalendarHub: React.FC = () => {
+  const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+  const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const event = useRef<Event>(C.NULL_EVENT);
   const mainRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLDivElement>(null);
 
-  const handleAsideScroll = () => {
+  useEffect(()=> {
+    // TODO Validate user....
+    calendar.current = new Calendar();
+    setCalendars(new Map([[calendar.current.id, calendar.current]]))
+  },[])
+
+  const getCurrentEvents = (): Map<string, Event> => {
+    return calendars.get(calendar.current.id)!.events;
+  }
+
+  const addCurrEventToCurrCalendar = (): void => {
+    calendar.current.events.set(event.current.id,event.current)
+    setCalendars((prevCalendars) => {
+      const updatedCalendars = new Map(prevCalendars);
+      updatedCalendars.set(calendar.current.id, calendar.current);
+      return updatedCalendars;
+    });
+  };
+
+  const deleteCurrEventTOCurrCalendar = (): void => {
+    calendar.current.events.delete(event.current.id)
+    setCalendars((prevCalendars) => {
+      const updatedCalendars = new Map(prevCalendars);
+      updatedCalendars.set(calendar.current.id, calendar.current);
+      return updatedCalendars;
+    });
+  };
+
+  const handleAsideScroll = (): void => {
     if (asideRef.current && mainRef.current) {
       mainRef.current.scrollTop = asideRef.current.scrollTop;
     }
   };
 
-  const handleMainScroll = () => {
+  const handleMainScroll = (): void => {
     if (asideRef.current && mainRef.current) {
       const sidebarMaxScrollTop = asideRef.current.scrollHeight - asideRef.current.clientHeight;
       if (mainRef.current.scrollTop > sidebarMaxScrollTop) {
@@ -30,10 +59,14 @@ const WeeklyCalendar: React.FC = () => {
     }
   };
 
-
+  const handleTitleChange = (e:any): void => {
+    const newTitle = e.target.value;
+    calendar.current = new Calendar(calendar.current.id,newTitle,getCurrentEvents());
+  }
+  
   return (
     <S.GridContainer>
-      <Header />
+      <Header name={calendar.current.name} handleTitleChange={handleTitleChange}/>
       <Aside 
         asideRef={asideRef} 
         handleAsideScroll={handleAsideScroll}
@@ -43,9 +76,10 @@ const WeeklyCalendar: React.FC = () => {
         mainRef={mainRef}
         handleMainScroll={handleMainScroll}
         event={event}
-        events={events}
+        events={getCurrentEvents()}
+        addCurrEventToCurrCalendar={addCurrEventToCurrCalendar}
+        deleteCurrEventTOCurrCalendar={deleteCurrEventTOCurrCalendar}
         setIsMouseDown={setIsMouseDown}
-        setEvents={setEvents}
         isMouseDown={isMouseDown}
       />
       {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
@@ -53,11 +87,10 @@ const WeeklyCalendar: React.FC = () => {
   );
 };
 
-const Header: React.FC = () => {
+const Header: React.FC<{ name: string, handleTitleChange: (e:any) => void}> = ({ name, handleTitleChange }) => {
   return (
     <S.Header>
-      <S.H_Title>Header</S.H_Title>
-      <S.H_Buttons>Hi</S.H_Buttons>
+      <S.HEADER_Title value={name} onChange={handleTitleChange}/>
     </S.Header>
   );
 };
@@ -87,10 +120,11 @@ const Main: React.FC<{
   handleMainScroll: () => void;
   event: React.MutableRefObject<Event>;
   events: Map<string, Event>;
-  setEvents: React.Dispatch<React.SetStateAction<Map<string, Event>>>;
   setIsMouseDown: React.Dispatch<React.SetStateAction<boolean>>;
   isMouseDown: boolean;
-}> = ({ mainRef, handleMainScroll, event, events, setEvents, setIsMouseDown, isMouseDown }) => {
+  addCurrEventToCurrCalendar: () => void;
+  deleteCurrEventTOCurrCalendar: () => void;
+}> = ({ mainRef, handleMainScroll, event, events, setIsMouseDown, isMouseDown, addCurrEventToCurrCalendar, deleteCurrEventTOCurrCalendar }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -116,23 +150,24 @@ const Main: React.FC<{
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
-
+  
     if (!isMouseDown) return;
-
+  
     const newEvent: Event = new Event(event.current.date, event.current.start);
     newEvent.height = F.calculateEventHeight(e, newEvent);
     newEvent.end = F.calculateEventEnd(newEvent);
     newEvent.id = event.current.id;
-
+  
     const newEventValid: boolean = F.isNewEventValid(newEvent, events);
-
+  
     if (!newEventValid) return;
-
+  
     event.current.height = newEvent.height;
     event.current.end = newEvent.end;
-
-    setEvents((prevEvents) => new Map([...prevEvents, [event.current.id, event.current]]));
+  
+    addCurrEventToCurrCalendar();
   };
+  
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
@@ -140,13 +175,8 @@ const Main: React.FC<{
 
     const newEventValid: boolean = F.isNewEventValid(event.current, events);
 
-    if (!newEventValid) {
-      setEvents((prevEvents) => {
-        const updatedEvents = new Map(prevEvents);
-        updatedEvents.delete(event.current.id);
-        return updatedEvents;
-      });
-    }
+    if (!newEventValid) deleteCurrEventTOCurrCalendar();
+    
 
     event.current = C.NULL_EVENT;
   };
@@ -261,4 +291,4 @@ const EventModal: React.FC<{
   );
 };
 
-export default WeeklyCalendar;
+export default CalendarHub;
