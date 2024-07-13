@@ -1,5 +1,48 @@
 import { v4 as uuidv4 } from 'uuid';
 
+
+class FormattedEvent {
+  id: string;
+  title: string;
+  color: string;
+  description: string;
+  startHours: string;
+  startMinutes: string;
+  endHours: string;
+  endMinutes: string;
+  height: number;
+  topOffset: number;
+  isOverlapping: boolean;
+
+  constructor(
+    id: string,
+    title: string,
+    color: string,
+    description: string,
+    startHours: string,
+    startMinutes: string,
+    endHours: string,
+    endMinutes: string,
+    height: number,
+    topOffset: number,
+    isOverlapping: boolean = false
+
+  ) {
+    this.id = id;
+    this.title = title;
+    this.color = color;
+    this.description = description;
+    this.startHours = startHours;
+    this.startMinutes = startMinutes;
+    this.endHours = endHours;
+    this.endMinutes = endMinutes;
+    this.height = height;
+    this.topOffset = topOffset;
+    this.isOverlapping = isOverlapping;
+  }
+}
+
+
 class Calendar {
   id: string;
   name: string;
@@ -21,16 +64,23 @@ class Event {
   start: Time;
   end: Time;
   height: number;
+  duration: Time;
+  isOverlapping: boolean;
+  topOffset: number;
+
 
   constructor( date: Date = new Date(), start: Time = new Time()) {
     this.id = uuidv4();
     this.date = date;
     this.start = start;
-    this.end = new Time(0,0);
-    this.title = "";
-    this.description = "";
+    this.end = new Time(-1,-1);
+    this.title = "Math";
+    this.description = "Diego la chupa";
     this.color = "gray";
-    this.height = 0;
+    this.height = -1;
+    this.duration = new Time(-1,-1);
+    this.isOverlapping = false;
+    this.topOffset = 0;
   }
 }
 
@@ -44,4 +94,4 @@ class Time {
   }
 }
 
-export { Event, Time, Calendar };
+export { Event, Time, Calendar, FormattedEvent };

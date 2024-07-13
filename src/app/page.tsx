@@ -7,7 +7,7 @@ import styled from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   body {
-    background-color: #FAECD4;
+    background-color: #F0E6E7;
   }
 `;
 

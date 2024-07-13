@@ -1,44 +1,51 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as C from "@/utils/CalendarHub/constants";
 import * as F from "@/utils/CalendarHub/functions";
+import * as I from "@/utils/CalendarHub/icons"
 import * as S from "@/styles/CalendarHub.styles";
-import { Event, Time, Calendar } from "@/utils/CalendarHub/classes";
-import Modal from "./Modal";
+import { Event, Time, Calendar, FormattedEvent } from "@/utils/CalendarHub/classes";
+
 
 // WEEKLY CALENDAR COMPONENT
 const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const event = useRef<Event>(C.NULL_EVENT);
   const mainRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLDivElement>(null);
 
-  useEffect(()=> {
+  useEffect(() => {
     // TODO Validate user....
     calendar.current = new Calendar();
     setCalendars(new Map([[calendar.current.id, calendar.current]]))
-  },[])
+  }, [])
 
-  const getCurrentEvents = (): Map<string, Event> => {
-    return calendars.get(calendar.current.id)!.events;
-  }
 
-  const addCurrEventToCurrCalendar = (): void => {
-    calendar.current.events.set(event.current.id,event.current)
+  const addEvent = (): void => {
+    calendar.current.events.set(event.current.id, event.current)
     setCalendars((prevCalendars) => {
       const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, calendar.current);
+      updatedCalendars.set(calendar.current.id, { ...calendar.current });
       return updatedCalendars;
     });
   };
 
-  const deleteCurrEventTOCurrCalendar = (): void => {
+  const deleteEvent = (): void => {
     calendar.current.events.delete(event.current.id)
     setCalendars((prevCalendars) => {
       const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, calendar.current);
+      updatedCalendars.set(calendar.current.id, { ...calendar.current });
+      return updatedCalendars;
+    });
+  };
+
+  const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const newTitle: string = e.target.value;
+    if (newTitle.length > 18) return;
+    calendar.current.name = newTitle;
+    setCalendars((prevCalendars) => {
+      const updatedCalendars = new Map(prevCalendars);
+      updatedCalendars.set(calendar.current.id, { ...calendar.current });
       return updatedCalendars;
     });
   };
@@ -59,47 +66,46 @@ const CalendarHub: React.FC = () => {
     }
   };
 
-  const handleTitleChange = (e:any): void => {
-    const newTitle = e.target.value;
-    calendar.current = new Calendar(calendar.current.id,newTitle,getCurrentEvents());
-  }
-  
+
   return (
     <S.GridContainer>
-      <Header name={calendar.current.name} handleTitleChange={handleTitleChange}/>
-      <Aside 
-        asideRef={asideRef} 
+      <Header name={calendar.current.name} changeCalendarName={changeCalendarName} />
+      <Aside
+        asideRef={asideRef}
         handleAsideScroll={handleAsideScroll}
-        />
+      />
       <SubHeader />
       <Main
         mainRef={mainRef}
         handleMainScroll={handleMainScroll}
         event={event}
-        events={getCurrentEvents()}
-        addCurrEventToCurrCalendar={addCurrEventToCurrCalendar}
-        deleteCurrEventTOCurrCalendar={deleteCurrEventTOCurrCalendar}
-        setIsMouseDown={setIsMouseDown}
-        isMouseDown={isMouseDown}
+        events={calendars.get(calendar.current.id)!.events}
+        addEvent={addEvent}
+        deleteEvent={deleteEvent}
       />
       {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
     </S.GridContainer>
   );
 };
 
-const Header: React.FC<{ name: string, handleTitleChange: (e:any) => void}> = ({ name, handleTitleChange }) => {
+const Header: React.FC<{
+  name: string,
+  changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>) => void
+}> = ({ name, changeCalendarName }) => {
   return (
     <S.Header>
-      <S.HEADER_Title value={name} onChange={handleTitleChange}/>
+      <S.HEADER_Container>
+        <S.HEADER_Title value={name} onChange={changeCalendarName} />
+      </S.HEADER_Container>
     </S.Header>
   );
 };
 
-const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideScroll: () => void}> = ({ asideRef, handleAsideScroll }) => {
+const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideScroll: () => void }> = ({ asideRef, handleAsideScroll }) => {
   return (
     <S.Aside ref={asideRef} onScroll={handleAsideScroll}>
       {F.generate24HourIntervals().map((hour: string, i: number) => (
-        <S.A_Hour key={i} $marginBottom={i === 0 ? 2.5 : 0}  >{hour}</S.A_Hour>
+        <S.A_Hour key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >{hour}</S.A_Hour>
       ))}
     </S.Aside>
   );
@@ -108,9 +114,7 @@ const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideSc
 const SubHeader: React.FC = () => {
   return (
     <S.SubHeader>
-      {C.DAYS.map((day, i) => (
-        <S.S_Day key={i}>{day}</S.S_Day>
-      ))}
+      {C.DAYS.map((day, i) => <S.S_Day key={i}>{day}</S.S_Day>)}
     </S.SubHeader>
   );
 };
@@ -120,12 +124,11 @@ const Main: React.FC<{
   handleMainScroll: () => void;
   event: React.MutableRefObject<Event>;
   events: Map<string, Event>;
-  setIsMouseDown: React.Dispatch<React.SetStateAction<boolean>>;
-  isMouseDown: boolean;
-  addCurrEventToCurrCalendar: () => void;
-  deleteCurrEventTOCurrCalendar: () => void;
-}> = ({ mainRef, handleMainScroll, event, events, setIsMouseDown, isMouseDown, addCurrEventToCurrCalendar, deleteCurrEventTOCurrCalendar }) => {
+  addEvent: () => void;
+  deleteEvent: () => void;
+}> = ({ mainRef, handleMainScroll, event, events, addEvent, deleteEvent }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -150,41 +153,41 @@ const Main: React.FC<{
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
-  
+
     if (!isMouseDown) return;
-  
+
     const newEvent: Event = new Event(event.current.date, event.current.start);
     newEvent.height = F.calculateEventHeight(e, newEvent);
     newEvent.end = F.calculateEventEnd(newEvent);
+    newEvent.duration = F.calculateEventDuration(newEvent);
     newEvent.id = event.current.id;
-  
+
+
     const newEventValid: boolean = F.isNewEventValid(newEvent, events);
-  
+
     if (!newEventValid) return;
-  
+
+    event.current.duration = newEvent.duration;
     event.current.height = newEvent.height;
     event.current.end = newEvent.end;
-  
-    addCurrEventToCurrCalendar();
+    event.current.topOffset = F.calculateTopOffset(newEvent.start)
+
+    addEvent();
   };
-  
+
 
   const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     e.preventDefault();
     setIsMouseDown(false);
-
     const newEventValid: boolean = F.isNewEventValid(event.current, events);
-
-    if (!newEventValid) deleteCurrEventTOCurrCalendar();
-    
-
+    if (!newEventValid) deleteEvent();
     event.current = C.NULL_EVENT;
   };
 
   return (
     <S.Main ref={mainRef} onScroll={handleMainScroll}>
       <S.M_Cells onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
-        {C.DAYS.map((day, i) => {
+        {F.range(7).map((i) => {
           const currentTime: Time = new Time(currentDate.getHours(), currentDate.getMinutes());
           const mondayDate = F.getMostRecentMonday();
           const dayDate: Date = F.addDateBy(mondayDate, i);
@@ -199,10 +202,7 @@ const Main: React.FC<{
               onMouseDown={(e) => handleMouseDown(e, dayDate)}
               onMouseUp={handleMouseUp}
             >
-              {Array.from({ length: 48 }, (_, j) => (
-                <S.M_Cell key={j} />
-              ))}
-
+              {F.range(48).map((j) => <S.M_Cell key={j} />)}
               <Events events={filteredEvents} />
 
               {isToday && <S.M_HourLineDot $fromTop={F.calculateTopOffset(currentTime)} />}
@@ -218,29 +218,85 @@ const Main: React.FC<{
 const Events: React.FC<{ events: Event[] }> = ({ events }) => {
   return (
     <div>
-      {events.map(({ id, height, start, end, color, title, description }) => {
-        const formatTime = (unit: number): string => (unit < 10 ? `0${unit}` : `${unit}`);
-        const startHours: string = formatTime(start.hours);
-        const startMinutes: string = formatTime(start.minutes);
-        const endHours: string = formatTime(end.hours);
-        const endMinutes: string = formatTime(end.minutes);
+      {
+        events.map((event) => {
+          const totalMinutes: number = F.timeToMinutes(event.duration);
+          const formattedEvent: FormattedEvent = F.formatEvent(event);
 
-        return (
-          <S.E_Event
-            key={id}
-            $height={height}
-            $fromTop={F.calculateTopOffset(start)}
-            $color={color}
-          >
-            {startHours}:{startMinutes}
-            <span>-</span>
-            {endHours}:{endMinutes} <br />
-            <strong>{title}</strong> <br />
-            {description}
-          </S.E_Event>
-        );
-      })}
+          if ((totalMinutes < 30)) {
+            return <ShortEvent key={event.id} event={formattedEvent} />;
+          } else if (totalMinutes >= 30 && totalMinutes < 60) {
+            return <MediumEvent key={event.id} event={formattedEvent} />;
+          } else {
+            return <LongEvent key={event.id} event={formattedEvent} />;
+          }
+        })}
     </div>
+  );
+};
+
+const ShortEvent: React.FC<{ event: FormattedEvent }> = ({ event }) => {
+  const { id, height, color, title, topOffset } = event;
+  return (
+    <S.ShortEvent key={id} $fromTop={topOffset} $height={height} $color={color}>
+      <S.EventTitle>{title}</S.EventTitle>
+    </S.ShortEvent>
+  );
+};
+
+const MediumEvent: React.FC<{ event: FormattedEvent }> = ({ event }) => {
+  const { id, height, startHours, startMinutes, endHours, endMinutes, color, title, topOffset, description } = event;
+  return (
+    <S.LongEvent key={id} $fromTop={topOffset} $height={height} $color={color}>
+      <S.LongEventHeader $color={color}>
+        <S.EventIcon $color={"white"} $width={12} $height={12}>
+          <I.heart />
+        </S.EventIcon>
+        <S.LongEventTime> 
+          <S.EventStartTime>
+            {startHours}:{startMinutes}
+          </S.EventStartTime>
+          <S.EventIcon $color={"white"} $width={12} $height={12}>
+            <I.right_arrow />
+          </S.EventIcon>
+          <S.EventEndTime>
+            {endHours}:{endMinutes}
+          </S.EventEndTime>
+        </S.LongEventTime>
+      </S.LongEventHeader>
+      <S.LongEventBody>
+        <S.EventTitle>{title}</S.EventTitle>
+      </S.LongEventBody>
+    </S.LongEvent>
+  );
+};
+
+const LongEvent: React.FC<{ event: FormattedEvent }> = ({ event }) => {
+  const { id, height, startHours, startMinutes, endHours, endMinutes, color, title, topOffset, description } = event;
+  return (
+    <S.LongEvent key={id} $fromTop={topOffset} $height={height} $color={color}>
+      <S.LongEventHeader $color={color}>
+      <S.EventIcon $color={"white"} $width={12} $height={12}>
+          <I.heart />
+        </S.EventIcon>
+        <S.LongEventTime> 
+          <S.EventStartTime>
+            {startHours}:{startMinutes}
+          </S.EventStartTime>
+          <S.EventIcon $color={"white"} $width={12} $height={12}>
+
+            <I.right_arrow />
+          </S.EventIcon>
+          <S.EventEndTime>
+            {endHours}:{endMinutes}
+          </S.EventEndTime>
+        </S.LongEventTime>
+      </S.LongEventHeader>
+      <S.LongEventBody>
+        <S.EventTitle>{title}</S.EventTitle>
+        <S.EventDescription>{description}</S.EventDescription>
+      </S.LongEventBody>
+    </S.LongEvent>
   );
 };
 
@@ -251,44 +307,44 @@ const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => (
   </S.H_HourLine>
 );
 
-const EventModal: React.FC<{
-  isModalOpen: boolean;
-  handleModalClose: () => void;
-}> = ({ isModalOpen, handleModalClose }) => {
-  const handleSubmit = (e: React.FormEvent): void => {
-    e.preventDefault();
-    handleModalClose();
-  };
+// const EventModal: React.FC<{
+//   isModalOpen: boolean;
+//   handleModalClose: () => void;
+// }> = ({ isModalOpen, handleModalClose }) => {
+//   const handleSubmit = (e: React.FormEvent): void => {
+//     e.preventDefault();
+//     handleModalClose();
+//   };
 
-  return (
-    <Modal show={isModalOpen} handleClose={handleModalClose}>
-      <S.ModalContent>
-        <S.EventSettings onSubmit={handleSubmit}>
-          <S.InputTitle />
-          <S.InputDescription />
-          <S.SelectColor>
-            {C.COLORS.map((color: string, i: number) => (
-              <option key={i} value={color}>{color}</option>
-            ))}
-          </S.SelectColor>
-          <S.InputTimeContainer>
-            <S.TimeInput />
-            <S.TimeInput />
-          </S.InputTimeContainer>
-          <S.ButtonsContainer>
-            {C.DAYS.map((day, i) => (
-              <S.DayLabel key={i}>
-                <S.EventDayChecks />
-                <S.DayText>{day.charAt(0)}</S.DayText>
-              </S.DayLabel>
-            ))}
-          </S.ButtonsContainer>
-          <S.SaveButton>Save</S.SaveButton>
-          <S.DeleteButton>Delete</S.DeleteButton>
-        </S.EventSettings>
-      </S.ModalContent>
-    </Modal>
-  );
-};
+//   return (
+//     <Modal show={isModalOpen} handleClose={handleModalClose}>
+//       <S.ModalContent>
+//         <S.EventSettings onSubmit={handleSubmit}>
+//           <S.InputTitle />
+//           <S.InputDescription />
+//           <S.SelectColor>
+//             {C.COLORS.map((color: string, i: number) => (
+//               <option key={i} value={color}>{color}</option>
+//             ))}
+//           </S.SelectColor>
+//           <S.InputTimeContainer>
+//             <S.TimeInput />
+//             <S.TimeInput />
+//           </S.InputTimeContainer>
+//           <S.ButtonsContainer>
+//             {C.DAYS.map((day, i) => (
+//               <S.DayLabel key={i}>
+//                 <S.EventDayChecks />
+//                 <S.DayText>{day.charAt(0)}</S.DayText>
+//               </S.DayLabel>
+//             ))}
+//           </S.ButtonsContainer>
+//           <S.SaveButton>Save</S.SaveButton>
+//           <S.DeleteButton>Delete</S.DeleteButton>
+//         </S.EventSettings>
+//       </S.ModalContent>
+//     </Modal>
+//   );
+// };
 
 export default CalendarHub;

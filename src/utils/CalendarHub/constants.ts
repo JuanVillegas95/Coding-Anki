@@ -1,9 +1,17 @@
 import { Event, Time, Calendar } from "@/utils/CalendarHub/classes"
 
 const HOUR_WIDTH: number = 60;
-const HOUR_HEIGHT: number = 50; // Quantity of pixels that corresponds to an hour
+const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hour
+const CALENDAR_WIDTH: number = 1000;
+const CALENDAR_HEIGHT: number = 750;
+const HEADER_HEIGHT: number = 85;
+const SUBHEADER_HEIGHT: number = 50;
+const SUBHEADER_FONT_SIZE: number = 15;
+const HOURS_FONT_SIZE: number = 12.5;
+const HEADER_FONT_SIZE: number = 18;
 
-const HEADER_HEIGHT: number = 70;
+
+
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
 const DAYS: Array<string> = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 const COLORS: Array<string> = ["gray", "orange", "pink", "purple", "brown", "blue"];
@@ -26,5 +34,11 @@ export {
   LEFT_MOUSE_CLICK,
   NULL_EVENT,
   NULL_CALENDAR,
-  NULL_CALENDARS
+  NULL_CALENDARS,
+  CALENDAR_HEIGHT,
+  CALENDAR_WIDTH,
+  SUBHEADER_HEIGHT,
+  SUBHEADER_FONT_SIZE,
+  HOURS_FONT_SIZE,
+  HEADER_FONT_SIZE
 };

@@ -1,5 +1,5 @@
 import * as C from "@/utils/CalendarHub/constants";
-import { Time, Event } from "@/utils/CalendarHub/classes";
+import { Time, Event, FormattedEvent } from "@/utils/CalendarHub/classes";
 import React from "react";
 
 // Utility functions
@@ -64,7 +64,7 @@ const generate24HourIntervals = (): string[] => {
 
 // Calculates the start time of an event based on a mouse click position.
 const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
-  const { clientY, currentTarget } = e; l
+  const { clientY, currentTarget } = e; 
   const topOffset: number = currentTarget.getBoundingClientRect().top;
   const distanceFromTop: number = clientY - topOffset;
   
@@ -117,7 +117,7 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
 }
 
 // Calculates the event duration
-const getEventDuration = ({ start, end }: Event): Time => {
+const calculateEventDuration = ({ start, end }: Event): Time => {
   const totalStartMinutes: number = timeToMinutes(start);
   const totalEndMinutes: number = timeToMinutes(end);
 
@@ -153,8 +153,9 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 };
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
-  const newEventDuration: Time = getEventDuration(newEvent);
-  if(newEventDuration.minutes < C.MAX_DURATION_MINUTES) return false
+  const totalMinutes: number = timeToMinutes(newEvent.duration);
+
+  if(totalMinutes < C.MAX_DURATION_MINUTES) return false
 
   const endBeforeStart: boolean= isEndBeforeStart(newEvent);
   if(endBeforeStart) return false
@@ -164,6 +165,21 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
 
   return true;
 }
+
+const formatEvent = (event: Event): FormattedEvent =>  new FormattedEvent(
+    event.id,
+    event.title,
+    event.color,
+    event.description,
+    formatTime(event.start.hours),
+    formatTime(event.start.minutes),
+    formatTime(event.end.hours),
+    formatTime(event.end.minutes),
+    event.height,
+    event.topOffset,
+    event.isOverlapping,
+  )
+
 
 
 export {
@@ -178,4 +194,8 @@ export {
   calculateEventHeight,
   calculateEventEnd,
   isNewEventValid,
+  calculateEventDuration,
+  formatTime,
+  timeToMinutes,
+  formatEvent
 };

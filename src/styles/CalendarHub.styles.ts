@@ -3,12 +3,11 @@ import styled from "styled-components";
 
 const GridContainer = styled.div`
   width: 90%;
-  max-width: 1400px;
-  height: 90vh;
+  max-width: ${C.CALENDAR_WIDTH}px;
+  height: ${C.CALENDAR_HEIGHT}px;
   margin: 0 30px;
-  border-radius: 2%;
+  border-radius: 1.5%;
   background-color: white;
-
   display: grid;
 
   grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
@@ -34,21 +33,31 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   margin: 10px;
+  padding: 20px;
 `;
 
-const HEADER_Title = styled.input`
-  text-align: left; 
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; 
-
-
+const HEADER_Container = styled.div`
+  position: relative;
+  width: fit-content;
+  font-size: ${C.HEADER_FONT_SIZE};
   &::after {
     content: '';
     display: block;
     width: 100%;
     border-bottom: 2px dashed #A0A0A0; 
-    margin-top: 5px; 
+    margin-top: 1px; 
   }
+`;
+
+const HEADER_Title = styled.input`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; 
+  font-size: ${C.HEADER_FONT_SIZE}px;
+  width: 225px;
+  max-width: 225px;
+  text-align: left; 
+  border: none;
+  outline: none;
 `;
 
 
@@ -57,7 +66,7 @@ const Aside = styled.div`
   text-align: center; 
   align-items: center; 
   justify-items: center; 
-  margin-top: ${C.HEADER_HEIGHT}px;
+  margin-top: ${C.DAYS_OF_THE_WEEK_HEIGHT - 7}px;
   overflow-y: scroll;
   /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
   &::-webkit-scrollbar {
@@ -71,10 +80,11 @@ const Aside = styled.div`
 
 const SubHeader = styled.div`
   grid-area: subheader;
-
+  height: ${C.SUBHEADER_HEIGHT}px;
   align-items: center; 
 
   font-family: 'Poppins', sans-serif;
+  font-size: ${C.SUBHEADER_FONT_SIZE}px;
   font-weight: 600; 
 
   display: grid;
@@ -99,16 +109,18 @@ const Main = styled.div`
   /* Hide scrollbar for IE, Edge and Firefox */
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-
+  margin-right: 15px;
 `;
 
 
-const A_Hour  = styled.div<{ $marginBottom: number }>`
+const A_Hour = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   font-family: 'Poppins', sans-serif;
-  font-size: 12.5px;
-  font-weight: 500; 
-  height: ${C.HOUR_HEIGHT/2}px;
+  font-size: ${C.HOURS_FONT_SIZE}px;
+  font-weight: 550;
+  height: ${C.HOUR_HEIGHT / 2}px;
   margin-bottom: ${({ $marginBottom }) => $marginBottom}px;
+  color: ${({ $isEven }) => ($isEven ? '#A9A9A9' : 'black')};
+  box-sizing: border-box;
 `;
 
 const M_DayColumn = styled.div`
@@ -119,6 +131,11 @@ const M_Cells = styled.div`
   position: relative;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  border-top: 2px solid #D3D3D3;  
+  border-left: 1px solid #D3D3D3;  
+  border-right: 1px solid #D3D3D3;  
+
+  box-sizing: border-box;
 `;
 
 const H_HourLine = styled.div<{ $fromTop: number }>`
@@ -154,15 +171,15 @@ const M_HourLineDot = styled.div<{ $fromTop: number }>`
 
 const M_Cell = styled.div`
   height: calc(${C.HOUR_HEIGHT}px / 2);
-  box-shadow: .2px .2px 0 0 slategray;
+  box-shadow: .3px .2px 0 0 slategray;
 `;
 
 // EVENT STYLES
-const E_Event = styled.div<{ $fromTop: number, $height: number, $color: string }>`
+
+const ShortEvent = styled.div<{ $fromTop: number, $height: number, $color: string }>`
   position: absolute;
   z-index: 40;
-  width: calc(100% - 5px);
-
+  width: calc(100% - 2px);
   top: ${({ $fromTop }) => $fromTop}px;
   background: green;
   margin: 0;
@@ -170,24 +187,83 @@ const E_Event = styled.div<{ $fromTop: number, $height: number, $color: string }
   border: 1px solid var(--primary-${({ $color }) => $color});
   background-color: var(--secondary-${({ $color }) => $color});
   border-width: 2px;
-  border-radius: 0.5rem;
-  padding: 5px; 
-  margin-left: auto;
-  margin-right: auto;
+  border-radius: 0.4rem;
   white-space: normal;
   overflow: hidden;
-  margin-left: 3.5px;
-
-
+  margin-left: 1.5px;
 
   &:hover {
     cursor: pointer;
   }
+`;
 
-  strong {
-    display: block;
+const EventTitle = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  margin-left: 2px;
+  font-size: 14px; 
+`;
+
+const EventDescription = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  margin-left: 2px;
+  font-size: 14px; 
+`;
+
+const LongEvent = styled(ShortEvent)`
+
+`;
+
+
+const EventIcon = styled.div<{$color: string, $width: number, $height: number}>`
+  width: ${({ $width }) => $width}px;
+  height: ${({ $height }) => $height}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+  padding-bottom: 3px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    color: ${({ $color }) => $color};
   }
 `;
+
+
+const LongEventHeader = styled.div<{$color: string}>`
+  background-color: var(--primary-${({ $color }) => $color});
+  width: 100%;
+  height: 25px;
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  justify-content: space-between;
+  color: white;
+  font-size: 10px;
+  box-sizing: border-box;
+  font-weight: 500;
+`;
+
+const LongEventTime = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  letter-spacing: 1px;
+`;
+
+const EventStartTime = styled.div`
+`;
+
+const EventEndTime = styled.div`
+`;
+
+const LongEventBody = styled.div`
+`;
+
+
 
 const ModalContent = styled.div`
   display: flex;
@@ -327,5 +403,16 @@ export {
   H_LineAfterHour,
   M_HourLineDot,
   M_Cell,
-  E_Event
+  ShortEvent,
+  HEADER_Container,
+  EventTitle,
+  LongEvent,
+  LongEventHeader,
+  LongEventBody,
+  EventIcon,
+  LongEventTime,
+  EventDescription,
+  EventStartTime,
+  EventEndTime
+
 };
