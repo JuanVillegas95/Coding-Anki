@@ -89,6 +89,7 @@ const SubHeader = styled.div`
 
   display: grid;
   grid-template-columns: repeat(7, 1fr);
+  margin-right: 15px;
 `;
 
 const S_Day = styled.div`

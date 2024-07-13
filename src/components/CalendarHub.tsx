@@ -223,6 +223,7 @@ const Events: React.FC<{ events: Event[] }> = ({ events }) => {
           const totalMinutes: number = F.timeToMinutes(event.duration);
           const formattedEvent: FormattedEvent = F.formatEvent(event);
 
+
           if ((totalMinutes < 30)) {
             return <ShortEvent key={event.id} event={formattedEvent} />;
           } else if (totalMinutes >= 30 && totalMinutes < 60) {
@@ -240,6 +241,7 @@ const ShortEvent: React.FC<{ event: FormattedEvent }> = ({ event }) => {
   return (
     <S.ShortEvent key={id} $fromTop={topOffset} $height={height} $color={color}>
       <S.EventTitle>{title}</S.EventTitle>
+    
     </S.ShortEvent>
   );
 };
