@@ -5,6 +5,8 @@ import * as F from "@/utils/CalendarHub/functions";
 import * as I from "@/utils/CalendarHub/icons"
 import * as S from "@/styles/CalendarHub.styles";
 
+
+
 const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
@@ -12,9 +14,7 @@ const CalendarHub: React.FC = () => {
   const mainRef = useRef<HTMLDivElement>(null);
   const asideRef = useRef<HTMLDivElement>(null);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
-
-  const nextWeek = (): void => setMondayDate(F.addDateBy(mondayDate, 7));
-  const prevWeek = (): void => setMondayDate(F.addDateBy(mondayDate, -7));
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     // TODO Validate user....
@@ -22,6 +22,21 @@ const CalendarHub: React.FC = () => {
 
     setCalendars(new Map([[calendar.current.id, calendar.current]]))
   }, [])
+
+  const closeModal = () => setIsModalOpen(false);
+
+  const openModal = () => setIsModalOpen(true);
+
+  const nextWeek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+    e.preventDefault();
+    setMondayDate(F.addDateBy(mondayDate, 7))
+  };
+  const prevWeek = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+    e.preventDefault();
+    setMondayDate(F.addDateBy(mondayDate, -7))
+  };
+
+
 
   const addEvent = (): void => {
     calendar.current.events.set(event.current.id, event.current)
@@ -39,6 +54,7 @@ const CalendarHub: React.FC = () => {
       updatedCalendars.set(calendar.current.id, { ...calendar.current });
       return updatedCalendars;
     });
+    event.current = C.NULL_EVENT;
   };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -90,11 +106,22 @@ const CalendarHub: React.FC = () => {
         events={calendars.get(calendar.current.id)!.events}
         addEvent={addEvent}
         deleteEvent={deleteEvent}
+        closeModal={closeModal}
+        openModal={openModal}
       />
-      {/* <EventModal handleModalClose={handleModalClose} isModalOpen={isModalOpen} /> */}
+      <EventModal 
+      isModalOpen={isModalOpen} 
+      closeModal={closeModal}
+      openModal={openModal}
+      deleteEvent={deleteEvent}
+      event={event}
+      />
     </S.GridContainer>
   );
 };
+
+
+
 
 const Header: React.FC<{
   mondayDate: Date,
@@ -102,8 +129,8 @@ const Header: React.FC<{
   changeCalendarName: (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => void,
-  prevWeek: () => void,
-  nextWeek: () => void,
+  prevWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+  nextWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }> = ({ name, changeCalendarName, prevWeek, nextWeek, mondayDate }) => {
 
   return (
@@ -128,17 +155,21 @@ const Header: React.FC<{
   );
 };
 
+
+
 const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideScroll: () => void }> = ({ asideRef, handleAsideScroll }) => {
   return (
     <S.Aside ref={asideRef} onScroll={handleAsideScroll}>
       {F.generate24HourIntervals().map((hour: string, i: number) => (
         <S.A_Hour key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >{hour}
-
         </S.A_Hour>
       ))}
     </S.Aside>
   );
 };
+
+
+
 
 const SubHeader: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
   return (
@@ -155,6 +186,9 @@ const SubHeader: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
   );
 };
 
+
+
+
 const Main: React.FC<{
   mondayDate: Date;
   mainRef: React.RefObject<HTMLDivElement>;
@@ -163,7 +197,9 @@ const Main: React.FC<{
   events: Map<string, Event>;
   addEvent: () => void;
   deleteEvent: () => void;
-}> = ({ mainRef, handleMainScroll, event, events, addEvent, deleteEvent, mondayDate }) => {
+  openModal: () => void;
+  closeModal: () => void;
+}> = ({ mainRef, handleMainScroll, event, events, addEvent, deleteEvent, mondayDate, openModal, closeModal }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
@@ -198,8 +234,8 @@ const Main: React.FC<{
     newEvent.end = F.calculateEventEnd(newEvent);
     newEvent.duration = F.calculateEventDuration(newEvent);
     newEvent.id = event.current.id;
-    const newEventValid: boolean = F.isNewEventValid(newEvent, events);
 
+    const newEventValid: boolean = F.isNewEventValid(newEvent, events);
     if (!newEventValid) return;
 
     event.current.duration = newEvent.duration;
@@ -215,8 +251,11 @@ const Main: React.FC<{
     e.preventDefault();
     setIsMouseDown(false);
     const newEventValid: boolean = F.isNewEventValid(event.current, events);
-    if (!newEventValid) deleteEvent();
-    event.current = C.NULL_EVENT;
+    if (!newEventValid) {
+      deleteEvent()
+      return;
+    };
+    openModal();
   };
 
   return (
@@ -246,6 +285,9 @@ const Main: React.FC<{
   );
 };
 
+
+
+
 const Events: React.FC<{ events: Event[] }> = ({ events }) => {
   return (
     <div>
@@ -269,6 +311,10 @@ const Events: React.FC<{ events: Event[] }> = ({ events }) => {
     </div>
   );
 };
+
+
+
+
 const EventBody: React.FC<{ event: Event, eventType: string }> = ({ event, eventType }) => {
   const { start, end, color, title, description } = event;
   const startHours: string = F.formatTime(start.hours);
@@ -299,6 +345,8 @@ const EventBody: React.FC<{ event: Event, eventType: string }> = ({ event, event
 };
 
 
+
+
 const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => {
   const time: Time = new Time(currentDate.getHours(), currentDate.getMinutes())
   return (
@@ -308,44 +356,75 @@ const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => {
   )
 }
 
+
+
+
 const EventModal: React.FC<{
   isModalOpen: boolean;
-  handleModalClose: () => void;
-}> = ({ isModalOpen, handleModalClose }) => {
-  const handleSubmit = (e: React.FormEvent): void => {
+  openModal: () => void;
+  closeModal: () => void;
+  deleteEvent: () => void;
+  event: React.MutableRefObject<Event>;
+
+}> = ({ isModalOpen, closeModal, deleteEvent, event }) => {
+  // const [modalEvent, modalEvent] = useState<Event>(event.current); 
+
+  const handleDeleteEvent = (): void => {
+    deleteEvent();
+    closeModal();
+    event.current = C.NULL_EVENT;
+  }
+
+  const handleCloseModal = (): void => {
+    closeModal();
+    event.current = C.NULL_EVENT;
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    handleModalClose();
+    closeModal();
+    event.current = C.NULL_EVENT;
+  }
+
+  const titleChange = (): void => {
+    // Title change logic here
   };
 
   return (
-    <Modal show={isModalOpen} handleClose={handleModalClose}>
-      <S.ModalContent>
-        <S.EventSettings onSubmit={handleSubmit}>
-          <S.InputTitle />
-          <S.InputDescription />
-          <S.SelectColor>
-            {C.COLORS.map((color: string, i: number) => (
-              <option key={i} value={color}>{color}</option>
-            ))}
-          </S.SelectColor>
-          <S.InputTimeContainer>
-            <S.TimeInput />
-            <S.TimeInput />
-          </S.InputTimeContainer>
-          <S.ButtonsContainer>
-            {C.DAYS.map((day, i) => (
-              <S.DayLabel key={i}>
-                <S.EventDayChecks />
-                <S.DayText>{day.charAt(0)}</S.DayText>
-              </S.DayLabel>
-            ))}
-          </S.ButtonsContainer>
-          <S.SaveButton>Save</S.SaveButton>
-          <S.DeleteButton>Delete</S.DeleteButton>
-        </S.EventSettings>
-      </S.ModalContent>
-    </Modal>
+    <S.ModalDiv $block={isModalOpen ? "block" : "none"}>
+      <S.ContentDiv>
+        <S.CrossContainer $width={15} $height={15} $color={"black"} onClick={handleCloseModal}>
+          <I.cross />
+        </S.CrossContainer>
+        <S.ModalContent>
+          <S.EventSettings onSubmit={handleSubmit}>
+            <S.InputTitle onChange={titleChange} />
+            <S.InputDescription />
+            <S.SelectColor>
+              {C.COLORS.map((color: string, i: number) => (
+                <option key={i} value={color}>{color}</option>
+              ))}
+            </S.SelectColor>
+            <S.InputTimeContainer>
+              <S.TimeInput />
+              <S.TimeInput />
+            </S.InputTimeContainer>
+            <S.ButtonsContainer>
+              {C.DAYS.map((day, i) => (
+                <S.DayLabel key={i}>
+                  <S.EventDayChecks />
+                  <S.DayText>{day.charAt(0)}</S.DayText>
+                </S.DayLabel>
+              ))}
+            </S.ButtonsContainer>
+            <S.SaveButton>Save</S.SaveButton>
+            <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
+          </S.EventSettings>
+        </S.ModalContent>
+      </S.ContentDiv>
+    </S.ModalDiv>
   );
 };
+
 
 export default CalendarHub;
