@@ -109,12 +109,12 @@ const CalendarHub: React.FC = () => {
         closeModal={closeModal}
         openModal={openModal}
       />
-      <EventModal 
-      isModalOpen={isModalOpen} 
-      closeModal={closeModal}
-      openModal={openModal}
-      deleteEvent={deleteEvent}
-      event={event}
+      <EventModal
+        isModalOpen={isModalOpen}
+        closeModal={closeModal}
+        openModal={openModal}
+        deleteEvent={deleteEvent}
+        event={event}
       />
     </S.GridContainer>
   );
@@ -140,7 +140,7 @@ const Header: React.FC<{
         <S.HeaderItem>
           <S.MonthWrapper>
             <S.HeaderMonth>
-            {F.getMonth(mondayDate)}
+              {F.getMonth(mondayDate)}
             </S.HeaderMonth>
             <S.HeaderIconLeft $color={"black"} $width={15} $height={15} onClick={prevWeek}>
               <I.left />
@@ -207,8 +207,6 @@ const Main: React.FC<{
     const interval = setInterval(() => {
       setCurrentDate(new Date());
     }, 60000);
-
-
     return () => clearInterval(interval);
   }, []);
 
@@ -367,7 +365,7 @@ const EventModal: React.FC<{
   event: React.MutableRefObject<Event>;
 
 }> = ({ isModalOpen, closeModal, deleteEvent, event }) => {
-  // const [modalEvent, modalEvent] = useState<Event>(event.current); 
+  const [modalEvent, setModalEvent] = useState<Event>(event.current);
 
   const handleDeleteEvent = (): void => {
     deleteEvent();
@@ -386,9 +384,22 @@ const EventModal: React.FC<{
     event.current = C.NULL_EVENT;
   }
 
-  const titleChange = (): void => {
-    // Title change logic here
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const title: string = e.target.value;
+    setModalEvent((prevEvent) => ({ ...prevEvent, title }));
   };
+
+  const handleDescription = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    const description: string = e.target.value;
+    setModalEvent((prevEvent) => ({ ...prevEvent, description }));
+  };
+
+  // const handleIcon = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+  //   const iconKey: string = e.target.value;
+  //   const icon = C.ICONS.get(iconKey);
+  //   if(!icon) return;
+  //   setModalEvent((prevEvent) => ({ ...prevEvent, icon }));
+  // };
 
   return (
     <S.ModalDiv $block={isModalOpen ? "block" : "none"}>
@@ -398,12 +409,29 @@ const EventModal: React.FC<{
         </S.CrossContainer>
         <S.ModalContent>
           <S.EventSettings onSubmit={handleSubmit}>
-            <S.InputTitle onChange={titleChange} />
-            <S.InputDescription />
+            <S.InputTitle
+              value={modalEvent.title}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleTitle(e)}
+            />
+            <S.InputDescription
+              value={modalEvent.description}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDescription(e)}
+            />
+            {/* <S.SelectIcon 
+            // onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleIcon(e)}
+            >
+              {
+                Array.from(C.ICONS.keys()).map((icons: string, i: number) => {
+                  return <option>{icons}</option>
+                })
+              }
+            </S.SelectIcon> */}
             <S.SelectColor>
-              {C.COLORS.map((color: string, i: number) => (
+              {
+              C.COLORS.map((color: string, i: number) => (
                 <option key={i} value={color}>{color}</option>
-              ))}
+              ))
+              }
             </S.SelectColor>
             <S.InputTimeContainer>
               <S.TimeInput />

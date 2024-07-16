@@ -25,7 +25,7 @@ class Event {
   height: number;
   duration: Time;
   topOffset: number;
-  icon: any;
+  icon: string;
   overlappingEvents: Event[]; // Add this property
 
   constructor(date: Date = new Date(), start: Time = new Time()) {
