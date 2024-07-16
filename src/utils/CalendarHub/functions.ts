@@ -1,5 +1,5 @@
 import * as C from "@/utils/CalendarHub/constants";
-import { Time, Event, FormattedEvent } from "@/utils/CalendarHub/classes";
+import { Time, Event } from "@/utils/CalendarHub/classes";
 import React from "react";
 
 // Utility functions
@@ -32,14 +32,21 @@ const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getDate() === second.getDate();
 
 // Adds a specified number of days to the given date.
-const addDateBy = (date: Date, count: number): Date => new Date(date.setDate(date.getDate() + count));
+const addDateBy = (date: Date, count: number): Date => {
+  const newDate = new Date(date.getTime());
+  newDate.setDate(newDate.getDate() + count);
+  return newDate;
+};
 
 // Returns the most recent Monday
 const getMostRecentMonday = (): Date => {
   const today = new Date();
-  today.setDate(today.getDate() - (today.getDay() + 6) % 7 );
+  const dayOfWeek = today.getDay();
+  const daysSinceMonday = (dayOfWeek + 6) % 7;
+  today.setDate(today.getDate() - daysSinceMonday);
   return today;
 }
+
 
 // Calculates the top offset in pixels units given the time.
 const calculateTopOffset = (time: Time): number => {
@@ -166,19 +173,21 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   return true;
 }
 
-const formatEvent = (event: Event): FormattedEvent =>  new FormattedEvent(
-    event.id,
-    event.title,
-    event.color,
-    event.description,
-    formatTime(event.start.hours),
-    formatTime(event.start.minutes),
-    formatTime(event.end.hours),
-    formatTime(event.end.minutes),
-    event.height,
-    event.topOffset,
-    event.isOverlapping,
-  )
+const getMonth = (mondayDate: Date): string => {
+  const formatMonth = (month: Date): string =>{
+    return month.toLocaleString('default', { month: 'short' })
+  }
+
+  const month: string = formatMonth(mondayDate);
+  for(let i = 0; i<7; i++){
+    const newDate: Date = addDateBy(mondayDate,i);
+    const newMonth: string = formatMonth(newDate);
+    if(month !== newMonth){
+      return `${month}-${newMonth}`
+    }
+  }
+  return month;
+}
 
 
 
@@ -197,5 +206,5 @@ export {
   calculateEventDuration,
   formatTime,
   timeToMinutes,
-  formatEvent
+  getMonth
 };

@@ -1,46 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-
-
-class FormattedEvent {
-  id: string;
-  title: string;
-  color: string;
-  description: string;
-  startHours: string;
-  startMinutes: string;
-  endHours: string;
-  endMinutes: string;
-  height: number;
-  topOffset: number;
-  isOverlapping: boolean;
-
-  constructor(
-    id: string,
-    title: string,
-    color: string,
-    description: string,
-    startHours: string,
-    startMinutes: string,
-    endHours: string,
-    endMinutes: string,
-    height: number,
-    topOffset: number,
-    isOverlapping: boolean = false
-
-  ) {
-    this.id = id;
-    this.title = title;
-    this.color = color;
-    this.description = description;
-    this.startHours = startHours;
-    this.startMinutes = startMinutes;
-    this.endHours = endHours;
-    this.endMinutes = endMinutes;
-    this.height = height;
-    this.topOffset = topOffset;
-    this.isOverlapping = isOverlapping;
-  }
-}
+import * as I  from "@/utils/CalendarHub/icons"
 
 
 class Calendar {
@@ -65,22 +24,23 @@ class Event {
   end: Time;
   height: number;
   duration: Time;
-  isOverlapping: boolean;
   topOffset: number;
+  icon: any;
+  overlappingEvents: Event[]; // Add this property
 
-
-  constructor( date: Date = new Date(), start: Time = new Time()) {
+  constructor(date: Date = new Date(), start: Time = new Time()) {
     this.id = uuidv4();
     this.date = date;
     this.start = start;
-    this.end = new Time(-1,-1);
+    this.end = new Time(-1, -1);
     this.title = "Math";
-    this.description = "Diego la chupa";
+    this.description = "Die";
     this.color = "gray";
     this.height = -1;
-    this.duration = new Time(-1,-1);
-    this.isOverlapping = false;
+    this.duration = new Time(-1, -1);
     this.topOffset = 0;
+    this.icon = I.heart;
+    this.overlappingEvents = []; 
   }
 }
 
@@ -94,4 +54,4 @@ class Time {
   }
 }
 
-export { Event, Time, Calendar, FormattedEvent };
+export { Event, Time, Calendar };

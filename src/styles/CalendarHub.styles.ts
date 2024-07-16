@@ -36,17 +36,59 @@ const Header = styled.div`
   padding: 20px;
 `;
 
+const Icon = styled.div<{$color: string, $width: number, $height: number}>`
+  width: ${({ $width }) => $width}px;
+  height: ${({ $height }) => $height}px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    color: ${({ $color }) => $color};
+  }
+`;
+
+const HeaderIcon = styled(Icon)`
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const HeaderMonth = styled.div`
+  grid-area: month;
+
+`;
+
+
+const HeaderIconLeft = styled(HeaderIcon)`
+  grid-area: left;
+
+`;
+
+const HeaderIconRight = styled(HeaderIcon)`
+  grid-area: right;
+
+`;
+
+const HeaderItem = styled.div<{}>`
+
+`;
+
+const MonthWrapper = styled.div<{}>`
+  display: grid;
+  grid-template-areas: "month month" "left right" "left right";
+  grid-template-rows: 20px 20px; 
+  grid-template-columns: 1fr 1fr;
+`;
+
+
 const HEADER_Container = styled.div`
+  display: flex;
+  flex: row;
+  flex-wrap: nowrap;
   position: relative;
   width: fit-content;
   font-size: ${C.HEADER_FONT_SIZE};
-  &::after {
-    content: '';
-    display: block;
-    width: 100%;
-    border-bottom: 2px dashed #A0A0A0; 
-    margin-top: 1px; 
-  }
+
 `;
 
 const HEADER_Title = styled.input`
@@ -142,7 +184,7 @@ const M_Cells = styled.div`
 const H_HourLine = styled.div<{ $fromTop: number }>`
   position: absolute;
   z-index: 2;
-  width: calc(100% - 5px);
+  width: calc(100%);
   top: ${({ $fromTop }) => $fromTop}px;
   color: red; 
   font-size: 15px; 
@@ -177,10 +219,10 @@ const M_Cell = styled.div`
 
 // EVENT STYLES
 
-const ShortEvent = styled.div<{ $fromTop: number, $height: number, $color: string }>`
+const Event = styled.div<{ $fromTop: number, $height: number, $color: string, }>`
   position: absolute;
   z-index: 40;
-  width: calc(100% - 2px);
+  width: calc(100% - 1px);
   top: ${({ $fromTop }) => $fromTop}px;
   background: green;
   margin: 0;
@@ -191,7 +233,7 @@ const ShortEvent = styled.div<{ $fromTop: number, $height: number, $color: strin
   border-radius: 0.4rem;
   white-space: normal;
   overflow: hidden;
-  margin-left: 1.5px;
+  margin-left: 1px;
 
   &:hover {
     cursor: pointer;
@@ -212,29 +254,17 @@ const EventDescription = styled.p`
   font-size: 14px; 
 `;
 
-const LongEvent = styled(ShortEvent)`
 
-`;
-
-
-const EventIcon = styled.div<{$color: string, $width: number, $height: number}>`
-  width: ${({ $width }) => $width}px;
-  height: ${({ $height }) => $height}px;
+const EventIcon = styled(Icon)`
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 5px;
   padding-bottom: 3px;
-
-  svg {
-    width: 100%;
-    height: 100%;
-    color: ${({ $color }) => $color};
-  }
 `;
 
 
-const LongEventHeader = styled.div<{$color: string}>`
+const EventHeader = styled.div<{$color: string}>`
   background-color: var(--primary-${({ $color }) => $color});
   width: 100%;
   height: 25px;
@@ -248,20 +278,20 @@ const LongEventHeader = styled.div<{$color: string}>`
   font-weight: 500;
 `;
 
-const LongEventTime = styled.div`
+const EventTime = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
   letter-spacing: 1px;
 `;
 
-const EventStartTime = styled.div`
+const StartTime = styled.div`
 `;
 
-const EventEndTime = styled.div`
+const EndTime = styled.div`
 `;
 
-const LongEventBody = styled.div`
+const EventBody = styled.div`
 `;
 
 
@@ -404,16 +434,21 @@ export {
   H_LineAfterHour,
   M_HourLineDot,
   M_Cell,
-  ShortEvent,
+  Event,
   HEADER_Container,
   EventTitle,
-  LongEvent,
-  LongEventHeader,
-  LongEventBody,
+  EventHeader,
+  EventBody,
   EventIcon,
-  LongEventTime,
+  EventTime,
   EventDescription,
-  EventStartTime,
-  EventEndTime
-
+  StartTime,
+  EndTime,
+  Icon,
+  HeaderItem,
+  MonthWrapper,
+  HeaderIcon,
+  HeaderMonth,
+  HeaderIconRight,
+  HeaderIconLeft,
 };
