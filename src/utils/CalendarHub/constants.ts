@@ -22,17 +22,13 @@ const NULL_CALENDARS = new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
 
 const ICONS = new Map<string, string>([
-  ["heart", I.heart],
-  ["right_arrow", I.right_arrow],
-  ["left", I.left],
-  ["right", I.right],
-  ["cross", I.cross],
-  ["bell", I.bell],
-  ["cart", I.cart],
-  ["exclamation", I.exclamation],
-  ["interrogation", I.interrogation],
-  ["mark", I.mark],
-  ["star", I.star]
+  ["Heart", I.heart],
+  ["Bell", I.bell],
+  ["Cart", I.cart],
+  ["Exclamation", I.exclamation],
+  ["Interrogation", I.interrogation],
+  ["Mark", I.mark],
+  ["Star", I.star]
 ]);
 
 

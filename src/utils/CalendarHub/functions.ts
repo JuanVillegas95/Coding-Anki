@@ -189,6 +189,39 @@ const getMonth = (mondayDate: Date): string => {
   return month;
 }
 
+const generate24Hours = (): string[] => {
+  const hourArray: string[] = [];
+  for(let i = 0; i<24; i++)   hourArray.push(formatTime(i));
+  return hourArray;
+}
+
+const generate60Minutes = (): string[] => {
+  const minutesArray: string[] = [];
+  for(let i = 0; i<60; i++)   minutesArray.push(formatTime(i));
+  return minutesArray;
+}
+
+const formatDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+}
+
+const getDay = (date: Date): number => {
+  let dayOfTheWeek: number = date.getDay() - 1;
+  if(dayOfTheWeek < 0) dayOfTheWeek = 6;
+  return dayOfTheWeek;
+}
+
+const shouldBeLocked = (date: Date, index: number): boolean => {
+  let dayOfTheWeek: number = date.getDay() - 1;
+  if(dayOfTheWeek < 0) dayOfTheWeek = 6;
+  return dayOfTheWeek === index;
+}
+
+
 
 
 export {
@@ -206,5 +239,11 @@ export {
   calculateEventDuration,
   formatTime,
   timeToMinutes,
-  getMonth
+  getMonth,
+  generate24Hours,
+  generate60Minutes,
+  isEventColliding,
+  formatDate,
+  getDay,
+  shouldBeLocked
 };

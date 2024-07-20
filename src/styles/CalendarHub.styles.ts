@@ -43,7 +43,9 @@ const Icon = styled.div<{$color: string, $width: number, $height: number}>`
   svg {
     width: 100%;
     height: 100%;
-    color: ${({ $color }) => $color};
+    path {
+      fill: ${({ $color }) => $color};
+    }
   }
 `;
 
@@ -304,24 +306,68 @@ const ModalContent = styled.div`
   overflow: auto;
 `;
 
-const TimeInput = styled.input.attrs({
-  type: 'time',
-  step: 60,
-})`
-  appearance: none;
-  background-color: #f9f9f9;
+
+const TimeInput = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+const TimeHour = styled.select`
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+`;
+
+const TimeMinutes = styled.select`
   padding: 8px;
-  width: 100%; 
-  box-sizing: border-box; 
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  }
+`;
+
+const TimeText = styled.p`
+  color: black;
+`
+
+const RecurringEventWrapper = styled.div`
+  color: black;
+
+`
+const RecurringEvent = styled.input.attrs({
+  type: 'checkbox',
+})`
 `;
 
 const EventDayChecks = styled.input.attrs({
   type: 'checkbox',
 })`
 `;
+
+const DayPicker = styled.input.attrs({
+  type: 'date',
+})`
+`;
+
 
 const EventSettings = styled.form`
   display: flex;
@@ -351,6 +397,17 @@ const SelectColor = styled.select`
   width: 100%;
   box-sizing: border-box;
 `;
+
+const SelectIcon = styled.select`
+  padding: 10px;
+  font-size: 1.2rem;
+  border: 2px solid #d3d3d3;
+  background-color: white;
+  color: #333;
+  width: 100%;
+  box-sizing: border-box;
+`;
+
 
 const InputDescription = styled.input.attrs({ placeholder: 'Description' })`
   padding: 10px;
@@ -437,6 +494,11 @@ const CrossContainer = styled(Icon)`
   }
 `;
 
+const DayPickerWrapper = styled.div`
+
+`
+
+
 export {
   ModalContent,
   TimeInput,
@@ -485,4 +547,12 @@ export {
   ModalDiv,
   ContentDiv,
   CrossContainer,
+  SelectIcon,
+  TimeHour,
+  TimeMinutes,
+  TimeText,
+  RecurringEvent,
+  RecurringEventWrapper,
+  DayPicker,
+  DayPickerWrapper
 };

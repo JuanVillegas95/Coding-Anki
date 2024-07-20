@@ -6,11 +6,17 @@ class Calendar {
   id: string;
   name: string;
   events: Map<string, Event>;
-
-  constructor(id: string = uuidv4(), name: string = "Something is wrong", events: Map<string, Event> = new Map()) {
+  recurringEventIDs: Map<string, string[][]>; // The key is the eventGroupID the value is a string of 7 positions rerpsenting the day fo the week and in every position the events are stored
+  constructor(
+    id: string = uuidv4(), 
+    name: string = "Something is wrong", 
+    events: Map<string, Event> = new Map(),
+    recurringEventIDs: Map<string, string[][]> = new Map()
+  ){
     this.id = id;
     this.name = name;
     this.events = events;
+    this.recurringEventIDs = recurringEventIDs;
   }
 }
 
@@ -24,11 +30,11 @@ class Event {
   end: Time;
   height: number;
   duration: Time;
-  topOffset: number;
   icon: string;
-  overlappingEvents: Event[]; // Add this property
+  recurringEventID: string;
+  selectedDays: boolean[];
 
-  constructor(date: Date = new Date(), start: Time = new Time()) {
+  constructor(date: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
     this.id = uuidv4();
     this.date = date;
     this.start = start;
@@ -38,9 +44,9 @@ class Event {
     this.color = "gray";
     this.height = -1;
     this.duration = new Time(-1, -1);
-    this.topOffset = 0;
     this.icon = I.heart;
-    this.overlappingEvents = []; 
+    this.recurringEventID = recurringEventID;
+    this.selectedDays = Array(7).fill(false);
   }
 }
 
