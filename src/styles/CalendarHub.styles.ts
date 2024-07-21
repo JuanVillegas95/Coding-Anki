@@ -1,6 +1,14 @@
 import * as C from "@/utils/CalendarHub/constants"
 import styled from "styled-components";
 
+
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`;
+
 const GridContainer = styled.div`
   width: 90%;
   max-width: ${C.CALENDAR_WIDTH}px;
@@ -14,14 +22,7 @@ const GridContainer = styled.div`
   grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
   grid-template-areas: "header header" "aside subheader" "aside main";
 
-    /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  ${C.HIDE_SCROLL_BAR} 
 `;
 
 const Header = styled.div`
@@ -247,6 +248,9 @@ const EventTitle = styled.p`
   font-weight: 700;
   margin-left: 2px;
   font-size: 14px; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `;
 
 const EventDescription = styled.p`
@@ -254,6 +258,9 @@ const EventDescription = styled.p`
   font-weight: 500;
   margin-left: 2px;
   font-size: 14px; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `;
 
 
@@ -554,5 +561,6 @@ export {
   RecurringEvent,
   RecurringEventWrapper,
   DayPicker,
-  DayPickerWrapper
+  DayPickerWrapper,
+  Container
 };

@@ -25,7 +25,7 @@ class Event {
   title: string;
   color: string;
   description: string;
-  date: Date;
+  startDate: Date;
   start: Time;
   end: Time;
   height: number;
@@ -33,10 +33,11 @@ class Event {
   icon: string;
   recurringEventID: string;
   selectedDays: boolean[];
+  endDate: Date;
 
-  constructor(date: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
+  constructor(startDate: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
     this.id = uuidv4();
-    this.date = date;
+    this.startDate = startDate;
     this.start = start;
     this.end = new Time(-1, -1);
     this.title = "Math";
@@ -47,6 +48,7 @@ class Event {
     this.icon = I.heart;
     this.recurringEventID = recurringEventID;
     this.selectedDays = Array(7).fill(false);
+    this.endDate = new Date();
   }
 }
 

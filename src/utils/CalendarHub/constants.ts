@@ -31,6 +31,15 @@ const ICONS = new Map<string, string>([
   ["Star", I.star]
 ]);
 
+const HIDE_SCROLL_BAR: string = `
+&::-webkit-scrollbar {
+  display: none;
+}
+
+
+-ms-overflow-style: none;  
+scrollbar-width: none; 
+`
 
 export {
   HOUR_HEIGHT,
@@ -51,4 +60,5 @@ export {
   HOURS_FONT_SIZE,
   HEADER_FONT_SIZE,
   ICONS,
+  HIDE_SCROLL_BAR
 };

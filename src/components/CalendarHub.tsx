@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect, useRef } from "react";
 import { Event, Time, Calendar } from "@/utils/CalendarHub/classes";
 import { v4 as uuidv4 } from 'uuid';
@@ -51,33 +52,32 @@ const CalendarHub: React.FC = () => {
   };
 
 
-  const addRecurringEventsToCalendar = (startDate: Date, endDate: Date, selectedDays: boolean[]): void => {
+  const addRecurringEventsToCalendar = (): void => {
+    let { startDate, endDate, selectedDays } = currentEvent;
     while (startDate < endDate) {
-        startDate = F.addDateBy(startDate, 1);
-        let dayOfWeek: number = startDate.getDay() - 1;
-        if (dayOfWeek < 0) dayOfWeek = 6;
-        console.log(selectedDays[dayOfWeek], startDate)
-        if (!selectedDays[dayOfWeek]) continue; 
+      startDate = F.addDateBy(startDate, 1);
+      const dayOfWeek: number = F.getDay(startDate)
+      if (!selectedDays[dayOfWeek]) continue;
 
-        const newEvent: Event = {...currentEvent, id: uuidv4(), date: startDate};
-        calendar.current.events.set(newEvent.id, newEvent); 
-        let recurringEventIDs = calendar.current.recurringEventIDs.get(newEvent.recurringEventID);
+      const newEvent: Event = { ...currentEvent, id: uuidv4(), startDate: startDate };
+      calendar.current.events.set(newEvent.id, newEvent);
+      let recurringEventIDs = calendar.current.recurringEventIDs.get(newEvent.recurringEventID);
 
-        if (recurringEventIDs === undefined) {
-            recurringEventIDs = Array(7).fill(null).map(() => []);
-            calendar.current.recurringEventIDs.set(newEvent.recurringEventID, recurringEventIDs);
-        }
-
-        recurringEventIDs[dayOfWeek].push(newEvent.id);
+      if (recurringEventIDs === undefined) {
+        recurringEventIDs = Array(7).fill(null).map(() => []);
         calendar.current.recurringEventIDs.set(newEvent.recurringEventID, recurringEventIDs);
+      }
+
+      recurringEventIDs[dayOfWeek].push(newEvent.id);
+      calendar.current.recurringEventIDs.set(newEvent.recurringEventID, recurringEventIDs);
     }
 
     setCalendars((prevCalendars) => {
-        const updatedCalendars = new Map(prevCalendars);
-        updatedCalendars.set(calendar.current.id, { ...calendar.current });
-        return updatedCalendars;
+      const updatedCalendars = new Map(prevCalendars);
+      updatedCalendars.set(calendar.current.id, { ...calendar.current });
+      return updatedCalendars;
     });
-};
+  };
 
   const deleteRecurringEventsToCalendar = (recurringEventID: string): void => {
     calendar.current.events.get(currentEvent.id)
@@ -87,7 +87,7 @@ const CalendarHub: React.FC = () => {
       return updatedCalendars;
     });
   };
-  
+
 
   const deleteCurrentEvent = (): void => {
     calendar.current.events.delete(currentEvent.id)
@@ -126,42 +126,44 @@ const CalendarHub: React.FC = () => {
   };
 
   return (
-    <S.GridContainer>
-      <Header
-        name={calendar.current.name}
-        changeCalendarName={changeCalendarName}
-        mondayDate={mondayDate}
-        nextWeek={nextWeek}
-        prevWeek={prevWeek}
-      />
-      <Aside
-        asideRef={asideRef}
-        handleAsideScroll={handleAsideScroll}
-      />
-      <SubHeader mondayDate={mondayDate} />
-      <Main
-        mondayDate={mondayDate}
-        mainRef={mainRef}
-        handleMainScroll={handleMainScroll}
-        currentEvent={currentEvent}
-        updateCurrentEvent={updateCurrentEvent}
-        events={calendars.get(calendar.current.id)!.events}
-        addCurrentEventToCalendar={addCurrentEventToCalendar}
-        deleteCurrentEvent={deleteCurrentEvent}
-        closeModal={closeModal}
-        openModal={openModal}
-      />
-      <EventModal
-        isModalOpen={isModalOpen}
-        closeModal={closeModal}
-        deleteCurrentEvent={deleteCurrentEvent}
-        updateCurrentEvent={updateCurrentEvent}
-        currentEvent={currentEvent}
-        events={calendars.get(calendar.current.id)!.events}
-        addCurrentEventToCalendar={addCurrentEventToCalendar}
-        addRecurringEventsToCalendar={addRecurringEventsToCalendar}
-      />
-    </S.GridContainer>
+    <S.Container>
+      <S.GridContainer>
+        <Header
+          name={calendar.current.name}
+          changeCalendarName={changeCalendarName}
+          mondayDate={mondayDate}
+          nextWeek={nextWeek}
+          prevWeek={prevWeek}
+        />
+        <Aside
+          asideRef={asideRef}
+          handleAsideScroll={handleAsideScroll}
+        />
+        <SubHeader mondayDate={mondayDate} />
+        <Main
+          mondayDate={mondayDate}
+          mainRef={mainRef}
+          handleMainScroll={handleMainScroll}
+          currentEvent={currentEvent}
+          updateCurrentEvent={updateCurrentEvent}
+          events={calendars.get(calendar.current.id)!.events}
+          addCurrentEventToCalendar={addCurrentEventToCalendar}
+          deleteCurrentEvent={deleteCurrentEvent}
+          closeModal={closeModal}
+          openModal={openModal}
+        />
+        <EventModal
+          isModalOpen={isModalOpen}
+          closeModal={closeModal}
+          deleteCurrentEvent={deleteCurrentEvent}
+          updateCurrentEvent={updateCurrentEvent}
+          currentEvent={currentEvent}
+          events={calendars.get(calendar.current.id)!.events}
+          addCurrentEventToCalendar={addCurrentEventToCalendar}
+          addRecurringEventsToCalendar={addRecurringEventsToCalendar}
+        />
+      </S.GridContainer>
+    </S.Container>
   );
 };
 
@@ -273,11 +275,12 @@ const Main: React.FC<{
 
     if (!isMouseDown) return;
 
-    const newEvent: Event = new Event(currentEvent.date, currentEvent.start);
+    const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
     newEvent.height = F.calculateEventHeight(e, newEvent);
     newEvent.end = F.calculateEventEnd(newEvent);
     newEvent.duration = F.calculateEventDuration(newEvent);
     newEvent.id = currentEvent.id;
+    newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
 
     if (!F.isNewEventValid(newEvent, events)) return;
     updateCurrentEvent(newEvent);
@@ -306,7 +309,7 @@ const Main: React.FC<{
         {F.range(7).map((i) => {
           const dayDate: Date = F.addDateBy(mondayDate, i);
           const filteredEvents = Array.from(events.values()).filter((event) =>
-            F.areDatesTheSame(event.date, dayDate)
+            F.areDatesTheSame(event.startDate, dayDate)
           );
 
           return (
@@ -408,51 +411,40 @@ const EventModal: React.FC<{
   addCurrentEventToCalendar: () => void;
   currentEvent: Event;
   updateCurrentEvent: (newEvent: Event) => void;
-  addRecurringEventsToCalendar: (startDate: Date, endDate: Date, selectedDats: boolean[]) => void
+  addRecurringEventsToCalendar: () => void
   events: Map<string, Event>;
 }> = ({ isModalOpen, closeModal, deleteCurrentEvent, currentEvent, updateCurrentEvent, addCurrentEventToCalendar, events, addRecurringEventsToCalendar }) => {
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
-  const [selectedDays, setSelectedDays] = useState<boolean[]>(Array(7).fill(false));
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
-
-  useEffect(() => {
-    const initialDays = Array(7).fill(false);
-    initialDays[F.getDay(currentEvent.date)] = true;
-    setSelectedDays(initialDays);
-    setStartDate(currentEvent.date);
-  },[currentEvent])
-
-
 
 
   const handleDateStart = (e: React.ChangeEvent<HTMLInputElement>) => {
     const startDate: Date = new Date(e.target.value);
-    setStartDate(startDate);
+    const updatedEvent: Event = { ...currentEvent, startDate };
+    updateCurrentEvent(updatedEvent);
   }
 
   const handleDateEnd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const endDate: Date = new Date(e.target.value);
-    setEndDate(endDate);
+    const updatedEvent: Event = { ...currentEvent, endDate };
+    updateCurrentEvent(updatedEvent);
   }
 
-  const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index:number): void => {
+  const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
     const isSelected: boolean = e.target.checked;
-    setSelectedDays((prevSelectedDays: boolean[]) => {
-      const newSelectedDays = [...prevSelectedDays];
-      newSelectedDays[index] = isSelected;
-      return newSelectedDays;
-    })
+    let updatedEvent: Event = { ...currentEvent };
+    updatedEvent.selectedDays[index] = isSelected;
+    updateCurrentEvent(updatedEvent);
   }
+
   const handleRecurringEvent = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const isRecurringEvent: boolean = e.target.checked
     setIsRecurringEvent(isRecurringEvent);
     let updatedEvent: Event
-    if(isRecurringEvent){
+    if (isRecurringEvent) {
       const recurringEventID: string = uuidv4();
-      updatedEvent = { ...currentEvent, recurringEventID};
-    }else{
-      updatedEvent = { ...currentEvent, recurringEventID: ""};
+      updatedEvent = { ...currentEvent, recurringEventID };
+    } else {
+      updatedEvent = { ...currentEvent, recurringEventID: "" };
     }
     updateCurrentEvent(updatedEvent);
   };
@@ -471,9 +463,10 @@ const EventModal: React.FC<{
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     closeModal();
-    if(currentEvent.recurringEventID != ""){
-      addRecurringEventsToCalendar(startDate, endDate,selectedDays);
-    }else{
+    //TODO check if collisions and check if the event fulifulls the condtions
+    if (currentEvent.recurringEventID != "") {
+      addRecurringEventsToCalendar();
+    } else {
       addCurrentEventToCalendar();
     }
     updateCurrentEvent(C.NULL_EVENT);
@@ -481,6 +474,12 @@ const EventModal: React.FC<{
 
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const title: string = e.target.value;
+
+    if (title.length === 0) {
+      alert('Title cannot be empty.');
+      return;
+    }
+
     const updatedEvent: Event = { ...currentEvent, title };
     updateCurrentEvent(updatedEvent);
   };
@@ -528,7 +527,7 @@ const EventModal: React.FC<{
         break;
     }
 
-    const isOverlapping = F.isEventOverlapping(events, updatedEvent.date, updatedEvent.start);
+    const isOverlapping = F.isEventOverlapping(events, updatedEvent.startDate, updatedEvent.start);
     const isCollading = F.isEventColliding(updatedEvent, events);
     if (isOverlapping || isCollading) {
       alert("Event is overlapping/colliding");
@@ -558,7 +557,7 @@ const EventModal: React.FC<{
             />
 
             <S.SelectIcon
-              value={currentEvent.icon}
+              //TODO CHECK THE VALUE OF ICON STRING value={currentEvent.icon || ''}
               onChange={handleIcon}
             >
               {Array.from(C.ICONS.keys()).map((key: string, i: number) => {
@@ -583,18 +582,18 @@ const EventModal: React.FC<{
               <S.RecurringEvent checked={isRecurringEvent} onChange={handleRecurringEvent} />
               {isRecurringEvent && <S.DayPickerWrapper>
                 Start
-                <S.DayPicker value={F.formatDate(currentEvent.date)} onChange={handleDateStart}/>
+                <S.DayPicker value={F.formatDate(currentEvent.startDate)} onChange={handleDateStart} />
                 End
-                <S.DayPicker value={F.formatDate(endDate)} onChange={handleDateEnd}/>
+                <S.DayPicker value={F.formatDate(currentEvent.endDate)} onChange={handleDateEnd} />
                 <S.ButtonsContainer>
                   {C.DAYS.map((day: string, index: number) => (
 
                     <S.DayLabel key={index}>
-                      <S.EventDayChecks 
-                      checked={selectedDays[index]} 
-                      onChange={(e) => handleSelectedDays(e,index)}
-                      disabled={F.shouldBeLocked(currentEvent.date, index)}
-                    />
+                      <S.EventDayChecks
+                        checked={currentEvent.selectedDays[index]}
+                        onChange={(e) => handleSelectedDays(e, index)}
+                        disabled={F.shouldBeLocked(currentEvent.startDate, index)}
+                      />
                       <S.DayText>{day.charAt(0)}</S.DayText>
                     </S.DayLabel>
                   ))}

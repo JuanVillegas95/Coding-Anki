@@ -28,7 +28,7 @@
   font-family: 'Mona Sans';
   src: url('/fonts/Mona-Sans.ttf');
   font-weight: 600;
-  font-style: bold;
+  font-style: normal; /* Corrected */
 }
 
 
