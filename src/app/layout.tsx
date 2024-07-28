@@ -1,5 +1,7 @@
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import type { Metadata } from "next";
-import { Poppins, Lexend_Deca, Belanosima } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import StyledComponentsRegistry from "../../lib/registry";
 import React from "react";
@@ -21,12 +23,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
     <html lang="en">
-      <body >
+      <body suppressHydrationWarning={true} className={poppins.className}>
         <StyledComponentsRegistry>
           {children}
+          <ToastContainer limit={3}/>
         </StyledComponentsRegistry>
       </body>
     </html>

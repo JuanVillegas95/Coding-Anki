@@ -34,15 +34,17 @@ class Event {
   recurringEventID: string;
   selectedDays: boolean[];
   endDate: Date;
+  colorImage: any;
 
   constructor(startDate: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
     this.id = uuidv4();
     this.startDate = startDate;
     this.start = start;
     this.end = new Time(-1, -1);
-    this.title = "Math";
-    this.description = "Die";
+    this.title = "";
+    this.description = "";
     this.color = "gray";
+    this.colorImage = I.gray;
     this.height = -1;
     this.duration = new Time(-1, -1);
     this.icon = I.heart;

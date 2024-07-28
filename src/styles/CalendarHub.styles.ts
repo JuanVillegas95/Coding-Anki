@@ -10,8 +10,9 @@ const Container = styled.div`
 `;
 
 const GridContainer = styled.div`
-  width: 90%;
-  max-width: ${C.CALENDAR_WIDTH}px;
+  width: ${C.CALENDAR_WIDTH}px;
+  min-width: ${C.CALENDAR_WIDTH - 200}px;
+
   height: ${C.CALENDAR_HEIGHT}px;
   margin: 0 30px;
   border-radius: 1.5%;
@@ -37,13 +38,15 @@ const Header = styled.div`
   padding: 20px;
 `;
 
-const Icon = styled.div<{$color: string, $width: number, $height: number}>`
+const Icon = styled.div<{$color: string, $width: number, $svg_w: number}>`
   width: ${({ $width }) => $width}px;
-  height: ${({ $height }) => $height}px;
-
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   svg {
-    width: 100%;
-    height: 100%;
+    width: ${({ $svg_w }) => $svg_w}px;
+    height: auto;
     path {
       fill: ${({ $color }) => $color};
     }
@@ -113,14 +116,7 @@ const Aside = styled.div`
   justify-items: center; 
   margin-top: ${C.DAYS_OF_THE_WEEK_HEIGHT - 7}px;
   overflow-y: scroll;
-  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  ${C.HIDE_SCROLL_BAR} 
 `;
 
 const SubHeader = styled.div`
@@ -144,18 +140,11 @@ const S_Day = styled.div`
 
 const Main = styled.div`
   grid-area: main;
+  margin-right: 15px;
 
   position: relative;
   overflow-y: scroll;
-  /* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-  margin-right: 15px;
+  ${C.HIDE_SCROLL_BAR}
 `;
 
 
@@ -224,7 +213,7 @@ const M_Cell = styled.div`
 
 const Event = styled.div<{ $fromTop: number, $height: number, $color: string, }>`
   position: absolute;
-  z-index: 40;
+  z-index: 3;
   width: calc(100% - 1px);
   top: ${({ $fromTop }) => $fromTop}px;
   background: green;
@@ -265,13 +254,8 @@ const EventDescription = styled.p`
 
 
 const EventIcon = styled(Icon)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 5px;
-  padding-bottom: 3px;
-`;
 
+`;
 
 const EventHeader = styled.div<{$color: string}>`
   background-color: var(--primary-${({ $color }) => $color});
@@ -356,94 +340,178 @@ const TimeText = styled.p`
   color: black;
 `
 
-const RecurringEventWrapper = styled.div`
-  color: black;
 
-`
 const RecurringEvent = styled.input.attrs({
   type: 'checkbox',
 })`
 `;
 
+const RecurringEventButton = styled.button.attrs({type: "button"})`
+  width: 180px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; 
+  font-size: 20px;
+  &:hover{
+    cursor: pointer;
+    background-color: lightgray;
+  }
+`
 const EventDayChecks = styled.input.attrs({
   type: 'checkbox',
 })`
 `;
 
-const DayPicker = styled.input.attrs({
-  type: 'date',
-})`
+const DayPicker = styled.input.attrs({type: 'date',})`
+
 `;
 
 
-const EventSettings = styled.form`
+const ModalForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px;
-  color: #fff; /* Assuming white text for visibility */
+  align-items: stretch;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 650px;
+  max-width: 70%;
+  height: auto;
+  padding: 2rem;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 1rem;
 
-  & > * {
-    margin: 5px 0;
+`;
+
+const FirstRowDiv = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  height: 60px;
+  padding: 8px;
+  gap: 10px;
+`
+
+const TitleInput = styled.input.attrs({ placeholder: 'Title' })`
+  font-size: 1.2rem;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  border-radius: 5px;
+  padding: 12px;
+  flex: 1;
+`;
+
+const MenuDiv = styled.div`
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  &:hover{
+    background-color: lightgray;
+    cursor: pointer;
   }
 `;
 
-const InputTitle = styled.input.attrs({ placeholder: 'Title' })`
-  padding: 10px;
-  font-size: 1.2rem;
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const SelectColor = styled.select`
-  padding: 10px;
-  font-size: 1.2rem;
-  border: 2px solid #d3d3d3;
+const SelectMenuDiv = styled.div<{ $block: string }>`
+  position: absolute;
   background-color: white;
-  color: #333;
-  width: 100%;
-  box-sizing: border-box;
-`;
-
-const SelectIcon = styled.select`
-  padding: 10px;
-  font-size: 1.2rem;
-  border: 2px solid #d3d3d3;
-  background-color: white;
-  color: #333;
-  width: 100%;
-  box-sizing: border-box;
+  width: 150px;
+  height: 150px;
+  display: ${({$block}) => $block};
+  left: 60px;
+  z-index: 10;
+  border-radius: 20px;
 `;
 
 
-const InputDescription = styled.input.attrs({ placeholder: 'Description' })`
-  padding: 10px;
+const ItemWrapperDiv = styled.div`
+  border-radius: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  border: solid .5px gray;
+`;
+
+
+const ItemDiv = styled(Icon)`
+  border-radius: 20px;
+
+  width: 49px;
+  height: 49px;
+  &:hover{
+    background-color: lightgray;
+    cursor: pointer;
+  }
+`;
+
+const IconColorWrapper = styled.div`
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+` 
+
+const IconColor = styled.img`
+  width: 25px;
+  height: 25px;
+  border-radius: 10px;
+` 
+
+const ModalTextArea = styled.textarea.attrs({rows: 5, placeholder: "Description"})`
   font-size: 1.2rem;
-  width: 100%;
   box-sizing: border-box;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid gray;
+  border-radius: 5px;
+  margin: 0 10px;
+  flex: 1;
+  text-align: left; 
+  padding: 12px;
+  margin: 10px;
+  resize: none;
+  
 `;
 
 const InputTimeContainer = styled.div`
+  justify-content: space-between;
   display: flex;
   gap: 10px;
+  padding: 0 10px;
 `;
 
 const ButtonsContainer = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 180px;
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; 
+  font-size: 15px;
+  gap: 8px;
 `;
 
 const DayLabel = styled.label`
   display: flex;
+  flex-direction: column;
   align-items: center;
   color: black;
-  padding: 10px;
   border-radius: 40%;
 `;
 
 const DayText = styled.span`
-  margin-left: 5px;
 `;
 
 const SaveButton = styled.button.attrs({ type: 'submit' })`
@@ -468,7 +536,26 @@ const DeleteButton = styled.button`
   flex: 1;
 `;
 
-const ModalDiv = styled.div<{ $block: string; }>`
+
+const DayPickerWrapper = styled.div`
+  justify-content: space-between;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  padding: 0 10px;
+  height: 60px;
+  margin: 10px 0;
+  gap: 10px;
+`
+
+
+const EventButtons = styled.div`
+  margin-top: 15px;
+  padding: 5px;
+  border-top: solid black 1px;
+`
+
+const ModalDiv = styled.div<{ $block: string,  }>`
     display: ${p => p.$block};
     position: fixed;
     top: 0;
@@ -476,44 +563,44 @@ const ModalDiv = styled.div<{ $block: string; }>`
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.6);
-    z-index: 50;
+    z-index: 4;
 `;
 
-const ContentDiv = styled.div`
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 50%;
-    height: auto;
-    padding: 2rem;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 0.5rem;
+const ContentDiv = styled.div<{}>`
+
 `;
 
-const CrossContainer = styled(Icon)`
+const ModalCloseDiv = styled(Icon)`
   position: absolute;
-  top: .5rem;
-  right: .5rem;
+  top: 1rem;
+  right: 1rem;
   display: inline-block;
   &:hover {
     cursor: pointer;
   }
 `;
 
-const DayPickerWrapper = styled.div`
-
+const DayInputWrapperDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  border: none;
 `
 
-
 export {
+  DayInputWrapperDiv,
+  ContentDiv,
+  ModalCloseDiv,
   ModalContent,
+  ModalDiv,
   TimeInput,
   EventDayChecks,
-  EventSettings,
-  InputTitle,
-  SelectColor,
-  InputDescription,
+  ModalForm,
+  TitleInput,
+  ModalTextArea,
   InputTimeContainer,
   ButtonsContainer,
   DayLabel,
@@ -551,16 +638,22 @@ export {
   HeaderMonth,
   HeaderIconRight,
   HeaderIconLeft,
-  ModalDiv,
-  ContentDiv,
-  CrossContainer,
-  SelectIcon,
+  SelectMenuDiv,
   TimeHour,
   TimeMinutes,
   TimeText,
   RecurringEvent,
-  RecurringEventWrapper,
   DayPicker,
   DayPickerWrapper,
-  Container
+  Container,
+  EventButtons,
+  FirstRowDiv,
+  MenuDiv,
+  ItemWrapperDiv,
+  ItemDiv,
+  IconColor,
+  RecurringEventButton,
+  IconColorWrapper,
+
+
 };

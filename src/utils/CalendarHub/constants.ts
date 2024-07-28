@@ -12,23 +12,37 @@ const HOURS_FONT_SIZE: number = 12.5;
 const HEADER_FONT_SIZE: number = 18;
 
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
-const DAYS: Array<string> = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-const COLORS: Array<string> = ["gray", "orange", "pink", "purple", "brown", "blue"];
+const DAYS: string[]= ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+
 const MAX_DURATION_MINUTES: number = 15;
 const LEFT_MOUSE_CLICK: number = 0;
 const NULL_EVENT = new Event(new Date(-500, 6, 14, 3, 15, 30, 789),new Time(-1,-1));
 const NULL_CALENDAR = new Calendar("-1","-1");
 const NULL_CALENDARS = new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
+const ICONS_ARRAY: string[] = [
+  I.bell,
+  I.cart,
+  I.heart,
+  I.star,
+  I.mark,
+  I.phone,
+  I.information,
+  I.coke,
+  I.meh
+];
 
-const ICONS = new Map<string, string>([
-  ["Heart", I.heart],
-  ["Bell", I.bell],
-  ["Cart", I.cart],
-  ["Exclamation", I.exclamation],
-  ["Interrogation", I.interrogation],
-  ["Mark", I.mark],
-  ["Star", I.star]
+
+const COLORS_MAP = new Map<any, string>([
+  [I.gray, "gray"],
+  [I.orange, "orange"],
+  [I.pink, "pink"],
+  [I.purple, "purple"],
+  [I.brown, "brown"],
+  [I.blue, "blue"],
+  [I.teal, "teal"],
+  [I.red, "red"],
+  [I.yellow, "yellow"]
 ]);
 
 const HIDE_SCROLL_BAR: string = `
@@ -47,7 +61,6 @@ export {
   HEADER_HEIGHT,
   DAYS_OF_THE_WEEK_HEIGHT,
   DAYS,
-  COLORS,
   MAX_DURATION_MINUTES,
   LEFT_MOUSE_CLICK,
   NULL_EVENT,
@@ -59,6 +72,7 @@ export {
   SUBHEADER_FONT_SIZE,
   HOURS_FONT_SIZE,
   HEADER_FONT_SIZE,
-  ICONS,
-  HIDE_SCROLL_BAR
+  HIDE_SCROLL_BAR,
+  ICONS_ARRAY,
+  COLORS_MAP,
 };
