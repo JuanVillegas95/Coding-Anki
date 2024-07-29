@@ -173,10 +173,12 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   return true;
 }
 
+const formatMonth = (month: Date): string =>{
+  return month.toLocaleString('default', { month: 'short' })
+}
+
 const getMonth = (mondayDate: Date): string => {
-  const formatMonth = (month: Date): string =>{
-    return month.toLocaleString('default', { month: 'short' })
-  }
+
 
   const month: string = formatMonth(mondayDate);
   for(let i = 0; i<7; i++){
@@ -245,5 +247,6 @@ export {
   isEventColliding,
   formatDate,
   getDay,
-  shouldBeLocked
+  shouldBeLocked,
+  formatMonth
 };

@@ -18,8 +18,6 @@ const IconDiv = styled.div<{$color: string, $width: number, $svg_w: number}>`
   }
 `;
 
-
-
 const ContainerDiv = styled.div`
   display: flex;
   justify-content: center;
@@ -98,29 +96,61 @@ const ContainerSection = styled.section`
   grid-area: subheader;
   height: ${C.SUBHEADER_HEIGHT}px;
   align-items: center; 
-
-  font-family: 'Poppins', sans-serif;
-  font-size: ${C.SUBHEADER_FONT_SIZE}px;
-  font-weight: 400; 
-
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   margin-right: 15px;
 `;
 
-const S_Day = styled.div`
+const SectionDayDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const ContianerNumberDiv = styled.div<{ $isToday: boolean }>`
+  background-color: ${({ $isToday }) => ($isToday ? "red" : "white")};
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   text-align: center; 
 `;
 
+const DayNameP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; 
 
-const Main = styled.div`
+  font-size: 12px;
+`
+
+const DayNumberP = styled.p<{ $isToday: boolean }>`
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 400; 
+  margin-top: 4px;
+  color: ${({ $isToday }) => ($isToday ? "white" : "black")};
+`
+
+const ContainerMain = styled.main`
   grid-area: main;
   margin-right: 15px;
 
   position: relative;
   overflow-y: scroll;
   ${C.HIDE_SCROLL_BAR}
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-top: 2px solid #D3D3D3;  
+  border-left: 1px solid #D3D3D3;  
+  border-right: 1px solid #D3D3D3;  
+  box-sizing: border-box;
 `;
+
+const ContainerCellsDiv = styled.div`
+  position: relative;
+
+`;
+
 
 
 const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
@@ -137,16 +167,6 @@ const M_DayColumn = styled.div`
   position: relative;
 `;
 
-const M_Cells = styled.div`
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border-top: 2px solid #D3D3D3;  
-  border-left: 1px solid #D3D3D3;  
-  border-right: 1px solid #D3D3D3;  
-
-  box-sizing: border-box;
-`;
 
 const H_HourLine = styled.div<{ $fromTop: number }>`
   position: absolute;
@@ -576,6 +596,11 @@ export {
   ContainerAside,
   HourDiv,
   ContainerSection,
+  SectionDayDiv,
+  ContianerNumberDiv,
+  DayNameP,
+  DayNumberP,
+  ContainerMain,
 
   DayInputWrapperDiv,
   ContentDiv,
@@ -593,11 +618,8 @@ export {
   DayText,
   SaveButton,
   DeleteButton,
-  Main,
 
-  S_Day,
   M_DayColumn,
-  M_Cells,
   H_HourLine,
   H_LineAfterHour,
   M_HourLineDot,

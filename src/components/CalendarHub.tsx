@@ -233,14 +233,22 @@ const Aside: React.FC<{
 };
 
 const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
+
   return (
     <S.ContainerSection>
       {C.DAYS.map((day, i) => {
-        const dayOfTheMonth = F.addDateBy(mondayDate, i).getDate();
+        const dayOfTheMonth: Date = F.addDateBy(mondayDate, i);
+        const dayOfTheMonthNumber: string = dayOfTheMonth.getDate().toString();
+        const isToday: boolean = F.areDatesTheSame(dayOfTheMonth,new Date());
         return <S.SectionDayDiv key={i}>
-          {day}
-          <br />
-          {dayOfTheMonth}
+          <S.DayNameP>
+            {day.slice(0,3)}
+          </S.DayNameP>
+          <S.ContianerNumberDiv $isToday={isToday}>
+            <S.DayNumberP $isToday={isToday}>
+              {dayOfTheMonthNumber}
+            </S.DayNumberP>
+          </S.ContianerNumberDiv>
         </S.SectionDayDiv>
       })}
     </S.ContainerSection>
@@ -249,16 +257,21 @@ const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
 
 const Main: React.FC<{
   mondayDate: Date;
-  mainRef: React.RefObject<HTMLDivElement>;
-  handleMainScroll: () => void;
   currentEvent: Event;
   events: Map<string, Event>;
-  addCurrentEventToCalendar: () => void;
-  deleteCurrentEvent: () => void;
-  openModal: () => void;
+  mainRef: React.RefObject<HTMLDivElement>;
+  handleMainScroll: () => void;
   closeModal: () => void;
+  openModal: () => void;
+  deleteCurrentEvent: () => void;
+  addCurrentEventToCalendar: () => void;
   updateCurrentEvent: (newEvent: Event) => void;
-}> = ({ mainRef, handleMainScroll, currentEvent, events, addCurrentEventToCalendar, deleteCurrentEvent, mondayDate, openModal, closeModal, updateCurrentEvent }) => {
+}> = ({ 
+  mainRef, handleMainScroll, currentEvent, 
+  events, addCurrentEventToCalendar, deleteCurrentEvent, 
+  mondayDate, openModal, closeModal, updateCurrentEvent 
+}) => {
+
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
@@ -315,8 +328,7 @@ const Main: React.FC<{
   }
 
   return (
-    <S.Main ref={mainRef} onScroll={handleMainScroll}>
-      <S.M_Cells onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
+    <S.ContainerMain ref={mainRef} onScroll={handleMainScroll} onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
         {F.range(7).map((i) => {
           const dayDate: Date = F.addDateBy(mondayDate, i);
           const filteredEvents = Array.from(events.values()).filter((event) =>
@@ -335,9 +347,8 @@ const Main: React.FC<{
             </S.M_DayColumn>
           );
         })}
-      </S.M_Cells>
       <HourLine currentDate={currentDate} />
-    </S.Main>
+    </S.ContainerMain>
   );
 };
 
