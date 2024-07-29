@@ -183,10 +183,10 @@ const getMonth = (mondayDate: Date): string => {
     const newDate: Date = addDateBy(mondayDate,i);
     const newMonth: string = formatMonth(newDate);
     if(month !== newMonth){
-      return `${month}-${newMonth}`
+      return `${month} - ${newMonth}`
     }
   }
-  return month;
+  return mondayDate.toLocaleDateString('default', { month: 'long' });
 }
 
 const generate24Hours = (): string[] => {

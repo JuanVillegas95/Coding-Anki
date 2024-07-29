@@ -134,8 +134,8 @@ const CalendarHub: React.FC = () => {
   };
 
   return (
-    <S.Container>
-      <S.GridContainer>
+    <S.ContainerDiv>
+      <S.CalendarDiv>
         <Header
           name={calendar.current.name}
           changeCalendarName={changeCalendarName}
@@ -147,7 +147,7 @@ const CalendarHub: React.FC = () => {
           asideRef={asideRef}
           handleAsideScroll={handleAsideScroll}
         />
-        <SubHeader mondayDate={mondayDate} />
+        <Section mondayDate={mondayDate} />
         <Main
           mondayDate={mondayDate}
           mainRef={mainRef}
@@ -170,66 +170,80 @@ const CalendarHub: React.FC = () => {
           addCurrentEventToCalendar={addCurrentEventToCalendar}
           addRecurringEventsToCalendar={addRecurringEventsToCalendar}
         />
-      </S.GridContainer>
-    </S.Container>
+      </S.CalendarDiv>
+    </S.ContainerDiv>
   );
 };
+
+
 
 const Header: React.FC<{
   mondayDate: Date,
   name: string,
-  changeCalendarName: (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => void,
+  changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>,) => void,
   prevWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
   nextWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
 }> = ({ name, changeCalendarName, prevWeek, nextWeek, mondayDate }) => {
 
   return (
-    <S.Header>
-      <S.HEADER_Container>
-        <S.HEADER_Title value={name} onChange={changeCalendarName} />
-        <S.HeaderItem>
-          <S.MonthWrapper>
-            <S.HeaderMonth>
-              {F.getMonth(mondayDate)}
-            </S.HeaderMonth>
-            <S.HeaderIconLeft $color={"black"} $width={15} $svg_w={10} onClick={prevWeek}>
-              <I.left />
-            </S.HeaderIconLeft>
-            <S.HeaderIconRight $color={"black"} $width={15} $svg_w={10} onClick={nextWeek}>
-              <I.right />
-            </S.HeaderIconRight>
-          </S.MonthWrapper>
-        </S.HeaderItem>
-      </S.HEADER_Container>
-    </S.Header>
+    <S.ContainerHeader>
+      <S.CalendarTitleInput value={name} onChange={changeCalendarName} />
+      <Month mondayDate={mondayDate} prevWeek={prevWeek} nextWeek={nextWeek} />
+    </S.ContainerHeader>
   );
 };
 
-const Aside: React.FC<{ asideRef: React.RefObject<HTMLDivElement>, handleAsideScroll: () => void }> = ({ asideRef, handleAsideScroll }) => {
+
+
+const Month: React.FC<{
+  mondayDate: Date,
+  prevWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+  nextWeek: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+}> = ({ prevWeek, nextWeek, mondayDate }) => {
+
   return (
-    <S.Aside ref={asideRef} onScroll={handleAsideScroll}>
+    <S.MonthContainerDiv>
+      <S.ClickIconDiv $color={"black"} $width={15} $svg_w={15} onClick={prevWeek}>
+        <I.left />
+      </S.ClickIconDiv>
+      <S.MonthDiv>  
+        {F.getMonth(mondayDate)}
+      </S.MonthDiv>
+      <S.ClickIconDiv $color={"black"} $width={15} $svg_w={15} onClick={nextWeek}>
+        <I.right />
+      </S.ClickIconDiv>
+    </S.MonthContainerDiv>
+  );
+};
+
+const Aside: React.FC<{ 
+  asideRef: React.RefObject<HTMLDivElement>, 
+  handleAsideScroll: () => void 
+}> = ({ asideRef, handleAsideScroll }) => {
+
+  return (
+    <S.ContainerAside ref={asideRef} onScroll={handleAsideScroll}>
       {F.generate24HourIntervals().map((hour: string, i: number) => (
-        <S.A_Hour key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >{hour}
-        </S.A_Hour>
+        <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >
+          {hour}
+        </S.HourDiv>
       ))}
-    </S.Aside>
+    </S.ContainerAside>
   );
 };
 
-const SubHeader: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
+const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
   return (
-    <S.SubHeader>
+    <S.ContainerSection>
       {C.DAYS.map((day, i) => {
         const dayOfTheMonth = F.addDateBy(mondayDate, i).getDate();
-        return <S.S_Day key={i}>
+        return <S.SectionDayDiv key={i}>
           {day}
           <br />
           {dayOfTheMonth}
-        </S.S_Day>
+        </S.SectionDayDiv>
       })}
-    </S.SubHeader>
+    </S.ContainerSection>
   );
 };
 
@@ -575,9 +589,9 @@ const EventModal: React.FC<{
           />
 
           <S.MenuDiv onClick={toggleIconMenu}>
-            <S.Icon $color="black" $width={30} $svg_w={25}>
+            <S.IconDiv $color="black" $width={30} $svg_w={25}>
               <currentEvent.icon />
-            </S.Icon>
+            </S.IconDiv>
             <S.SelectMenuDiv $block={isIconMenu ? "block" : "none"}>
               <S.ItemWrapperDiv>
                 {C.ICONS_ARRAY.map((icon: string) => {
@@ -684,10 +698,9 @@ const TimeInput: React.FC<{
 };
 
 const DateInput: React.FC<{
-  handleDate: (e: React.ChangeEvent<HTMLInputElement>, tag: string) => void
   text: string,
   date: Date,
-
+  handleDate: (e: React.ChangeEvent<HTMLInputElement>, tag: string) => void
 }> = ({ text, date, handleDate }) => {
 
   const dateTag: string = `${text}Date`
@@ -698,5 +711,8 @@ const DateInput: React.FC<{
     </S.DayInputWrapperDiv>
   );
 };
+
+
+
 
 export default CalendarHub;

@@ -1,44 +1,9 @@
 import * as C from "@/utils/CalendarHub/constants"
 import styled from "styled-components";
 
+// PARENTS CLASSES
 
-const Container = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-`;
-
-const GridContainer = styled.div`
-  width: ${C.CALENDAR_WIDTH}px;
-  min-width: ${C.CALENDAR_WIDTH - 200}px;
-
-  height: ${C.CALENDAR_HEIGHT}px;
-  margin: 0 30px;
-  border-radius: 1.5%;
-  background-color: white;
-  display: grid;
-
-  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
-  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
-  grid-template-areas: "header header" "aside subheader" "aside main";
-
-  ${C.HIDE_SCROLL_BAR} 
-`;
-
-const Header = styled.div`
-  grid-area: header;
-  padding: 10px;
-  box-shadow: 0 .2px 0 0 slategray;
-
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px;
-  padding: 20px;
-`;
-
-const Icon = styled.div<{$color: string, $width: number, $svg_w: number}>`
+const IconDiv = styled.div<{$color: string, $width: number, $svg_w: number}>`
   width: ${({ $width }) => $width}px;
   height: auto;
   display: flex;
@@ -53,63 +18,73 @@ const Icon = styled.div<{$color: string, $width: number, $svg_w: number}>`
   }
 `;
 
-const HeaderIcon = styled(Icon)`
-  &:hover {
-    cursor: pointer;
-  }
+
+
+const ContainerDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 `;
 
-const HeaderMonth = styled.div`
-  grid-area: month;
-
-`;
-
-
-const HeaderIconLeft = styled(HeaderIcon)`
-  grid-area: left;
-
-`;
-
-const HeaderIconRight = styled(HeaderIcon)`
-  grid-area: right;
-
-`;
-
-const HeaderItem = styled.div<{}>`
-
-`;
-
-const MonthWrapper = styled.div<{}>`
+const CalendarDiv = styled.div`
+  width: ${C.CALENDAR_WIDTH}px;
+  height: ${C.CALENDAR_HEIGHT}px;
+  min-width: ${C.CALENDAR_WIDTH - 200}px;
+  margin: 0 30px;
+  border-radius: 1.5%;
+  background-color: white;
   display: grid;
-  grid-template-areas: "month month" "left right" "left right";
-  grid-template-rows: 20px 20px; 
-  grid-template-columns: 1fr 1fr;
+
+  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
+  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
+  grid-template-areas: "header header" "aside subheader" "aside main";
+
+  ${C.HIDE_SCROLL_BAR} 
 `;
 
-
-const HEADER_Container = styled.div`
+const ContainerHeader = styled.header`
+  grid-area: header;
   display: flex;
   flex: row;
   flex-wrap: nowrap;
-  position: relative;
-  width: fit-content;
-  font-size: ${C.HEADER_FONT_SIZE};
-
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+  padding: 20px;
+  box-shadow: 0 .2px 0 0 slategray;
 `;
 
-const HEADER_Title = styled.input`
+const CalendarTitleInput = styled.input`
   font-family: 'Poppins', sans-serif;
   font-weight: 800; 
-  font-size: ${C.HEADER_FONT_SIZE}px;
   width: 225px;
-  max-width: 225px;
   text-align: left; 
   border: none;
   outline: none;
 `;
 
+const MonthContainerDiv = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;   
+`;
 
-const Aside = styled.div`
+const ClickIconDiv = styled(IconDiv)`
+  &:hover{
+    cursor: pointer;
+  }
+`;
+
+const MonthDiv = styled.div`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; 
+  width: 80px;      
+  text-align: center; 
+`;
+
+
+const ContainerAside = styled.aside`
   grid-area: aside;
   text-align: center; 
   align-items: center; 
@@ -119,14 +94,14 @@ const Aside = styled.div`
   ${C.HIDE_SCROLL_BAR} 
 `;
 
-const SubHeader = styled.div`
+const ContainerSection = styled.section`
   grid-area: subheader;
   height: ${C.SUBHEADER_HEIGHT}px;
   align-items: center; 
 
   font-family: 'Poppins', sans-serif;
   font-size: ${C.SUBHEADER_FONT_SIZE}px;
-  font-weight: 600; 
+  font-weight: 400; 
 
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -148,7 +123,7 @@ const Main = styled.div`
 `;
 
 
-const A_Hour = styled.div<{ $marginBottom: number; $isEven: boolean }>`
+const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   font-family: 'Poppins', sans-serif;
   font-size: ${C.HOURS_FONT_SIZE}px;
   font-weight: 550;
@@ -253,7 +228,7 @@ const EventDescription = styled.p`
 `;
 
 
-const EventIcon = styled(Icon)`
+const EventIcon = styled(IconDiv)`
 
 `;
 
@@ -262,7 +237,7 @@ const EventHeader = styled.div<{$color: string}>`
   width: 100%;
   height: 25px;
   display: flex;
-  flex-direction: row;
+
   align-items: center; 
   justify-content: space-between;
   color: white;
@@ -391,7 +366,7 @@ const ModalForm = styled.form`
 const FirstRowDiv = styled.div`
   display: flex;
   flex-wrap: nowrap;
-  flex-direction: row;
+
   height: 60px;
   padding: 8px;
   gap: 10px;
@@ -410,7 +385,7 @@ const MenuDiv = styled.div`
   position: relative;
   display: flex;
   flex-wrap: nowrap;
-  flex-direction: row;
+
   align-items: center;
   padding: 10px;
   background-color: #f0f0f0;
@@ -441,7 +416,7 @@ const ItemWrapperDiv = styled.div`
 `;
 
 
-const ItemDiv = styled(Icon)`
+const ItemDiv = styled(IconDiv)`
   border-radius: 20px;
 
   width: 49px;
@@ -540,7 +515,7 @@ const DeleteButton = styled.button`
 const DayPickerWrapper = styled.div`
   justify-content: space-between;
   display: flex;
-  flex-direction: row;
+
   flex-wrap: nowrap;
   padding: 0 10px;
   height: 60px;
@@ -570,7 +545,7 @@ const ContentDiv = styled.div<{}>`
 
 `;
 
-const ModalCloseDiv = styled(Icon)`
+const ModalCloseDiv = styled(IconDiv)`
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -591,6 +566,17 @@ const DayInputWrapperDiv = styled.div`
 `
 
 export {
+  ContainerDiv,
+  CalendarDiv,
+  ContainerHeader,
+  CalendarTitleInput,
+  MonthContainerDiv,
+  ClickIconDiv,
+  MonthDiv,
+  ContainerAside,
+  HourDiv,
+  ContainerSection,
+
   DayInputWrapperDiv,
   ContentDiv,
   ModalCloseDiv,
@@ -607,13 +593,8 @@ export {
   DayText,
   SaveButton,
   DeleteButton,
-  GridContainer,
-  Header,
-  Aside,
-  SubHeader,
   Main,
-  HEADER_Title,
-  A_Hour,
+
   S_Day,
   M_DayColumn,
   M_Cells,
@@ -622,7 +603,6 @@ export {
   M_HourLineDot,
   M_Cell,
   Event,
-  HEADER_Container,
   EventTitle,
   EventHeader,
   EventBody,
@@ -631,13 +611,7 @@ export {
   EventDescription,
   StartTime,
   EndTime,
-  Icon,
-  HeaderItem,
-  MonthWrapper,
-  HeaderIcon,
-  HeaderMonth,
-  HeaderIconRight,
-  HeaderIconLeft,
+  IconDiv,
   SelectMenuDiv,
   TimeHour,
   TimeMinutes,
@@ -645,7 +619,6 @@ export {
   RecurringEvent,
   DayPicker,
   DayPickerWrapper,
-  Container,
   EventButtons,
   FirstRowDiv,
   MenuDiv,
@@ -654,6 +627,5 @@ export {
   IconColor,
   RecurringEventButton,
   IconColorWrapper,
-
 
 };
