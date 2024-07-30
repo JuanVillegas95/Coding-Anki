@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as I  from "@/utils/CalendarHub/icons"
+import { StaticImageData } from 'next/image';
 
 
 class Calendar {
@@ -30,11 +31,11 @@ class Event {
   end: Time;
   height: number;
   duration: Time;
-  icon: string;
+  icon: React.ComponentType;
   recurringEventID: string;
   selectedDays: boolean[];
   endDate: Date;
-  colorImage: any;
+  colorImage: StaticImageData;
 
   constructor(startDate: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
     this.id = uuidv4();
@@ -47,7 +48,7 @@ class Event {
     this.colorImage = I.gray;
     this.height = -1;
     this.duration = new Time(-1, -1);
-    this.icon = I.heart;
+    this.icon = I.star;
     this.recurringEventID = recurringEventID;
     this.selectedDays = Array(7).fill(false);
     this.endDate = new Date();

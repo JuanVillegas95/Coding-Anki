@@ -70,7 +70,7 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
   const { clientY, currentTarget } = e; 
   const topOffset: number = currentTarget.getBoundingClientRect().top;
   const distanceFromTop: number = clientY - topOffset;
@@ -78,10 +78,10 @@ const calculateEventStart = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): T
   const totalHours: number = pixelsToHours(distanceFromTop);
   const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
   
-  const startingHour: number = Math.floor(minutesToHours(totalMinutes));
-  const startingMinutes: number = totalMinutes % 60;
+  const timeHour: number = Math.floor(minutesToHours(totalMinutes));
+  const timeMinutes: number = totalMinutes % 60;
 
-  return new Time(startingHour, startingMinutes);
+  return new Time(timeHour, timeMinutes);
 }
 
 
@@ -100,15 +100,14 @@ const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, 
 }
 
 // Calculate the eventHeight based on the mouse position and the Start Time
-const calculateEventHeight = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, { start }: Event): number =>{
-  const { clientY, currentTarget } = e;
-  const topOffset: number = currentTarget.getBoundingClientRect().top;
-  const distanceFromTop: number = clientY - topOffset;
-
+const calculateEventHeight = ({ start, end }: Event): number =>{
   const totalHourStart: number= start.hours + minutesToHours(start.minutes);
   const distanceFromStart: number = hoursToPixels(totalHourStart);
 
-  return distanceFromTop - distanceFromStart
+  const totalHourEnd: number = end.hours + minutesToHours(end.minutes);
+  const distanceFromEnd: number = hoursToPixels(totalHourEnd);
+
+  return distanceFromEnd - distanceFromStart
 }
 
 // Calculates the  end time of an event based the height and start time
@@ -226,6 +225,7 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
 
 
 
+
 export {
   range,
   areDatesTheSame,
@@ -233,7 +233,7 @@ export {
   getMostRecentMonday,
   calculateTopOffset,
   generate24HourIntervals,
-  calculateEventStart,
+  calculateEventTime,
   isEventOverlapping,
   calculateEventHeight,
   calculateEventEnd,
@@ -248,5 +248,6 @@ export {
   formatDate,
   getDay,
   shouldBeLocked,
-  formatMonth
+  formatMonth,
+  getSameDateEvents,
 };

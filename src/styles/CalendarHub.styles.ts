@@ -1,8 +1,6 @@
 import * as C from "@/utils/CalendarHub/constants"
 import styled from "styled-components";
 
-// PARENTS CLASSES
-
 const IconDiv = styled.div<{$color: string, $width: number, $svg_w: number}>`
   width: ${({ $width }) => $width}px;
   height: auto;
@@ -30,6 +28,7 @@ const CalendarDiv = styled.div`
   height: ${C.CALENDAR_HEIGHT}px;
   min-width: ${C.CALENDAR_WIDTH - 200}px;
   margin: 0 30px;
+  padding-bottom: 5px;
   border-radius: 1.5%;
   background-color: white;
   display: grid;
@@ -134,24 +133,30 @@ const DayNumberP = styled.p<{ $isToday: boolean }>`
 const ContainerMain = styled.main`
   grid-area: main;
   margin-right: 15px;
-
   position: relative;
   overflow-y: scroll;
   ${C.HIDE_SCROLL_BAR}
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border-top: 2px solid #D3D3D3;  
-  border-left: 1px solid #D3D3D3;  
-  border-right: 1px solid #D3D3D3;  
-  box-sizing: border-box;
 `;
 
 const ContainerCellsDiv = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   position: relative;
-
+  border-top: 2px solid #D3D3D3;  
+  border-left: 1px solid #D3D3D3;  
+  border-right: 1px solid #D3D3D3;  
+  border-bottom: 2px solid #D3D3D3;  
+  box-sizing: border-box;
 `;
 
+const CellColumnDiv = styled.div`
+  position: relative;
+`;
 
+const CellDiv = styled.div`
+  height: calc(${C.HOUR_HEIGHT}px / 2);
+  box-shadow: .3px .2px 0 0 slategray;
+`;
 
 const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   font-family: 'Poppins', sans-serif;
@@ -163,55 +168,12 @@ const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   box-sizing: border-box;
 `;
 
-const M_DayColumn = styled.div`
-  position: relative;
-`;
 
-
-const H_HourLine = styled.div<{ $fromTop: number }>`
-  position: absolute;
-  z-index: 2;
-  width: calc(100%);
-  top: ${({ $fromTop }) => $fromTop}px;
-  color: red; 
-  font-size: 15px; 
-  display: flex;
-  align-items: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  pointer-events: none;
-`;
-
-const H_LineAfterHour = styled.div`
-  flex: 1;
-  height: 1px;
-  background-color: red; 
-`;
-// MAIN STYLES END
-const M_HourLineDot = styled.div<{ $fromTop: number }>`
-  position: absolute;
-  width: 10px; 
-  height: 10px; 
-  border-radius: 50%; 
-  background-color: orange; 
-  top: ${({ $fromTop }) => $fromTop}px;
-  left: calc(50% - 5px);
-  transform: translateX(-50%);
-`;
-
-const M_Cell = styled.div`
-  height: calc(${C.HOUR_HEIGHT}px / 2);
-  box-shadow: .3px .2px 0 0 slategray;
-`;
-
-// EVENT STYLES
-
-const Event = styled.div<{ $fromTop: number, $height: number, $color: string, }>`
+const EventDiv = styled.div<{ $fromTop: number, $height: number, $color: string, }>`
   position: absolute;
   z-index: 3;
   width: calc(100% - 1px);
   top: ${({ $fromTop }) => $fromTop}px;
-  background: green;
   margin: 0;
   height: ${({ $height }) => $height}px;
   border: 1px solid var(--primary-${({ $color }) => $color});
@@ -227,144 +189,111 @@ const Event = styled.div<{ $fromTop: number, $height: number, $color: string, }>
   }
 `;
 
-const EventTitle = styled.p`
+const EventBigTitleP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 16px; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+
+`;
+
+
+const EventSmallTitleP = styled.p`
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   margin-left: 2px;
-  font-size: 14px; 
+  font-size: 12px; 
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 `;
 
-const EventDescription = styled.p`
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  margin-left: 2px;
-  font-size: 14px; 
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-`;
-
-
-const EventIcon = styled(IconDiv)`
-
-`;
-
-const EventHeader = styled.div<{$color: string}>`
+const EventHeader = styled.header<{$color: string}>`
   background-color: var(--primary-${({ $color }) => $color});
   width: 100%;
   height: 25px;
   display: flex;
-
+  justify-content: center;
   align-items: center; 
-  justify-content: space-between;
   color: white;
   font-size: 10px;
   box-sizing: border-box;
   font-weight: 500;
+  padding: 8px;
 `;
 
-const EventTime = styled.div`
+const EventTimeDiv = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
   letter-spacing: 1px;
+  margin-left: 8px;
+  margin-top: 1px;
 `;
 
-const StartTime = styled.div`
+const EventStartTimeDiv = styled.div`
+  margin-right: 5px;
 `;
 
-const EndTime = styled.div`
+const EventEndTimeDiv = styled.div`
+  margin-left: 5px;
 `;
 
-const EventBody = styled.div`
-`;
-
-
-
-const ModalContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  max-width: 100%;
-  overflow: auto;
-`;
-
-
-const TimeInput = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
+const EventBodyDiv = styled.div<{$height : number}>`
+  position: relative;
+  height: ${({ $height }) => $height - 25}px;
   padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
-const TimeHour = styled.select`
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: #fff;
-  color: #333;
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
-  }
-`;
-
-const TimeMinutes = styled.select`
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  background-color: #fff;
-  color: #333;
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
-  }
-`;
-
-const TimeText = styled.p`
-  color: black;
-`
-
-
-const RecurringEvent = styled.input.attrs({
-  type: 'checkbox',
-})`
-`;
-
-const RecurringEventButton = styled.button.attrs({type: "button"})`
-  width: 180px;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border: none;
+const EventDescriptionP = styled.p`
+  ${C.HIDE_SCROLL_BAR};
   font-family: 'Poppins', sans-serif;
-  font-weight: 800; 
-  font-size: 20px;
-  &:hover{
-    cursor: pointer;
-    background-color: lightgray;
-  }
-`
-const EventDayChecks = styled.input.attrs({
-  type: 'checkbox',
-})`
+  font-weight: 500;
+  font-size: 14px; 
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  margin-top: 1px;
+  line-height: 18px;
+  white-space: pre-line;
 `;
 
-const DayPicker = styled.input.attrs({type: 'date',})`
-
+const EventIconDiv = styled(IconDiv)`
+  position: absolute;
+  z-index: -1;
+  right: 5px;
+  bottom: 5px;
 `;
 
+
+const HourLineDiv = styled.div<{ $fromTop: number }>`
+  position: absolute;
+  z-index: 2;
+  width: calc(100%);
+  top: ${({ $fromTop }) => $fromTop}px;
+  color: red; 
+  display: flex;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; 
+  pointer-events: none;
+  flex: 1;
+  height: 1px;
+  background-color: red; 
+`;
+
+
+const ContainerModalDiv = styled.div<{ $block: string,  }>`
+    display: ${({$block}) => $block};
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 4;
+`;
 
 const ModalForm = styled.form`
   display: flex;
@@ -380,24 +309,21 @@ const ModalForm = styled.form`
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 1rem;
-
+  padding: 40px;
 `;
 
-const FirstRowDiv = styled.div`
+const Row1Div = styled.div`
   display: flex;
   flex-wrap: nowrap;
-
-  height: 60px;
-  padding: 8px;
   gap: 10px;
+  margin-bottom: 15px;
 `
-
 const TitleInput = styled.input.attrs({ placeholder: 'Title' })`
   font-size: 1.2rem;
   box-sizing: border-box;
   border: 1px solid gray;
   border-radius: 5px;
-  padding: 12px;
+  padding: 10px;
   flex: 1;
 `;
 
@@ -416,7 +342,50 @@ const MenuDiv = styled.div`
   }
 `;
 
-const SelectMenuDiv = styled.div<{ $block: string }>`
+const Row2Div = styled.div`
+  width: 100%;
+  margin-bottom: 15px;
+`
+
+const ModalTextArea = styled.textarea.attrs({rows: 5, placeholder: "Description"})`
+  font-size: 1.2rem;
+  box-sizing: border-box;
+  text-align: left;
+  vertical-align: top;
+  border: 1px solid gray;
+  border-radius: 5px;
+  flex: 1;
+  text-align: left; 
+  resize: none;
+  width: 100%;
+  padding: 10px;
+  ${C.HIDE_SCROLL_BAR}
+`;
+
+const Row3Div = styled.div`
+  justify-content: space-between;
+  display: flex;
+  margin-bottom: 15px;
+`;
+
+const Row4Div = styled.div`
+  justify-content: space-between;
+  display: flex;
+`
+
+
+const TimeContainerDiv = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  border: none;
+`;
+
+
+const ContainerMenuDiv = styled.div<{ $block: string }>`
   position: absolute;
   background-color: white;
   width: 150px;
@@ -427,14 +396,12 @@ const SelectMenuDiv = styled.div<{ $block: string }>`
   border-radius: 20px;
 `;
 
-
-const ItemWrapperDiv = styled.div`
+const MenuItemDiv = styled.div`
   border-radius: 20px;
   display: flex;
   flex-wrap: wrap;
   border: solid .5px gray;
 `;
-
 
 const ItemDiv = styled(IconDiv)`
   border-radius: 20px;
@@ -447,43 +414,65 @@ const ItemDiv = styled(IconDiv)`
   }
 `;
 
-const IconColorWrapper = styled.div`
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-` 
+const TimeP = styled.p` // TODO IMPROVE THIS
+  color: black;
+`
 
-const IconColor = styled.img`
-  width: 25px;
-  height: 25px;
-  border-radius: 10px;
-` 
-
-const ModalTextArea = styled.textarea.attrs({rows: 5, placeholder: "Description"})`
-  font-size: 1.2rem;
-  box-sizing: border-box;
-  text-align: left;
-  vertical-align: top;
-  border: 1px solid gray;
-  border-radius: 5px;
-  margin: 0 10px;
-  flex: 1;
-  text-align: left; 
-  padding: 12px;
-  margin: 10px;
-  resize: none;
-  
+const TimeSelect = styled.select`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  &:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+  }
 `;
 
-const InputTimeContainer = styled.div`
-  justify-content: space-between;
-  display: flex;
-  gap: 10px;
-  padding: 0 10px;
+const DayInputDate = styled.input.attrs({type: 'date',})`
+  position: relative;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  width: 120px;
+
+  &::-webkit-calendar-picker-indicator {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: transparent;
+    background: 0 0;
+    margin: 0;
+    opacity: 0;
+    pointer-events: auto;
+  }
 `;
 
-const ButtonsContainer = styled.div`
+const RecurringEventButton = styled.button.attrs({type: "button"})`
+  width: 180px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800; 
+  font-size: 20px;
+  &:hover{
+    cursor: pointer;
+    background-color: lightgray;
+  }
+`
+
+const ContainerDaySelectorDiv = styled.div`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -506,13 +495,44 @@ const DayLabel = styled.label`
   border-radius: 40%;
 `;
 
-const DayText = styled.span`
+const DaySpan = styled.span`
 `;
+
+
+const EventInputCheckBox = styled.input.attrs({
+  type: 'checkbox',
+})`
+`;
+
+
+const IconColorDiv = styled.div`
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+` 
+
+const IconColorImg = styled.img`
+  width: 25px;
+  height: 25px;
+  border-radius: 10px;
+` 
+
+const Row5Div = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid lightgray;
+  margin-top: 15px;
+  padding-top: 10px;
+  gap: 20px;
+`
+
 
 const SaveButton = styled.button.attrs({ type: 'submit' })`
   padding: 10px;
-  background-color: #4CAF50; /* Green background */
+  background-color: #4CAF50; 
   color: white;
+  border-radius: 8px;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
@@ -523,46 +543,14 @@ const SaveButton = styled.button.attrs({ type: 'submit' })`
 const DeleteButton = styled.button`
   padding: 10px;
   background-color: #f44336; 
+  border-radius: 8px;
+
   color: white;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
   text-align: center;
   flex: 1;
-`;
-
-
-const DayPickerWrapper = styled.div`
-  justify-content: space-between;
-  display: flex;
-
-  flex-wrap: nowrap;
-  padding: 0 10px;
-  height: 60px;
-  margin: 10px 0;
-  gap: 10px;
-`
-
-
-const EventButtons = styled.div`
-  margin-top: 15px;
-  padding: 5px;
-  border-top: solid black 1px;
-`
-
-const ModalDiv = styled.div<{ $block: string,  }>`
-    display: ${p => p.$block};
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 4;
-`;
-
-const ContentDiv = styled.div<{}>`
-
 `;
 
 const ModalCloseDiv = styled(IconDiv)`
@@ -575,15 +563,6 @@ const ModalCloseDiv = styled(IconDiv)`
   }
 `;
 
-const DayInputWrapperDiv = styled.div`
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  border: none;
-`
 
 export {
   ContainerDiv,
@@ -601,53 +580,47 @@ export {
   DayNameP,
   DayNumberP,
   ContainerMain,
-
-  DayInputWrapperDiv,
-  ContentDiv,
-  ModalCloseDiv,
-  ModalContent,
-  ModalDiv,
-  TimeInput,
-  EventDayChecks,
+  ContainerCellsDiv,
+  CellColumnDiv,
+  CellDiv,
+  EventBigTitleP,
+  EventSmallTitleP,
+  EventStartTimeDiv,
+  EventEndTimeDiv,
+  EventBodyDiv,
+  EventIconDiv,
+  ContainerModalDiv,
   ModalForm,
+  Row1Div,
+  Row2Div,
+  Row3Div,
+  Row4Div,
+  Row5Div,
+  ModalCloseDiv,
+  IconColorDiv,
+  IconColorImg,
+  ContainerMenuDiv,
+  MenuItemDiv,
+  ItemDiv,
+  MenuDiv,
+  TimeContainerDiv,
+  TimeP,
+  DayInputDate,
+  RecurringEventButton,
+  ContainerDaySelectorDiv,
+  DaySpan,
+  EventInputCheckBox,
+  IconDiv,
   TitleInput,
   ModalTextArea,
-  InputTimeContainer,
-  ButtonsContainer,
   DayLabel,
-  DayText,
+  EventDiv,
+  EventDescriptionP,
+  EventTimeDiv,
+  EventHeader,
+  HourLineDiv,
+  TimeSelect,
+
   SaveButton,
   DeleteButton,
-
-  M_DayColumn,
-  H_HourLine,
-  H_LineAfterHour,
-  M_HourLineDot,
-  M_Cell,
-  Event,
-  EventTitle,
-  EventHeader,
-  EventBody,
-  EventIcon,
-  EventTime,
-  EventDescription,
-  StartTime,
-  EndTime,
-  IconDiv,
-  SelectMenuDiv,
-  TimeHour,
-  TimeMinutes,
-  TimeText,
-  RecurringEvent,
-  DayPicker,
-  DayPickerWrapper,
-  EventButtons,
-  FirstRowDiv,
-  MenuDiv,
-  ItemWrapperDiv,
-  ItemDiv,
-  IconColor,
-  RecurringEventButton,
-  IconColorWrapper,
-
 };

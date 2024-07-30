@@ -1,8 +1,9 @@
 "use client"
 import React, { useState, useEffect, useRef } from "react";
 import { Event, Time, Calendar } from "@/utils/CalendarHub/classes";
-import { toast } from 'react-toastify';
+import { StaticImageData } from "next/image";
 import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
 import * as C from "@/utils/CalendarHub/constants";
 import * as F from "@/utils/CalendarHub/functions";
 import * as I from "@/utils/CalendarHub/icons"
@@ -121,17 +122,7 @@ const CalendarHub: React.FC = () => {
     }
   };
 
-  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const title: string = e.target.value;
 
-    if (title.length === 0) {
-      toast.error('Title cannot be empty.');
-      return;
-    }
-
-    const updatedEvent: Event = { ...currentEvent, title };
-    updateCurrentEvent(updatedEvent);
-  };
 
   return (
     <S.ContainerDiv>
@@ -157,7 +148,6 @@ const CalendarHub: React.FC = () => {
           events={calendars.get(calendar.current.id)!.events}
           addCurrentEventToCalendar={addCurrentEventToCalendar}
           deleteCurrentEvent={deleteCurrentEvent}
-          closeModal={closeModal}
           openModal={openModal}
         />
         <EventModal
@@ -206,7 +196,7 @@ const Month: React.FC<{
       <S.ClickIconDiv $color={"black"} $width={15} $svg_w={15} onClick={prevWeek}>
         <I.left />
       </S.ClickIconDiv>
-      <S.MonthDiv>  
+      <S.MonthDiv>
         {F.getMonth(mondayDate)}
       </S.MonthDiv>
       <S.ClickIconDiv $color={"black"} $width={15} $svg_w={15} onClick={nextWeek}>
@@ -216,9 +206,9 @@ const Month: React.FC<{
   );
 };
 
-const Aside: React.FC<{ 
-  asideRef: React.RefObject<HTMLDivElement>, 
-  handleAsideScroll: () => void 
+const Aside: React.FC<{
+  asideRef: React.RefObject<HTMLDivElement>,
+  handleAsideScroll: () => void
 }> = ({ asideRef, handleAsideScroll }) => {
 
   return (
@@ -239,10 +229,10 @@ const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
       {C.DAYS.map((day, i) => {
         const dayOfTheMonth: Date = F.addDateBy(mondayDate, i);
         const dayOfTheMonthNumber: string = dayOfTheMonth.getDate().toString();
-        const isToday: boolean = F.areDatesTheSame(dayOfTheMonth,new Date());
+        const isToday: boolean = F.areDatesTheSame(dayOfTheMonth, new Date());
         return <S.SectionDayDiv key={i}>
           <S.DayNameP>
-            {day.slice(0,3)}
+            {day.slice(0, 3)}
           </S.DayNameP>
           <S.ContianerNumberDiv $isToday={isToday}>
             <S.DayNumberP $isToday={isToday}>
@@ -261,118 +251,119 @@ const Main: React.FC<{
   events: Map<string, Event>;
   mainRef: React.RefObject<HTMLDivElement>;
   handleMainScroll: () => void;
-  closeModal: () => void;
   openModal: () => void;
   deleteCurrentEvent: () => void;
   addCurrentEventToCalendar: () => void;
   updateCurrentEvent: (newEvent: Event) => void;
-}> = ({ 
-  mainRef, handleMainScroll, currentEvent, 
-  events, addCurrentEventToCalendar, deleteCurrentEvent, 
-  mondayDate, openModal, closeModal, updateCurrentEvent 
+}> = ({
+  mainRef, handleMainScroll, currentEvent,
+  events, addCurrentEventToCalendar, deleteCurrentEvent,
+  mondayDate, openModal, updateCurrentEvent
 }) => {
+    const [currentDate, setCurrentDate] = useState<Date>(new Date());
+    const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
 
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentDate(new Date());
+      }, 60000);
+      return () => clearInterval(interval);
+    }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDate(new Date());
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
+    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
+      e.preventDefault();
+      if (e.button !== C.LEFT_MOUSE_CLICK) return;
+      setIsMouseDown(true);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date): void => {
-    e.preventDefault();
-    if (e.button !== C.LEFT_MOUSE_CLICK) return;
-    setIsMouseDown(true);
-
-    const newEventStart: Time = F.calculateEventStart(e);
-    const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
-    if (eventOverlapping) return;
-    const newEvent = new Event(date, newEventStart);
-    updateCurrentEvent(newEvent);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
-    e.preventDefault();
-
-    if (!isMouseDown) return;
-
-    const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
-    newEvent.height = F.calculateEventHeight(e, newEvent);
-    newEvent.end = F.calculateEventEnd(newEvent);
-    newEvent.duration = F.calculateEventDuration(newEvent);
-    newEvent.id = currentEvent.id;
-    newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
-
-    if (!F.isNewEventValid(newEvent, events)) return;
-    updateCurrentEvent(newEvent);
-    addCurrentEventToCalendar();
-  };
-
-  const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
-    e.preventDefault();
-    setIsMouseDown(false);
-
-    if (!F.isNewEventValid(currentEvent, events)) {
-      deleteCurrentEvent();
-      return;
+      const newEventStart: Time = F.calculateEventTime(e);
+      const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
+      if (eventOverlapping) return;
+      const newEvent = new Event(date, newEventStart);
+      updateCurrentEvent(newEvent);
     };
-    openModal();
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      e.preventDefault();
+
+      if (!isMouseDown) return;
+
+      const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
+      newEvent.end = F.calculateEventTime(e);
+      newEvent.height = F.calculateEventHeight(newEvent);
+      newEvent.duration = F.calculateEventDuration(newEvent);
+      newEvent.id = currentEvent.id;
+      newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
+
+      if (!F.isNewEventValid(newEvent, events)) return;
+      updateCurrentEvent(newEvent);
+      addCurrentEventToCalendar();
+    };
+
+    const handleMouseUp = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      e.preventDefault();
+      setIsMouseDown(false);
+
+      if (!F.isNewEventValid(currentEvent, events)) {
+        deleteCurrentEvent();
+        return;
+      };
+      openModal();
+    };
+
+    const handleOnClickEvent = (event: Event) => {
+      updateCurrentEvent(event);
+      openModal();
+    }
+
+    return (
+      <S.ContainerMain ref={mainRef} onScroll={handleMainScroll}>
+        <S.ContainerCellsDiv onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
+          {F.range(7).map((i) => {
+            const dayDate: Date = F.addDateBy(mondayDate, i);
+            const filteredEvents = Array.from(events.values()).filter((event) =>
+              F.areDatesTheSame(event.startDate, dayDate)
+            );
+            return (
+              <S.CellColumnDiv
+                key={i}
+                onMouseDown={(e) => handleMouseDown(e, dayDate)}
+                onMouseUp={handleMouseUp}
+              >
+                {F.range(48).map((j) => <S.CellDiv key={j} />)}
+                <Events events={filteredEvents} handleOnClickEvent={handleOnClickEvent} />
+              </S.CellColumnDiv>
+            );
+          })}
+        </S.ContainerCellsDiv>
+        <S.HourLineDiv $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))} />
+      </S.ContainerMain>
+    );
   };
 
-  const handleOnClickEvent = (event: Event) => {
-    updateCurrentEvent(event);
-    openModal();
-  }
+const Events: React.FC<{
+  events: Event[],
+  handleOnClickEvent: (event: Event) => void
+}> = ({ events, handleOnClickEvent }) => {
 
   return (
-    <S.ContainerMain ref={mainRef} onScroll={handleMainScroll} onMouseMove={handleMouseMove} onMouseLeave={() => setIsMouseDown(false)}>
-        {F.range(7).map((i) => {
-          const dayDate: Date = F.addDateBy(mondayDate, i);
-          const filteredEvents = Array.from(events.values()).filter((event) =>
-            F.areDatesTheSame(event.startDate, dayDate)
-          );
-
-          return (
-            <S.M_DayColumn
-              key={i}
-              onMouseDown={(e) => handleMouseDown(e, dayDate)}
-              onMouseUp={handleMouseUp}
-            >
-              {F.range(48).map((j) => <S.M_Cell key={j} />)}
-              <Events events={filteredEvents} handleOnClickEvent={handleOnClickEvent} />
-
-            </S.M_DayColumn>
-          );
-        })}
-      <HourLine currentDate={currentDate} />
-    </S.ContainerMain>
-  );
-};
-
-const Events: React.FC<{ events: Event[], handleOnClickEvent: (event: Event) => void }> = ({ events, handleOnClickEvent }) => {
-  return (
-    <div>
+    <>
       {
         events.map((event: Event) => {
           const totalMinutes: number = F.timeToMinutes(event.duration);
           const topOffset: number = F.calculateTopOffset(event.start);
-          const eventType: string = totalMinutes < 30
-            ? "SHORT"
-            : totalMinutes >= 30 && totalMinutes < 60
+          const eventType: string = (totalMinutes < 30) ? "SHORT"
+            : (totalMinutes >= 30 && totalMinutes < 60)
               ? "MEDIUM"
               : "LONG";
           const { id, height, color, title, } = event;
           return (
-            <S.Event key={id} $fromTop={topOffset} $height={height} $color={color} onClick={() => handleOnClickEvent(event)}>
-              {(eventType === "SHORT") && <S.EventTitle>{title}</S.EventTitle>}
+            <S.EventDiv key={id} $fromTop={topOffset} $height={height} $color={color} onClick={() => handleOnClickEvent(event)}>
+              {(eventType === "SHORT") && <S.EventSmallTitleP>{title}</S.EventSmallTitleP>}
               {(eventType === "MEDIUM" || eventType === "LONG") && <EventBody event={event} eventType={eventType} />}
-            </S.Event>
+            </S.EventDiv>
           )
         })}
-    </div>
+    </>
   );
 };
 
@@ -386,44 +377,37 @@ const EventBody: React.FC<{ event: Event, eventType: string }> = ({ event, event
   return (
     <>
       <S.EventHeader $color={color}>
-        <S.EventIcon $color={"white"} $width={18} $svg_w={10}>
+        <S.IconDiv $color={"white"} $width={13} $svg_w={13}>
           <event.icon />
-        </S.EventIcon>
-        <S.EventTime>
-          <S.StartTime> {startHours}:{startMinutes} </S.StartTime>
-          <S.EventIcon $color={"white"} $width={20} $svg_w={10}>
+        </S.IconDiv>
+        <S.EventTimeDiv>
+          <S.EventStartTimeDiv> {startHours}:{startMinutes} </S.EventStartTimeDiv>
+          <S.IconDiv $color={"white"} $width={14} $svg_w={14}>
             <I.right_arrow />
-          </S.EventIcon>
-          <S.EndTime> {endHours}:{endMinutes}</S.EndTime>
-        </S.EventTime>
+          </S.IconDiv>
+          <S.EventEndTimeDiv> {endHours}:{endMinutes}</S.EventEndTimeDiv>
+        </S.EventTimeDiv>
       </S.EventHeader>
-      <S.EventBody>
-        <S.EventTitle>{title}</S.EventTitle>
-        {eventType === "LONG" && <S.EventDescription>{description}</S.EventDescription>}
-      </S.EventBody>
+      <S.EventBodyDiv $height={event.height}>
+        <S.EventBigTitleP>{title}</S.EventBigTitleP>
+        {eventType === "LONG" && <S.EventDescriptionP>{description}</S.EventDescriptionP>}
+        {eventType === "LONG" && <S.EventIconDiv $color={C.TERTIARY_COLORS[event.color]} $width={50} $svg_w={50}>
+          <event.icon />
+        </S.EventIconDiv>}
+      </S.EventBodyDiv>
     </>
   );
 };
 
-const HourLine: React.FC<{ currentDate: Date }> = ({ currentDate }) => {
-  const time: Time = new Time(currentDate.getHours(), currentDate.getMinutes())
-  return (
-    <S.H_HourLine $fromTop={F.calculateTopOffset(time)}>
-      <S.H_LineAfterHour />
-    </S.H_HourLine>
-  )
-}
-
 const EventModal: React.FC<{
+  events: Map<string, Event>;
+  isModalOpen: boolean;
+  currentEvent: Event;
   closeModal: () => void;
   deleteCurrentEvent: () => void;
   updateCurrentEvent: (newEvent: Event) => void;
   addCurrentEventToCalendar: () => void;
   addRecurringEventsToCalendar: () => void
-  events: Map<string, Event>;
-  isModalOpen: boolean;
-  currentEvent: Event;
-
 }> = ({ isModalOpen, closeModal, deleteCurrentEvent, currentEvent, updateCurrentEvent, addCurrentEventToCalendar, events, addRecurringEventsToCalendar }) => {
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
   const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
@@ -460,14 +444,14 @@ const EventModal: React.FC<{
     updateCurrentEvent(updatedEvent);
   };
 
-  const handleIcon = (icon: string): void => {
+  const handleIcon = (icon: React.ComponentType): void => {
     const updatedEvent: Event = { ...currentEvent, icon };
     updateCurrentEvent(updatedEvent);
   };
 
-  const handleColor = (value: string): void => {
+  const handleColor = (value: StaticImageData): void => {
     const color: any = C.COLORS_MAP.get(value);
-    const colorImage: string = value;
+    const colorImage: StaticImageData = value;
     const updatedEvent: Event = { ...currentEvent, color, colorImage };
     updateCurrentEvent(updatedEvent);
   };
@@ -521,6 +505,7 @@ const EventModal: React.FC<{
 
   const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     e.preventDefault();
+
     setIsRecurringEvent(!isRecurringEvent);
     let updatedEvent: Event
     if (isRecurringEvent) {
@@ -529,22 +514,57 @@ const EventModal: React.FC<{
     } else {
       updatedEvent = { ...currentEvent, recurringEventID: "" };
     }
+
     updateCurrentEvent(updatedEvent);
   };
 
-  const handleDeleteEvent = (): void => {
+  const handleDeleteEvent = (e: any): void => {
+    e.preventDefault();
     deleteCurrentEvent();
     closeModal();
     updateCurrentEvent(C.NULL_EVENT);
   };
 
   const handleCloseModal = (): void => {
+    setIsColorMenu(false);
+    setIsIconMenu(false);
+    setIsRecurringEvent(false);
     closeModal();
     updateCurrentEvent(C.NULL_EVENT);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
+
+    if (currentEvent.title.length === 0) {
+      toast.warning('Title cannot be empty', {
+        toastId: "titleID-50",
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+    
+    if (currentEvent.description.length === 0) {
+      toast.warning('Description cannot be empty', {
+        toastId: "descriptionID-200",
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      return;
+    }
+
+
     closeModal();
     //TODO check if collisions and check if the event fulfills the conditions
     if (currentEvent.recurringEventID != "") {
@@ -557,120 +577,121 @@ const EventModal: React.FC<{
 
   const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string): void => {
     const value: string = e.target.value;
+    const parsedValue = parseInt(value, 10); 
     let updatedEvent: Event = { ...currentEvent };
-
-    switch (tag) {
-      case "StartHour":
-        updatedEvent.start = { ...updatedEvent.start, hours: parseInt(value) };
-        break;
-      case "StartMinute":
-        updatedEvent.start = { ...updatedEvent.start, minutes: parseInt(value) };
-        break;
-      case "EndHour":
-        updatedEvent.end = { ...updatedEvent.end, hours: parseInt(value) };
-        break;
-      case "EndMinute":
-        updatedEvent.end = { ...updatedEvent.end, minutes: parseInt(value) };
-        break;
-      default:
-        break;
+    const duration: Time = F.calculateEventDuration(updatedEvent);
+  
+    if (tag === "StartHour") {
+      updatedEvent.start.hours = parsedValue;
+      updatedEvent.end.hours = (parsedValue + duration.hours) % 24;
+    } else if (tag === "StartMinute") {
+      updatedEvent.start.minutes = parsedValue;
+    } else if (tag === "EndHour") {
+      updatedEvent.end.hours = parsedValue;
+    } else if (tag === "EndMinute") {
+      updatedEvent.end.minutes = parsedValue;
     }
-
-    const isOverlapping = F.isEventOverlapping(events, updatedEvent.startDate, updatedEvent.start);
-    const isColliding = F.isEventColliding(updatedEvent, events);
-    if (isOverlapping || isColliding) {
-      toast.error("Event is overlapping/colliding");
+    
+    // Recalculate the duration and check for minimum event duration
+    updatedEvent.duration = F.calculateEventDuration(updatedEvent);
+    const totalMinutes: number = F.timeToMinutes(updatedEvent.duration);
+    if (totalMinutes < 15) {
+      toast.error("Event duration cannot be less than 15 minutes.");
       return;
     }
+  
+    // Check for event collision
+    const isColliding: boolean = F.isEventColliding(updatedEvent, events);
+    if (isColliding) {
+      toast.error("Event is overlapping/colliding.");
+      return;
+    }
+  
+    // Update the event height for visual representation, if applicable
+    updatedEvent.height = F.calculateEventHeight(updatedEvent);
+  
+    // Finally update the current event
     updateCurrentEvent(updatedEvent);
   };
-
+  
   return (
-    <S.ModalDiv $block={isModalOpen ? "block" : "none"}>
+    <S.ContainerModalDiv $block={isModalOpen ? "block" : "none"}>
       <S.ModalForm onSubmit={handleSubmit} >
 
-        <S.ModalCloseDiv $color={"black"} $width={15} $svg_w={15} onClick={closeModal}>
+        <S.ModalCloseDiv $color={"black"} $width={15} $svg_w={15} onClick={handleCloseModal}>
           <I.cross />
         </S.ModalCloseDiv>
 
-        <S.FirstRowDiv>
+        <S.Row1Div>
           <S.TitleInput
             value={currentEvent.title}
             onChange={handleTitle}
           />
+          <IconMenu
+            toggleIconMenu={toggleIconMenu}
+            isIconMenu={isIconMenu}
+            handleIcon={handleIcon}
+            currentEvent={currentEvent}
+          />
+          <ColorMenu
+            toggleColorMenu={toggleColorMenu}
+            isColorMenu={isColorMenu}
+            handleColor={handleColor}
+            colorImage={currentEvent.colorImage}
+          />
+        </S.Row1Div>
 
-          <S.MenuDiv onClick={toggleIconMenu}>
-            <S.IconDiv $color="black" $width={30} $svg_w={25}>
-              <currentEvent.icon />
-            </S.IconDiv>
-            <S.SelectMenuDiv $block={isIconMenu ? "block" : "none"}>
-              <S.ItemWrapperDiv>
-                {C.ICONS_ARRAY.map((icon: string) => {
-                  const Icon: string = icon;
-                  return (
-                    <S.ItemDiv $color={"black"} $width={50} $svg_w={20} onClick={() => handleIcon(Icon)}>
-                      < Icon />
-                    </S.ItemDiv>
-                  )
-                })}
-              </S.ItemWrapperDiv>
-            </S.SelectMenuDiv>
-          </S.MenuDiv>
+        <S.Row2Div>
+          <S.ModalTextArea
+            value={currentEvent.description}
+            onChange={handleDescription}
+          />
+        </S.Row2Div>
 
-          <S.MenuDiv onClick={toggleColorMenu}>
-            <S.IconColorWrapper>
-              <S.IconColor src={currentEvent.colorImage.src} />
-            </S.IconColorWrapper>
-            <S.SelectMenuDiv $block={isColorMenu ? "block" : "none"}>
-              <S.ItemWrapperDiv>
-                {Array.from(C.COLORS_MAP.keys()).map((key: any) => {
-                  return (
-                    <S.ItemDiv $color={""} $width={50} $svg_w={0} onClick={() => handleColor(key)}>
-                      <S.IconColor src={key.src} />
-                    </S.ItemDiv>
-                  )
-                })}
-              </S.ItemWrapperDiv>
-            </S.SelectMenuDiv>
-          </S.MenuDiv>
-        </S.FirstRowDiv>
+        <S.Row3Div>
+          <TimeInput 
+            text={"Start"} 
+            time={currentEvent.start} 
+            handleTime={handleTime} 
+          />
+          <TimeInput 
+            text={"End"} 
+            time={currentEvent.end} 
+            handleTime={handleTime} 
+          />
+          <S.RecurringEventButton onClick={handleRecurringEvent}> 
+            Recurring 
+          </ S.RecurringEventButton>
+        </S.Row3Div>
 
-        <S.ModalTextArea
-          value={currentEvent.description}
-          onChange={handleDescription}
-        />
-
-        <S.InputTimeContainer>
-          <TimeInput text={"Start"} time={currentEvent.start} handleTime={handleTime} />
-          <TimeInput text={"End"} time={currentEvent.end} handleTime={handleTime} />
-          <S.RecurringEventButton onClick={handleRecurringEvent}> Recurring </ S.RecurringEventButton>
-        </S.InputTimeContainer>
-
-        {isRecurringEvent && <S.DayPickerWrapper>
-          <DateInput text={"Start"} date={currentEvent.startDate} handleDate={handleDate} />
-          <DateInput text={"End"} date={currentEvent.startDate} handleDate={handleDate} />
-          <S.ButtonsContainer>
-            {C.DAYS.map((day: string, index: number) => (
-              <S.DayLabel key={index}>
-                <S.DayText>{day.charAt(0)}</S.DayText>
-                <S.EventDayChecks
-                  checked={currentEvent.selectedDays[index]}
-                  onChange={(e) => handleSelectedDays(e, index)}
-                  disabled={F.shouldBeLocked(currentEvent.startDate, index)}
-                />
-              </S.DayLabel>
-            ))}
-          </S.ButtonsContainer>
-        </S.DayPickerWrapper>
+        {isRecurringEvent && <S.Row4Div>
+          <DateInput 
+            text={"Start"} 
+            date={currentEvent.startDate} 
+            handleDate={handleDate} 
+          />
+          <DateInput 
+            text={"End"} 
+            date={F.addDateBy(currentEvent.startDate, 1)} 
+            handleDate={handleDate} 
+          />
+          <S.ContainerDaySelectorDiv>
+            <DaySelector 
+              selectedDays={currentEvent.selectedDays} 
+              startDate={currentEvent.startDate} 
+              handleSelectedDays={handleSelectedDays}
+            />
+          </S.ContainerDaySelectorDiv>
+        </S.Row4Div>
         }
 
-        <S.EventButtons>
+        <S.Row5Div>
           <S.SaveButton>Save</S.SaveButton>
-          <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
-        </S.EventButtons>
+          <S.DeleteButton onClick={(e) => handleDeleteEvent(e)}>Delete</S.DeleteButton>
+        </S.Row5Div>
 
       </S.ModalForm>
-    </S.ModalDiv>
+    </S.ContainerModalDiv>
   );
 };
 
@@ -680,31 +701,29 @@ const TimeInput: React.FC<{
   time: Time,
 
 }> = ({ text, time, handleTime }) => {
-
   const hours: string[] = F.generate24Hours();
   const minutes: string[] = F.generate60Minutes();
   const hourTag: string = `${text}Hour`
   const minuteTag: string = `${text}Minute`
+
   return (
-    <S.TimeInput>
-      <S.TimeText>
-        {text}
-      </S.TimeText>
-      <S.TimeHour value={F.formatTime(time.hours)} onChange={(e) => handleTime(e, hourTag)}>
+    <S.TimeContainerDiv>
+      <S.TimeP> {text} </S.TimeP>
+      <S.TimeSelect value={F.formatTime(time.hours)} onChange={(e) => handleTime(e, hourTag)}>
         {hours.map((hour: string, index: number) => (
           <option key={index} value={hour}>
             {hour}
           </option>
         ))}
-      </S.TimeHour>
-      <S.TimeMinutes value={F.formatTime(time.minutes)} onChange={(e) => handleTime(e, minuteTag)}>
+      </S.TimeSelect>
+      <S.TimeSelect value={F.formatTime(time.minutes)} onChange={(e) => handleTime(e, minuteTag)}>
         {minutes.map((minute: string, index: number) => (
           <option key={index} value={minute}>
             {minute}
           </option>
         ))}
-      </S.TimeMinutes>
-    </S.TimeInput>
+      </S.TimeSelect>
+    </S.TimeContainerDiv>
   );
 };
 
@@ -716,14 +735,86 @@ const DateInput: React.FC<{
 
   const dateTag: string = `${text}Date`
   return (
-    <S.DayInputWrapperDiv>
-      <S.TimeText>{text}</S.TimeText>
-      <S.DayPicker value={F.formatDate(date)} onChange={(e) => handleDate(e, dateTag)} />
-    </S.DayInputWrapperDiv>
+    <S.TimeContainerDiv>
+      <S.TimeP>{text}</S.TimeP>
+      <S.DayInputDate value={F.formatDate(date)} onChange={(e) => handleDate(e, dateTag)} />
+    </S.TimeContainerDiv>
   );
 };
 
+const ColorMenu: React.FC<{
+  toggleColorMenu: () => void,
+  isColorMenu: boolean,
+  handleColor: (key: any) => void,
+  colorImage: StaticImageData
+}> = ({ toggleColorMenu, isColorMenu, handleColor, colorImage }) => {
+  return (
+    <S.MenuDiv onClick={toggleColorMenu}>
+      <S.IconColorDiv>
+        <S.IconColorImg src={colorImage.src} />
+      </S.IconColorDiv>
+      <S.ContainerMenuDiv $block={isColorMenu ? "block" : "none"}>
+        <S.MenuItemDiv>
+          {Array.from(C.COLORS_MAP.keys()).map((key: any, i: number) => {
+            return (
+              <S.ItemDiv $color="" $width={50} $svg_w={0} onClick={() => handleColor(key)}>
+                <S.IconColorImg key={i} src={key.src} />
+              </S.ItemDiv>
+            );
+          })}
+        </S.MenuItemDiv>
+      </S.ContainerMenuDiv>
+    </S.MenuDiv>
+  );
+};
 
+const IconMenu: React.FC<{
+  isIconMenu: boolean,
+  currentEvent: Event,
+  toggleIconMenu: () => void,
+  handleIcon: (icon: React.ComponentType) => void,
+}> = ({ toggleIconMenu, isIconMenu, handleIcon, currentEvent }) => {
+  return (
+    <S.MenuDiv onClick={toggleIconMenu}>
+      <S.IconDiv $color="black" $width={30} $svg_w={25}>
+        <currentEvent.icon />
+      </S.IconDiv>
+      <S.ContainerMenuDiv $block={isIconMenu ? "block" : "none"}>
+        <S.MenuItemDiv>
+          {C.ICONS_ARRAY.map((icon: string, i: number) => {
+            const Icon = icon as unknown as React.ComponentType;
+            return (
+              <S.ItemDiv key={i} $color="black" $width={50} $svg_w={20} onClick={() => handleIcon(Icon)}>
+                <Icon />
+              </S.ItemDiv>
+            );
+          })}
+        </S.MenuItemDiv>
+      </S.ContainerMenuDiv>
+    </S.MenuDiv>
+  );
+};
 
+const DaySelector: React.FC<{
+  selectedDays: boolean[];
+  startDate: Date;
+  handleSelectedDays: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
+}> = ({ startDate, handleSelectedDays, selectedDays }) => {
+  
+  return (
+    <>
+      {C.DAYS.map((day: string, index: number) => (
+        <S.DayLabel key={index}>
+          <S.DaySpan>{day.charAt(0)}</S.DaySpan>
+          <S.EventInputCheckBox
+            checked={selectedDays[index]}
+            onChange={(e) => handleSelectedDays(e, index)}
+            disabled={F.shouldBeLocked(startDate, index)}
+          />
+        </S.DayLabel>
+      ))}
+    </>
+  );
+};
 
 export default CalendarHub;
