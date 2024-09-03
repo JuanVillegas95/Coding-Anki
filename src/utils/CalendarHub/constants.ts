@@ -1,6 +1,6 @@
-import { Event, Time, Calendar } from "@/utils/CalendarHub/classes"
+import { Event, Time, Calendar, User, Friend, FriendStatus} from "@/utils/CalendarHub/classes"
 import * as I from "@/utils/CalendarHub/icons"
-import { StaticImageData } from "next/image";
+import { v4 as uuidv4 } from 'uuid';
 
 const HOUR_WIDTH: number = 60;
 const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hour
@@ -20,7 +20,7 @@ const NULL_EVENT = new Event(new Date(-500, 6, 14, 3, 15, 30, 789),new Time(-1,-
 const NULL_CALENDAR = new Calendar("-1","-1");
 const NULL_CALENDARS = new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
-const ICONS_ARRAY: string[] = [
+const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
   I.cart,
   I.heart,
@@ -33,7 +33,7 @@ const ICONS_ARRAY: string[] = [
 ];
 
 
-const COLORS_MAP = new Map<StaticImageData, string>([
+const COLORS_MAP = new Map<React.ComponentType, string>([ 
   [I.gray, "gray"],
   [I.orange, "orange"],
   [I.pink, "pink"],
@@ -67,7 +67,25 @@ const TERTIARY_COLORS: { [colorName: string]: string } = {
   yellow: "#FFFACD"  
 };
 
+const USER: User = new User(
+  uuidv4(), // Generating a unique user ID
+  "rosie@example.com", // Email address
+  "Rosie", // Username
+  "securepassword123", // Password
+  new Map([
+    ["work", new Calendar(uuidv4(), "Work Calendar")],
+    ["personal", new Calendar(uuidv4(), "Personal Calendar asdkjhbasjhdajshdjhasgd")],
+    ["yeah", new Calendar(uuidv4(), "School Calendar")]
+  ]), // Initializes a map with two calendars
+  [
+    new Friend(uuidv4(), "Rosie", ["yeah1", "yeah2", "yeah3"], FriendStatus.Accepted), // Initializes friends list with one accepted friend
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending) // Another friend with a pending request
+  ]
+);
+
+
 export {
+  USER,
   HOUR_HEIGHT,
   HOUR_WIDTH,
   HEADER_HEIGHT,

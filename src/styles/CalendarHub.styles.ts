@@ -1,27 +1,46 @@
 import * as C from "@/utils/CalendarHub/constants"
-import styled from "styled-components";
+import styled, { keyframes, css } from 'styled-components';
 
-const IconDiv = styled.div<{$color: string, $width: number, $svg_w: number}>`
-  width: ${({ $width }) => $width}px;
-  height: auto;
+const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size: number, $svgSize: number}>`
+  background-color: transparent;
+  border-style: none;
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
   display: flex;
   align-items: center;
   justify-content: center;
   svg {
-    width: ${({ $svg_w }) => $svg_w}px;
-    height: auto;
+    width: ${({ $svgSize }) => $svgSize}px;
+    height: ${({ $svgSize }) => $svgSize}px;
     path {
       fill: ${({ $color }) => $color};
     }
   }
 `;
 
+const IconMenuButton = styled(IconButton)`
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  &:hover{
+    background-color: lightgray;
+    cursor: pointer;
+  }
+`
 const ContainerDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  position: relative;
+  overflow: hidden;
 `;
+
 
 const CalendarDiv = styled.div`
   width: ${C.CALENDAR_WIDTH}px;
@@ -40,6 +59,8 @@ const CalendarDiv = styled.div`
   ${C.HIDE_SCROLL_BAR} 
 `;
 
+
+
 const ContainerHeader = styled.header`
   grid-area: header;
   display: flex;
@@ -52,32 +73,49 @@ const ContainerHeader = styled.header`
   box-shadow: 0 .2px 0 0 slategray;
 `;
 
-const CalendarTitleInput = styled.input`
+const CalendarNameInput = styled.input`
   font-family: 'Poppins', sans-serif;
+  font-size: 18px;
   font-weight: 800; 
-  width: 225px;
+  letter-spacing: 1px;
+  margin-left: 5px;
   text-align: left; 
   border: none;
   outline: none;
+  border-bottom: 2px dashed lightgray;
+  border-image: repeating-linear-gradient(to right, lightgray 0, lightgray 10px, transparent 10px, transparent 20px) 1;
+  width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
-const MonthContainerDiv = styled.div`
+const ChangeWeekDiv = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;   
 `;
 
-const ClickIconDiv = styled(IconDiv)`
+const ClickableButton = styled(IconButton)`
+  user-select: none;
+  outline: none;
   &:hover{
     cursor: pointer;
   }
 `;
 
-const MonthDiv = styled.div`
+const ChangeWeekButton = styled(ClickableButton)`
+  border-radius: 15px;
+  &:hover{
+    background-color: 	#F8F8F8;
+  }
+`
+
+const MonthP = styled.p`
   font-family: 'Poppins', sans-serif;
   font-weight: 500; 
-  width: 80px;      
   text-align: center; 
+  margin-right: 15px;
+  font-size: 20px;
 `;
 
 
@@ -259,7 +297,7 @@ const EventDescriptionP = styled.p`
   white-space: pre-line;
 `;
 
-const EventIconDiv = styled(IconDiv)`
+const EventIconButton = styled(IconButton)`
   position: absolute;
   z-index: -1;
   right: 5px;
@@ -318,7 +356,7 @@ const Row1Div = styled.div`
   gap: 10px;
   margin-bottom: 15px;
 `
-const TitleInput = styled.input.attrs({ placeholder: 'Title' })`
+const TitleInput = styled.input.attrs({ placeholder: 'Title'})`
   font-size: 1.2rem;
   box-sizing: border-box;
   border: 1px solid gray;
@@ -327,20 +365,7 @@ const TitleInput = styled.input.attrs({ placeholder: 'Title' })`
   flex: 1;
 `;
 
-const MenuDiv = styled.div`
-  position: relative;
-  display: flex;
-  flex-wrap: nowrap;
 
-  align-items: center;
-  padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 10px;
-  &:hover{
-    background-color: lightgray;
-    cursor: pointer;
-  }
-`;
 
 const Row2Div = styled.div`
   width: 100%;
@@ -403,14 +428,10 @@ const MenuItemDiv = styled.div`
   border: solid .5px gray;
 `;
 
-const ItemDiv = styled(IconDiv)`
+const ItemButton = styled(ClickableButton)`
   border-radius: 20px;
-
-  width: 49px;
-  height: 49px;
   &:hover{
     background-color: lightgray;
-    cursor: pointer;
   }
 `;
 
@@ -510,6 +531,9 @@ const IconColorDiv = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  &:hover{
+    cursor: pointer;
+  }
 ` 
 
 const IconColorImg = styled.img`
@@ -553,13 +577,209 @@ const DeleteButton = styled.button`
   flex: 1;
 `;
 
-const ModalCloseDiv = styled(IconDiv)`
+const ModalCloseButton = styled(ClickableButton)`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 8px;
+  right: 8px;
   display: inline-block;
+  border-radius: 10px;
+  &:hover {
+    background-color: #F0F0F0;
+    cursor: pointer;
+  }
+`;
+
+const ArrowButton = styled(ClickableButton)`
+  background-color: white;
+  width: 70px;
+  height: 80px;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+
+const FriendContainerDiv = styled.div<{ $isClicked: boolean }>`
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: white;
+  height: auto;
+  width: 180px;
+  border-radius: 10px;
+  transition: transform 0.5s ease;
+  transform: ${({ $isClicked }) => $isClicked ? 'translateX(0px)' : 'translateX(400px)'};
+  justify-content: center;
+`;
+
+const FriendHeader = styled.header`
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid #D3D3D3;  
+  display: flex;
+  justify-content: center;
+`;
+
+
+const FriendSearchDiv = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid black;
+  border-radius: 5px;
+  margin-top: 25px;
+  margin-bottom: 5px;
+  margin-right: 30px;
+  margin-left: 30px;
+`;
+
+const FriendSearchInput = styled.input`
+  flex-grow: 1;
+  border: none;
+  border-color: transparent;
+  outline: none;
+  padding: 5px;
+`;
+
+const FriendSearchIcon = styled(ClickableButton)`
+`;
+
+const FriendButton = styled(ClickableButton)<{ $isClicked: boolean }>`
+  transition: transform 0.5s ease;
+  transform: ${({ $isClicked }) => $isClicked ? 'translateY(100px)' : 'translateY(0px)'};
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  border-radius: 50%;
+  background-color: white;
+`;
+
+const FriendCloseButton = styled(ClickableButton)`
+  position: absolute;
+  right: 8px;
+  top: 8px;
+`
+
+const FriendUl = styled.ul`
+  width: 100%;
+  flex-grow: 1;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+`
+const FriendNameP = styled.p`
+  font-weight: 500;
+  font-size: 20;
+  margin: 8px;
+`
+
+const FriendNameLi = styled.li`
+  display: flex;
+  flex-wrap: wrap;
+  padding: 5px;
+  width: 100%;
+  align-items: center;
+`
+
+const DropdownButton = styled(ClickableButton)<{ $isClicked: boolean} >`
+  transition: transform 0.3s linear;
+  transform: ${({ $isClicked }) => $isClicked ? "rotate(-90deg)" : "rotate(90deg)"};
+  border-radius: 15px;
+  margin-left: auto;
+`
+
+const slideInFromBottom = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px); 
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const FriendCalendarNameLi = styled.li<{ $isVisible: boolean, $delay: number }>`
+  animation: ${({ $isVisible, $delay }) => $isVisible ? "none" : css`${slideInFromBottom} ${$delay}s ease-in-out`};
+  will-change: transform, opacity; 
+  padding: 5px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 100%;
+`;
+
+const LinkedButton = styled(DropdownButton)`
+  background-color: transparent;
+  margin-right: 3px;
+`
+
+const CalendarNameP = styled.p`
+  margin-left: 20px;
+  font-size: 14px;
+`;
+
+const TodayButton = styled.button`
+  border-style: none;
+  background-color: white;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; 
+  width: 70px;      
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  height: 30px;
+  user-select: none;
+  &:hover{
+    cursor: pointer;
+    background-color: 	#F8F8F8;
+  }
+`
+
+const CalendarNameDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+`
+
+const CalendarNameUl = styled.ul`
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50px;
+  left: 30px;
+  z-index: 50;
+  border-radius: 15px;
+  background-color: white;
+  border: 1px solid #A0A0A0;
+`
+
+const CalendarNameLi = styled.li<{ $isVisible: boolean; $delay: number }>`
+  display: block; 
+  animation: ${({ $isVisible, $delay }) =>
+    $isVisible ? "none" : css`${slideInFromBottom} ${$delay}s ease-in-out`};
+  will-change: transform, opacity; 
+  padding: 10px;
+  border-radius: 15px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 200px; 
+  padding: 15px;
+  font-size: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; 
   &:hover {
     cursor: pointer;
+    background-color: #F8F8F8;
+
   }
 `;
 
@@ -568,10 +788,10 @@ export {
   ContainerDiv,
   CalendarDiv,
   ContainerHeader,
-  CalendarTitleInput,
-  MonthContainerDiv,
-  ClickIconDiv,
-  MonthDiv,
+  CalendarNameInput,
+  ChangeWeekDiv,
+  ClickableButton,
+  MonthP,
   ContainerAside,
   HourDiv,
   ContainerSection,
@@ -588,7 +808,7 @@ export {
   EventStartTimeDiv,
   EventEndTimeDiv,
   EventBodyDiv,
-  EventIconDiv,
+  EventIconButton,
   ContainerModalDiv,
   ModalForm,
   Row1Div,
@@ -596,13 +816,12 @@ export {
   Row3Div,
   Row4Div,
   Row5Div,
-  ModalCloseDiv,
+  ModalCloseButton,
   IconColorDiv,
   IconColorImg,
   ContainerMenuDiv,
   MenuItemDiv,
-  ItemDiv,
-  MenuDiv,
+  ItemButton,
   TimeContainerDiv,
   TimeP,
   DayInputDate,
@@ -610,7 +829,7 @@ export {
   ContainerDaySelectorDiv,
   DaySpan,
   EventInputCheckBox,
-  IconDiv,
+  IconButton,
   TitleInput,
   ModalTextArea,
   DayLabel,
@@ -620,7 +839,29 @@ export {
   EventHeader,
   HourLineDiv,
   TimeSelect,
+  ArrowButton,
+  FriendSearchDiv,
+  FriendContainerDiv,
+  FriendSearchIcon,
+  FriendHeader,
+  FriendSearchInput,
+  FriendCloseButton,
+  FriendButton,
+  FriendUl,
+  FriendNameLi,
+  FriendCalendarNameLi,
+  FriendNameP,
 
+  IconMenuButton,
+
+  DropdownButton,
+  LinkedButton,
+  CalendarNameP,
+  TodayButton,
+  ChangeWeekButton,
   SaveButton,
   DeleteButton,
+  CalendarNameDiv,
+  CalendarNameLi,
+  CalendarNameUl,
 };

@@ -8,23 +8,33 @@ import cart from "@/svg/cart.svg"
 import interrogation from "@/svg/interrogation.svg"
 import mark from "@/svg/mark.svg"
 import star from "@/svg/star.svg"
+import search from "@/svg/search.svg"
+import following from "@/svg/following.svg"
+import link from "@/svg/link.svg"
+import horizontalDots from "@/svg/grip-dots-h.svg"
+import verticalDots from "@/svg/grip-dots-vertical.svg"
+import dropdown from "@/svg/angle-right.svg"
+import emptyCircle from "@/svg/empty-circle.svg"
+import fullCircle from "@/svg/full-circle.svg"
+import users from "@/svg/users.svg"
 
 import phone from "@/svg/phone.svg"
 import information from "@/svg/information.svg"
 import coke from "@/svg/coke.svg"
 import meh from "@/svg/meh.svg"
 
-import purple from "@/images/purple.jpeg"
-import blue from "@/images/blue.jpeg"
-import orange from "@/images/orange.jpeg"
-import brown from "@/images/brown.jpeg"
-import gray from "@/images/gray.jpeg"
-import pink from "@/images/pink.jpeg"
-import teal from "@/images/teal.jpeg"
-import red from "@/images/red.jpeg"
-import yellow from "@/images/yellow.jpeg"
+import purple from "@/svg/purple.svg"
+import blue from "@/svg/blue.svg"
+import orange from "@/svg/orange.svg"
+import brown from "@/svg/brown.svg"
+import gray from "@/svg/gray.svg"
+import pink from "@/svg/pink.svg"
+import teal from "@/svg/teal.svg"
+import red from "@/svg/red.svg"
+import yellow from "@/svg/yellow.svg"
 
 export {
+  link,
   heart,
   right_arrow,
   left,
@@ -48,4 +58,12 @@ export {
   teal,
   red,
   yellow,
+  search,
+  following,
+  horizontalDots,
+  verticalDots,
+  dropdown,
+  emptyCircle,
+  fullCircle,
+  users,
 }
