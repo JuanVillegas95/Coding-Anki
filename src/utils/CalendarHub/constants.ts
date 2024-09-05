@@ -14,11 +14,35 @@ const HOURS_FONT_SIZE: number = 12.5;
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
 const DAYS: string[]= ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 
+
+
+// EVENTS TRESHOLDS
+const SHORT_DURATION_THRESHOLD = 60;  // Less than 30 minutes is 'SHORT'
+const MEDIUM_DURATION_THRESHOLD = 90; // Between 60 and 90 minutes is 'MEDIUM'
+
+
 const MAX_DURATION_MINUTES: number = 15;
+
+// Peripherals events
 const LEFT_MOUSE_CLICK: number = 0;
-const NULL_EVENT = new Event(new Date(-500, 6, 14, 3, 15, 30, 789),new Time(-1,-1));
-const NULL_CALENDAR = new Calendar("-1","-1");
-const NULL_CALENDARS = new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
+const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
+const ENTER_KEY : string = "Enter";
+
+const NULL_TIME: Time = new Time(-1,-1);
+const NULL_DATE: Date = new Date(-500, 6, 14, 3, 15, 30, 789);
+
+/**
+ * `NULL_EVENT` acts as a marker to initiate or terminate the event creation, dragging and resizing process.
+ */
+const NULL_EVENT: Event = new Event(NULL_DATE,NULL_TIME);
+
+enum EVENT_ACTION {
+  CREATE = "CREATE",
+  DRAG = "DRAG",
+  RESIZE = "RESIZE",
+}
+const NULL_CALENDAR: Calendar = new Calendar("-1","-1");
+const NULL_CALENDARS: Map<string, Calendar>= new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
 const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
@@ -106,4 +130,10 @@ export {
   ICONS_ARRAY,
   COLORS_MAP,
   TERTIARY_COLORS,
+  SHORT_DURATION_THRESHOLD,
+  MEDIUM_DURATION_THRESHOLD,
+  NULL_DATE,
+  EVENT_ACTION,
+  ESCAPE_KEYS,
+  ENTER_KEY,
 };

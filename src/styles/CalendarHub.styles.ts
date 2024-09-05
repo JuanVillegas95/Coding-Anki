@@ -22,7 +22,7 @@ const IconMenuButton = styled(IconButton)`
   position: relative;
   display: flex;
   flex-wrap: nowrap;
-
+  justify-content: center;
   align-items: center;
   padding: 10px;
   background-color: #f0f0f0;
@@ -206,27 +206,6 @@ const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   box-sizing: border-box;
 `;
 
-
-const EventDiv = styled.div<{ $fromTop: number, $height: number, $color: string, }>`
-  position: absolute;
-  z-index: 3;
-  width: calc(100% - 1px);
-  top: ${({ $fromTop }) => $fromTop}px;
-  margin: 0;
-  height: ${({ $height }) => $height}px;
-  border: 1px solid var(--primary-${({ $color }) => $color});
-  background-color: var(--secondary-${({ $color }) => $color});
-  border-width: 2px;
-  border-radius: 0.4rem;
-  white-space: normal;
-  overflow: hidden;
-  margin-left: 1px;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
 const EventBigTitleP = styled.p`
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
@@ -234,18 +213,32 @@ const EventBigTitleP = styled.p`
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-
+  width: calc(100% - 15px);
 `;
 
+const ShortEventDiv = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  position: relative;
+  width: 100%; 
+`;
 
-const EventSmallTitleP = styled.p`
+const ShortEventTitleP = styled.p`
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
   margin-left: 2px;
-  font-size: 12px; 
+  font-size: 11px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  position: absolute;
+  z-index: 5;
+  max-width: calc(100% - 20px); 
+  min-width: 0; 
+  flex-shrink: 1; 
 `;
 
 const EventHeader = styled.header<{$color: string}>`
@@ -259,7 +252,9 @@ const EventHeader = styled.header<{$color: string}>`
   font-size: 10px;
   box-sizing: border-box;
   font-weight: 500;
-  padding: 8px;
+  padding-bottom: 6px;
+  padding-left: 8px;
+
 `;
 
 const EventTimeDiv = styled.div`
@@ -279,9 +274,8 @@ const EventEndTimeDiv = styled.div`
   margin-left: 5px;
 `;
 
-const EventBodyDiv = styled.div<{$height : number}>`
+const EventBodyDiv = styled.div`
   position: relative;
-  height: ${({ $height }) => $height - 25}px;
   padding: 10px;
 `;
 
@@ -292,16 +286,18 @@ const EventDescriptionP = styled.p`
   font-size: 14px; 
   word-wrap: break-word;
   overflow-wrap: break-word;
-  margin-top: 1px;
   line-height: 18px;
   white-space: pre-line;
+  max-height: calc(100% - 50px); 
+  overflow: auto;
+  padding-right: 5px; 
 `;
 
 const EventIconButton = styled(IconButton)`
   position: absolute;
   z-index: -1;
-  right: 5px;
-  bottom: 5px;
+  right: 8px;
+  bottom: 18px;
 `;
 
 
@@ -429,7 +425,12 @@ const MenuItemDiv = styled.div`
 `;
 
 const ItemButton = styled(ClickableButton)`
-  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  svg{
+  }
   &:hover{
     background-color: lightgray;
   }
@@ -783,6 +784,91 @@ const CalendarNameLi = styled.li<{ $isVisible: boolean; $delay: number }>`
   }
 `;
 
+const ShortEventDragButton = styled(IconButton)`
+  position: absolute;
+  right: 1px;
+  &:hover{
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+`
+
+const MediumEventDragButton = styled(IconButton)`
+  position: absolute;
+  right: -28px;
+  bottom: 0;
+  width: 100%;
+  &:hover{
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+`
+
+const LongEventDragButton = styled(IconButton)`
+  position: absolute;
+  left: 45%;
+  bottom: 0px;
+
+  &:hover{
+    cursor: move;
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+  }
+  z-index: 15;
+`
+
+
+
+const EventBottomDiv = styled.div`
+  width: 100%;
+  height: 6px;
+  flex: 0 0 auto;
+  &:hover{
+    cursor: ns-resize; 
+  }
+`;
+
+const EventTopDiv = styled.div.attrs<{ $color: string; }>(
+  ({ $color }) => ({ 
+    style: { 
+      backgroundColor: `var(--primary-${$color})`
+    }
+  }))`
+  flex: 0 0 auto;
+  width: 100%;
+  height: 6px;
+    &:hover{
+    cursor: ns-resize; 
+  }
+`;
+
+const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string}>(
+  ({ $fromTop, $height, $color }) => ({
+  style: {
+    top: `${$fromTop}px`,
+    height: `${$height}px`,
+    border: `1px solid var(--primary-${$color})`,
+    backgroundColor: `var(--secondary-${$color})`,
+  },
+}))`
+  position: absolute;
+  overflow: hidden;
+  z-index: 3;
+  width: 100%;
+  border-width: 2px;
+  border-radius: 0.4rem;
+  white-space: normal;
+  display: flex;
+  flex-direction: column;
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
 export {
   ContainerDiv,
@@ -804,7 +890,7 @@ export {
   CellColumnDiv,
   CellDiv,
   EventBigTitleP,
-  EventSmallTitleP,
+  ShortEventTitleP,
   EventStartTimeDiv,
   EventEndTimeDiv,
   EventBodyDiv,
@@ -851,9 +937,9 @@ export {
   FriendNameLi,
   FriendCalendarNameLi,
   FriendNameP,
-
+  ShortEventDiv,
   IconMenuButton,
-
+  MediumEventDragButton,
   DropdownButton,
   LinkedButton,
   CalendarNameP,
@@ -864,4 +950,8 @@ export {
   CalendarNameDiv,
   CalendarNameLi,
   CalendarNameUl,
+  ShortEventDragButton,
+  LongEventDragButton,
+  EventTopDiv,
+  EventBottomDiv,
 };

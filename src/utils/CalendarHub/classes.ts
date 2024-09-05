@@ -70,18 +70,18 @@ class Calendar {
 class Event {
   id: string;
   title: string;
-  color: string;
   description: string;
   startDate: Date;
+  endDate: Date;
   start: Time;
   end: Time;
   height: number;
   duration: Time;
   icon: React.ComponentType;
-  colorIcon: React.ComponentType;
+  color: string;
+  colorIcon: React.ComponentType; // todo delete this property
   recurringEventID: string;
   selectedDays: boolean[];
-  endDate: Date;
 
   constructor(startDate: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
     this.id = uuidv4();

@@ -70,7 +70,7 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent> ): Time => {
   const { clientY, currentTarget } = e; 
   const topOffset: number = currentTarget.getBoundingClientRect().top;
   const distanceFromTop: number = clientY - topOffset;
@@ -222,7 +222,11 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
   return dayOfTheWeek === index;
 }
 
-
+const getEventType = (totalMinutes: number): 'SHORT' | 'MEDIUM' | 'LONG' => {
+  return (totalMinutes < C.SHORT_DURATION_THRESHOLD) ? 'SHORT'
+       : (totalMinutes < C.MEDIUM_DURATION_THRESHOLD) ? 'MEDIUM'
+       : 'LONG';
+}
 
 
 
@@ -250,4 +254,5 @@ export {
   shouldBeLocked,
   formatMonth,
   getSameDateEvents,
+  getEventType
 };
