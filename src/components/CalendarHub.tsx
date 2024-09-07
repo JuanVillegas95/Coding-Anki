@@ -304,9 +304,10 @@ const Main: React.FC<{
       action: C.EVENT_ACTION,
       date: Date,
       event: Event,
-      e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      e: any,
     ): void => {
       e.preventDefault();
+      e.stopPropagation();
       if (e.button !== C.LEFT_MOUSE_CLICK || currentEvent !== C.NULL_EVENT) return;
 
       switch (action) {
@@ -348,7 +349,10 @@ const Main: React.FC<{
         updateCurrentEvent(newEvent);
         addCurrentEventToCalendar();
       } else if (isEventDragging) {
-
+        const newStart: Time = F.calculateEventTime(e);
+        const updatedEvent: Event = { ...currentEvent, start: newStart };
+        updateCurrentEvent(updatedEvent);
+        addCurrentEventToCalendar();
       } else if (isEventResizing) {
 
 
@@ -356,7 +360,7 @@ const Main: React.FC<{
     };
 
     const handleEventActionEnd = (
-      e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent>
+      e: any
     ): void => {
       e.preventDefault();
       if (e.button !== C.LEFT_MOUSE_CLICK || currentEvent === C.NULL_EVENT) return;
@@ -371,82 +375,87 @@ const Main: React.FC<{
         setIsCreatingNewEvent(false);
       } else if (isEventDragging) {
         setIsEventDragging(false);
+        updateCurrentEvent(C.NULL_EVENT);
       } else if (isEventResizing) {
 
         setIsEventResizing(false);
       }
     };
 
-    const handleOnClickEvent = (event: Event) => {
-      updateCurrentEvent(event);
-      openModal();
-    };
+    // const handleOnClickEvent = (event: Event) => {
+    //   updateCurrentEvent(event);
+    //   openModal();
+    // };
 
-    return (
-      <S.ContainerMain ref={mainRef} onScroll={handleMainScroll}>
-        <S.ContainerCellsDiv onMouseMove={handleMouseMove} onMouseLeave={(e) => handleEventActionEnd(e)}>
-          {
-            F.range(7).map((i) => {
-              const day: Date = F.addDateBy(mondayDate, i);
-              const filteredEvents: Event[] = F.getSameDateEvents(events, day);
+    return <S.ContainerMain
+      ref={mainRef}
+      onScroll={handleMainScroll}
+      onMouseLeave={(e) => handleEventActionEnd(e)}
+    >
+      {
+        F.range(7).map((i) => {
+          const day: Date = F.addDateBy(mondayDate, i);
+          const filteredEvents: Event[] = F.getSameDateEvents(events, day);
 
-              return (
-                <S.CellColumnDiv
-                  key={i}
-                  onMouseUp={handleEventActionEnd}
-                  onMouseDown={(e) => handleEventActionStart(C.EVENT_ACTION.CREATE, day, C.NULL_EVENT, e)}
+          return <S.CellColumnDiv
+            key={i}
+            onMouseDown={(e) => handleEventActionStart(C.EVENT_ACTION.CREATE, day, C.NULL_EVENT, e)}
+            onMouseUp={handleEventActionEnd}
+            onMouseMove={handleMouseMove}
+          >
+            {
+              F.range(48).map((j) => <S.CellDiv key={j} />)
+            }
+            {
+              filteredEvents.map((event: Event) => {
+                const { id, height, start, end, duration, color, icon, title, description } = event;
+                const totalMinutes: number = F.timeToMinutes(duration);
+                const topOffset: number = F.calculateTopOffset(start);
+                const startHours: string = F.formatTime(start.hours);
+                const startMinutes: string = F.formatTime(start.minutes);
+                const endHours: string = F.formatTime(end.hours);
+                const endMinutes: string = F.formatTime(end.minutes);
+                const isShortEvent: boolean = (totalMinutes < C.SHORT_DURATION_THRESHOLD);
+
+                return <S.EventDiv
+                  key={id}
+                  $fromTop={topOffset}
+                  $height={height} $color={color}
+                  $isDragged={isEventDragging}
+                  // onClick={() => handleOnClickEvent(event)}
+                  onMouseDown={(e) => handleEventActionStart(C.EVENT_ACTION.DRAG, C.NULL_DATE, event, e)}
+                  onMouseUp={(e) => handleEventActionEnd(e)}
                 >
+                  <S.EventTopDiv
+                    $color={isShortEvent ? "transparent" : color}
+                    onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
+                  />
                   {
-                    F.range(48).map((j) => <S.CellDiv key={j} />)
+                    isShortEvent ? (
+                      <ShortEvent title={title} />
+                    ) : (
+                      <LongEvent
+                        color={color}
+                        startHours={startHours}
+                        startMinutes={startMinutes}
+                        endHours={endHours}
+                        endMinutes={endMinutes}
+                        icon={icon}
+                        title={title}
+                        description={description}
+                      />
+                    )
                   }
-                  {
-                    filteredEvents.map((event: Event) => {
-                      const { id, height, start, end, duration, color, icon, title, description } = event;
-
-                      const totalMinutes: number = F.timeToMinutes(duration);
-                      const topOffset: number = F.calculateTopOffset(start);
-                      const startHours: string = F.formatTime(start.hours);
-                      const startMinutes: string = F.formatTime(start.minutes);
-                      const endHours: string = F.formatTime(end.hours);
-                      const endMinutes: string = F.formatTime(end.minutes);
-                      const isShortEvent: boolean = (totalMinutes < C.SHORT_DURATION_THRESHOLD);
-
-                      return (
-                        <S.EventDiv key={id} $fromTop={topOffset} $height={height} $color={color} onClick={() => handleOnClickEvent(event)}>
-                          <S.EventTopDiv
-                            $color={isShortEvent ? "transparent" : color}
-                            onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
-                          />
-                          {
-                            isShortEvent ? (
-                              <ShortEvent title={title} />
-                            ) : (
-                              <LongEvent
-                                color={color}
-                                startHours={startHours}
-                                startMinutes={startMinutes}
-                                endHours={endHours}
-                                endMinutes={endMinutes}
-                                icon={icon}
-                                title={title}
-                                description={description}
-                              />
-                            )
-                          }
-                          <S.EventBottomDiv
-                            onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
-                          />
-                        </S.EventDiv >
-                      );
-                    })}
-                </S.CellColumnDiv>
-              );
-            })
-          }
-        </S.ContainerCellsDiv>
-        <S.HourLineDiv $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))} />
-      </S.ContainerMain>
-    );
+                  <S.EventBottomDiv
+                    onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
+                  />
+                </S.EventDiv >
+              })}
+          </S.CellColumnDiv>
+        })
+      }
+      <S.HourLineDiv $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))} />
+    </S.ContainerMain>
   };
 
 const ShortEvent: React.FC<{
@@ -670,6 +679,7 @@ const EventModal: React.FC<{
 
     // Finally update the current event
     updateCurrentEvent(updatedEvent);
+
   };
 
 

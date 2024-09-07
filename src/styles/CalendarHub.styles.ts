@@ -191,10 +191,7 @@ const ContainerMain = styled.main`
   position: relative;
   overflow-y: scroll;
   ${C.HIDE_SCROLL_BAR}
-`;
-
-const ContainerCellsDiv = styled.div`
-  display: grid;
+    display: grid;
   grid-template-columns: repeat(7, 1fr);
   position: relative;
   border-top: 2px solid #D3D3D3;  
@@ -202,6 +199,10 @@ const ContainerCellsDiv = styled.div`
   border-right: 1px solid #D3D3D3;  
   border-bottom: 2px solid #D3D3D3;  
   box-sizing: border-box;
+`;
+
+const ContainerCellsDiv = styled.div`
+
 `;
 
 const CellColumnDiv = styled.div`
@@ -837,7 +838,7 @@ const EventTopDiv = styled.div.attrs<{ $color: string; }>(
 
 
 
-const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string}>(
+const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>(
   ({ $fromTop, $height, $color }) => ({
   style: {
     top: `${$fromTop}px`,
@@ -845,7 +846,7 @@ const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: s
     border: `1px solid var(--primary-${$color})`,
     backgroundColor: `var(--secondary-${$color})`,
   },
-}))<{ $fromTop: number; $height: number; $color: string}>`
+}))<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>`
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -855,7 +856,7 @@ const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: s
   border-radius: 8px;
   box-sizing: border-box;
   &:hover {
-    cursor: pointer;
+    cursor:  ${({ $isDragged }) =>  $isDragged ? "grabbing" : "pointer"};
   }
   letter-spacing: 0.5px;
 `;
