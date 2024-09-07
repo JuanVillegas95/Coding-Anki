@@ -16,12 +16,10 @@ const DAYS: string[]= ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "
 
 
 
-// EVENTS TRESHOLDS
-const SHORT_DURATION_THRESHOLD = 60;  // Less than 30 minutes is 'SHORT'
-const MEDIUM_DURATION_THRESHOLD = 90; // Between 60 and 90 minutes is 'MEDIUM'
+const SHORT_DURATION_THRESHOLD = 60;  // Less than 60 minutes is a "SHORT" event.
 
 
-const MAX_DURATION_MINUTES: number = 15;
+const MAX_DURATION_MINUTES: number = 20;
 
 // Peripherals events
 const LEFT_MOUSE_CLICK: number = 0;
@@ -131,7 +129,6 @@ export {
   COLORS_MAP,
   TERTIARY_COLORS,
   SHORT_DURATION_THRESHOLD,
-  MEDIUM_DURATION_THRESHOLD,
   NULL_DATE,
   EVENT_ACTION,
   ESCAPE_KEYS,

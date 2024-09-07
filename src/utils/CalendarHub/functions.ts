@@ -22,6 +22,8 @@ const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.
 // Converts the map into an array returning only the events with the same date
 const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.startDate, date));
 
+
+
 // Creates an array of n size;
 const range = (size: number): number[] => [...Array(size).keys()]
 
@@ -222,11 +224,6 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
   return dayOfTheWeek === index;
 }
 
-const getEventType = (totalMinutes: number): 'SHORT' | 'MEDIUM' | 'LONG' => {
-  return (totalMinutes < C.SHORT_DURATION_THRESHOLD) ? 'SHORT'
-       : (totalMinutes < C.MEDIUM_DURATION_THRESHOLD) ? 'MEDIUM'
-       : 'LONG';
-}
 
 
 
@@ -254,5 +251,4 @@ export {
   shouldBeLocked,
   formatMonth,
   getSameDateEvents,
-  getEventType
 };

@@ -18,6 +18,23 @@ const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size:
   }
 `;
 
+const IconDiv = styled.div<{$color: string, $size: number, $svgSize: number}>`
+  background-color: transparent;
+  border-style: none;
+  width: ${({ $size }) => $size}px;
+  height: ${({ $size }) => $size}px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  svg {
+    width: ${({ $svgSize }) => $svgSize}px;
+    height: ${({ $svgSize }) => $svgSize}px;
+    path {
+      fill: ${({ $color }) => $color};
+    }
+  }
+`;
+
 const IconMenuButton = styled(IconButton)`
   position: relative;
   display: flex;
@@ -206,58 +223,11 @@ const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   box-sizing: border-box;
 `;
 
-const EventBigTitleP = styled.p`
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  font-size: 16px; 
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: calc(100% - 15px);
-`;
 
-const ShortEventDiv = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  align-items: center;
-  position: relative;
-  width: 100%; 
-`;
 
-const ShortEventTitleP = styled.p`
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700;
-  margin-left: 2px;
-  font-size: 11px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  position: absolute;
-  z-index: 5;
-  max-width: calc(100% - 20px); 
-  min-width: 0; 
-  flex-shrink: 1; 
-`;
 
-const EventHeader = styled.header<{$color: string}>`
-  background-color: var(--primary-${({ $color }) => $color});
-  width: 100%;
-  height: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center; 
-  color: white;
-  font-size: 10px;
-  box-sizing: border-box;
-  font-weight: 500;
-  padding-bottom: 6px;
-  padding-left: 8px;
 
-`;
-
-const EventTimeDiv = styled.div`
+const LongEventTimeDiv = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
@@ -266,39 +236,25 @@ const EventTimeDiv = styled.div`
   margin-top: 1px;
 `;
 
-const EventStartTimeDiv = styled.div`
+const LongEventStartDiv = styled.div`
   margin-right: 5px;
 `;
 
-const EventEndTimeDiv = styled.div`
+const LongEventArrowDiv = styled(IconDiv)`
+  margin-bottom: 2px;
+`
+
+const LongEventEndDiv = styled.div`
   margin-left: 5px;
 `;
 
-const EventBodyDiv = styled.div`
-  position: relative;
-  padding: 10px;
-`;
 
-const EventDescriptionP = styled.p`
-  ${C.HIDE_SCROLL_BAR};
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500;
-  font-size: 14px; 
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  line-height: 18px;
-  white-space: pre-line;
-  max-height: calc(100% - 50px); 
-  overflow: auto;
-  padding-right: 5px; 
-`;
-
-const EventIconButton = styled(IconButton)`
+const LongEventIconBodyDiv = styled(IconDiv)`
   position: absolute;
+  bottom: -17px;
+  right: 7px;
   z-index: -1;
-  right: 8px;
-  bottom: 18px;
-`;
+`
 
 
 const HourLineDiv = styled.div<{ $fromTop: number }>`
@@ -784,50 +740,80 @@ const CalendarNameLi = styled.li<{ $isVisible: boolean; $delay: number }>`
   }
 `;
 
-const ShortEventDragButton = styled(IconButton)`
-  position: absolute;
-  right: 1px;
-  &:hover{
-    cursor: move; /* fallback if grab cursor is unsupported */
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-  }
+const ContainerShortEventDiv = styled.div`
+  flex: 1;
+  height: calc(100% - 12px); // -12px for Top/Bottom div are 6px.
+  display: flex;
+  align-items: center;
+`;
+
+const ContainerLongEventDiv = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  height: calc(100% - 12px); // -20px for EventHeader
 `
 
-const MediumEventDragButton = styled(IconButton)`
-  position: absolute;
-  right: -28px;
-  bottom: 0;
+const LongEventHeader = styled.header<{$color: string}>`
+  background-color: var(--primary-${({ $color }) => $color});
+  height: 20px;
   width: 100%;
-  &:hover{
-    cursor: move;
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-  }
-`
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 0 0 5px 5px;
+`;
 
-const LongEventDragButton = styled(IconButton)`
-  position: absolute;
-  left: 45%;
-  bottom: 0px;
 
-  &:hover{
-    cursor: move;
-    cursor: grab;
-    cursor: -moz-grab;
-    cursor: -webkit-grab;
-  }
-  z-index: 15;
+const LongEventIconDiv = styled(IconDiv)`
+  margin-left: 5px;
 `
 
 
+const ShortEventTitleP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;        
+  white-space: nowrap;     
+  text-overflow: ellipsis;  
+  display: block;    
+  padding: 0 5px;
+`;
+
+const LongEventTitleP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 14px; 
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`;
+
+const LongEventDescriptionP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px; 
+  text-overflow: ellipsis;
+  word-break: break-word; // Adjusts word wrapping
+  overflow: hidden; // Hides overflow text
+  height: 100%; 
+  margin-top: 5px;
+`;
+
+const LongEventBodyDiv = styled.div`
+  position: relative;
+  padding: 10px;
+  height: calc(100% - 35px);
+`;
 
 const EventBottomDiv = styled.div`
   width: 100%;
-  height: 6px;
-  flex: 0 0 auto;
+  flex: 0 0 6px;
   &:hover{
     cursor: ns-resize; 
   }
@@ -839,13 +825,17 @@ const EventTopDiv = styled.div.attrs<{ $color: string; }>(
       backgroundColor: `var(--primary-${$color})`
     }
   }))`
-  flex: 0 0 auto;
   width: 100%;
-  height: 6px;
+  flex: 0 0 6px;
+  border-width: 2px;
+  border-top-left-radius: 8px; 
+  border-top-right-radius: 8px; 
     &:hover{
     cursor: ns-resize; 
   }
 `;
+
+
 
 const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string}>(
   ({ $fromTop, $height, $color }) => ({
@@ -855,77 +845,120 @@ const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: s
     border: `1px solid var(--primary-${$color})`,
     backgroundColor: `var(--secondary-${$color})`,
   },
-}))`
+}))<{ $fromTop: number; $height: number; $color: string}>`
+  display: flex;
+  flex-direction: column;
   position: absolute;
-  overflow: hidden;
   z-index: 3;
   width: 100%;
   border-width: 2px;
-  border-radius: 0.4rem;
-  white-space: normal;
-  display: flex;
-  flex-direction: column;
+  border-radius: 8px;
+  box-sizing: border-box;
   &:hover {
     cursor: pointer;
   }
+  letter-spacing: 0.5px;
 `;
 
-export {
-  ContainerDiv,
+
+
+export{
+  // Calendar Components
   CalendarDiv,
-  ContainerHeader,
   CalendarNameInput,
+  CalendarNameP,
+  CalendarNameDiv,
+  CalendarNameLi,
+  CalendarNameUl,
+  TodayButton,
+  ChangeWeekButton,
+  SaveButton,
+  DeleteButton,
   ChangeWeekDiv,
-  ClickableButton,
   MonthP,
+
+  // Container Components 
+  // TODO things that are not containers should be wrappers or viceversa
+  ContainerDiv,
+  ContainerShortEventDiv,
+  ContainerLongEventDiv,
+  ContainerHeader,
   ContainerAside,
-  HourDiv,
   ContainerSection,
-  SectionDayDiv,
-  ContianerNumberDiv,
-  DayNameP,
-  DayNumberP,
   ContainerMain,
   ContainerCellsDiv,
+  ContainerModalDiv,
+  ContainerMenuDiv,
+  ContainerDaySelectorDiv,
+
+  // Header and Menu Items
+  MenuItemDiv,
+  ItemButton,
+  IconMenuButton,
+  DropdownButton,
+  LinkedButton,
+
+  // Day and Time Components
+  DayInputDate,
+  DaySpan,
+  DayLabel,
+  DayNameP,
+  DayNumberP,
+  HourDiv,
+  HourLineDiv,
+  TimeContainerDiv,
+  TimeP,
+  TimeSelect,
+
+  // Event Components
+  EventDiv,
+  EventTopDiv,
+  EventBottomDiv,
+  RecurringEventButton,
+  EventInputCheckBox,
+
+  // Long Event Components
+  LongEventTitleP,
+  LongEventBodyDiv,
+  LongEventIconBodyDiv,
+  LongEventIconDiv,
+  LongEventTimeDiv,
+  LongEventStartDiv,
+  LongEventArrowDiv,
+  LongEventEndDiv,
+  LongEventDescriptionP,
+  LongEventHeader,
+
+  // Short Event Components
+  ShortEventTitleP,
+
+  // Cell Components
   CellColumnDiv,
   CellDiv,
-  EventBigTitleP,
-  ShortEventTitleP,
-  EventStartTimeDiv,
-  EventEndTimeDiv,
-  EventBodyDiv,
-  EventIconButton,
-  ContainerModalDiv,
+
+  // Modal Components
   ModalForm,
+  ModalCloseButton,
   Row1Div,
   Row2Div,
   Row3Div,
   Row4Div,
   Row5Div,
-  ModalCloseButton,
   IconColorDiv,
   IconColorImg,
-  ContainerMenuDiv,
-  MenuItemDiv,
-  ItemButton,
-  TimeContainerDiv,
-  TimeP,
-  DayInputDate,
-  RecurringEventButton,
-  ContainerDaySelectorDiv,
-  DaySpan,
-  EventInputCheckBox,
-  IconButton,
-  TitleInput,
   ModalTextArea,
-  DayLabel,
-  EventDiv,
-  EventDescriptionP,
-  EventTimeDiv,
-  EventHeader,
-  HourLineDiv,
-  TimeSelect,
+
+  // Selector Components
+  SectionDayDiv,
+  ContianerNumberDiv,
+
+  // Button Components
+  ClickableButton,
+  IconButton,
   ArrowButton,
+  TitleInput,
+
+  // Friend Search Components
   FriendSearchDiv,
   FriendContainerDiv,
   FriendSearchIcon,
@@ -937,21 +970,4 @@ export {
   FriendNameLi,
   FriendCalendarNameLi,
   FriendNameP,
-  ShortEventDiv,
-  IconMenuButton,
-  MediumEventDragButton,
-  DropdownButton,
-  LinkedButton,
-  CalendarNameP,
-  TodayButton,
-  ChangeWeekButton,
-  SaveButton,
-  DeleteButton,
-  CalendarNameDiv,
-  CalendarNameLi,
-  CalendarNameUl,
-  ShortEventDragButton,
-  LongEventDragButton,
-  EventTopDiv,
-  EventBottomDiv,
-};
+}

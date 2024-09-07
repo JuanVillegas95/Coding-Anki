@@ -35,11 +35,16 @@ const CalendarHub: React.FC = () => {
     if (C.NULL_EVENT) setIsModalOpen(true);
   };
 
-  const nextWeek = (): void => setMondayDate(F.addDateBy(mondayDate, 7));
+  const weekControls: {
+    nextWeek: () => void;
+    prevWeek: () => void;
+    currWeek: () => void;
+  } = {
+    nextWeek: (): void => setMondayDate(F.addDateBy(mondayDate, 7)),
+    prevWeek: (): void => setMondayDate(F.addDateBy(mondayDate, -7)),
+    currWeek: (): void => setMondayDate(F.getMostRecentMonday()),
+  };
 
-  const prevWeek = (): void => setMondayDate(F.addDateBy(mondayDate, -7));
-
-  const currWeek = (): void => setMondayDate(F.getMostRecentMonday());
 
   const addCurrentEventToCalendar = (): void => {
     calendar.current.events.set(currentEvent.id, currentEvent);
@@ -124,109 +129,110 @@ const CalendarHub: React.FC = () => {
   };
 
 
-  return (
-    <S.ContainerDiv>
-      <S.CalendarDiv>
-        <Header
-          name={calendar.current.name}
-          changeCalendarName={changeCalendarName}
-          mondayDate={mondayDate}
-          nextWeek={nextWeek}
-          currWeek={currWeek}
-          prevWeek={prevWeek}
-        />
-        <Aside
-          asideRef={asideRef}
-          handleAsideScroll={handleAsideScroll}
-        />
-        <Section mondayDate={mondayDate} />
-        <Main
-          mondayDate={mondayDate}
-          mainRef={mainRef}
-          handleMainScroll={handleMainScroll}
-          currentEvent={currentEvent}
-          updateCurrentEvent={updateCurrentEvent}
-          events={calendars.get(calendar.current.id)!.events}
-          addCurrentEventToCalendar={addCurrentEventToCalendar}
-          deleteCurrentEvent={deleteCurrentEvent}
-          openModal={openModal}
-        />
-        <EventModal
-          isModalOpen={isModalOpen}
-          closeModal={closeModal}
-          deleteCurrentEvent={deleteCurrentEvent}
-          updateCurrentEvent={updateCurrentEvent}
-          currentEvent={currentEvent}
-          events={calendars.get(calendar.current.id)!.events}
-          addCurrentEventToCalendar={addCurrentEventToCalendar}
-          addRecurringEventsToCalendar={addRecurringEventsToCalendar}
-        />
-      </S.CalendarDiv>
-      <FriendList />
-    </S.ContainerDiv>
-  );
+  return <S.ContainerDiv>
+    <S.CalendarDiv>
+      <Header
+        mondayDate={mondayDate}
+        weekControls={weekControls}
+        name={calendar.current.name}
+        changeCalendarName={changeCalendarName}
+      />
+      <Aside
+        asideRef={asideRef}
+        handleAsideScroll={handleAsideScroll}
+      />
+      <Section mondayDate={mondayDate} />
+      <Main
+        mondayDate={mondayDate}
+        mainRef={mainRef}
+        handleMainScroll={handleMainScroll}
+        currentEvent={currentEvent}
+        events={calendars.get(calendar.current.id)!.events}
+        updateCurrentEvent={updateCurrentEvent}
+        addCurrentEventToCalendar={addCurrentEventToCalendar}
+        deleteCurrentEvent={deleteCurrentEvent}
+        openModal={openModal}
+      />
+      <EventModal
+        isModalOpen={isModalOpen}
+        closeModal={closeModal}
+        updateCurrentEvent={updateCurrentEvent}
+        currentEvent={currentEvent}
+        events={calendars.get(calendar.current.id)!.events}
+        addCurrentEventToCalendar={addCurrentEventToCalendar}
+        deleteCurrentEvent={deleteCurrentEvent}
+        addRecurringEventsToCalendar={addRecurringEventsToCalendar}
+      />
+    </S.CalendarDiv>
+    <FriendList />
+  </S.ContainerDiv>
 };
 
 const Header: React.FC<{
   mondayDate: Date,
   name: string,
   changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  prevWeek: () => void,
-  currWeek: () => void,
-  nextWeek: () => void,
-}> = ({ name, changeCalendarName, prevWeek, currWeek, nextWeek, mondayDate }) => {
-
+  weekControls: {
+    nextWeek: () => void;
+    prevWeek: () => void;
+    currWeek: () => void;
+  };
+}> = ({ name, changeCalendarName, weekControls, mondayDate }) => {
   const [isCalendarName, setIsCalendarName] = useState<boolean>(false);
 
-  const toggleCalendarNameMenu = () => {
-    setIsCalendarName(!isCalendarName);
-  }
+  const { nextWeek, prevWeek, currWeek } = weekControls;
 
-  return (
-    <S.ContainerHeader>
-      <S.CalendarNameDiv>
-        <S.DropdownButton
-          $size={30}
-          $svgSize={15}
-          $color={"black"}
-          $isClicked={isCalendarName}
-          onClick={toggleCalendarNameMenu}
-        >
-          <I.dropdown />
-        </S.DropdownButton>
-        <S.CalendarNameInput value={name} onChange={changeCalendarName} />
-        {
-          (isCalendarName) && (
-            <S.CalendarNameUl>
-              {
-                Array.from(C.USER.calendars.values()).map((calendar: Calendar, index: number) => {
-                  return (
-                    <S.CalendarNameLi key={index} $isVisible={!isCalendarName} $delay={(index + 1) * 0.30}>
-                      {calendar.name}
-                    </S.CalendarNameLi>
-                  )
-                })
-              }
-            </S.CalendarNameUl>
-          )
-        }
-      </S.CalendarNameDiv>
-      <S.ChangeWeekDiv>
-        <S.MonthP>
-          {F.getMonth(mondayDate)}
-        </S.MonthP>
-        <S.ChangeWeekButton $color={'black'} $size={30} $svgSize={15} onClick={prevWeek}>
-          <I.left />
-        </S.ChangeWeekButton>
-        <S.TodayButton onClick={currWeek}>
-          Today
-        </S.TodayButton>
-        <S.ChangeWeekButton $color={'black'} $size={30} $svgSize={15} onClick={nextWeek}>
-          <I.right />
-        </S.ChangeWeekButton>
-      </S.ChangeWeekDiv>
-    </S.ContainerHeader>
-  );
+  const toggleCalendarNameMenu = () => setIsCalendarName(!isCalendarName);
+
+
+  return <S.ContainerHeader>
+    <S.CalendarNameDiv>
+      <S.DropdownButton
+        $size={30}
+        $svgSize={15}
+        $color={"black"}
+        $isClicked={isCalendarName}
+        onClick={toggleCalendarNameMenu}
+      >
+        <I.dropdown />
+      </S.DropdownButton>
+      <S.CalendarNameInput value={name} onChange={changeCalendarName} />
+      {
+        (isCalendarName) && (
+          <S.CalendarNameUl>
+            {
+              Array.from(C.USER.calendars.values()).map((calendar: Calendar, index: number) => {
+                return (
+                  <S.CalendarNameLi key={index} $isVisible={!isCalendarName} $delay={(index + 1) * 0.30}>
+                    {calendar.name}
+                  </S.CalendarNameLi>
+                )
+              })
+            }
+          </S.CalendarNameUl>
+        )
+      }
+    </S.CalendarNameDiv>
+    <S.ChangeWeekDiv>
+      <S.MonthP>
+        {F.getMonth(mondayDate)}
+      </S.MonthP>
+      <S.ChangeWeekButton
+        $color={'black'}
+        $size={30}
+        $svgSize={15}
+        onClick={prevWeek}
+      >
+        <I.left />
+      </S.ChangeWeekButton>
+      <S.TodayButton onClick={currWeek}>
+        Today
+      </S.TodayButton>
+      <S.ChangeWeekButton $color={'black'} $size={30} $svgSize={15} onClick={nextWeek}>
+        <I.right />
+      </S.ChangeWeekButton>
+    </S.ChangeWeekDiv>
+  </S.ContainerHeader>
 };
 
 const Aside: React.FC<{
@@ -234,25 +240,23 @@ const Aside: React.FC<{
   handleAsideScroll: () => void
 }> = ({ asideRef, handleAsideScroll }) => {
 
-  return (
-    <S.ContainerAside ref={asideRef} onScroll={handleAsideScroll}>
-      {F.generate24HourIntervals().map((hour: string, i: number) => (
-        <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >
-          {hour}
-        </S.HourDiv>
-      ))}
-    </S.ContainerAside>
-  );
+  return <S.ContainerAside ref={asideRef} onScroll={handleAsideScroll}>
+    {F.generate24HourIntervals().map((hour: string, i: number) => (
+      <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >
+        {hour}
+      </S.HourDiv>
+    ))}
+  </S.ContainerAside>
 };
 
 const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
-
-  return (
-    <S.ContainerSection>
-      {C.DAYS.map((day, i) => {
+  return <S.ContainerSection>
+    {
+      C.DAYS.map((day, i) => {
         const dayOfTheMonth: Date = F.addDateBy(mondayDate, i);
         const dayOfTheMonthNumber: string = dayOfTheMonth.getDate().toString();
         const isToday: boolean = F.areDatesTheSame(dayOfTheMonth, new Date());
+
         return <S.SectionDayDiv key={i}>
           <S.DayNameP>
             {day.slice(0, 3)}
@@ -262,10 +266,10 @@ const Section: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
               {dayOfTheMonthNumber}
             </S.DayNumberP>
           </S.ContianerNumberDiv>
-        </S.SectionDayDiv>;
-      })}
-    </S.ContainerSection>
-  );
+        </S.SectionDayDiv>
+      })
+    }
+  </S.ContainerSection>
 };
 
 const Main: React.FC<{
@@ -288,7 +292,7 @@ const Main: React.FC<{
     const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
     const [isEventResizing, setIsEventResizing] = useState<boolean>(false);
 
-    // updates the red line of current time
+    // Effect on updating the component 'HourLineDiv'.
     useEffect(() => {
       const interval = setInterval(() => {
         setCurrentDate(new Date());
@@ -397,89 +401,36 @@ const Main: React.FC<{
                   }
                   {
                     filteredEvents.map((event: Event) => {
-                      const { id, height, color, title, start, end, description, duration } = event;
+                      const { id, height, start, end, duration, color, icon, title, description } = event;
 
                       const totalMinutes: number = F.timeToMinutes(duration);
-                      const eventType: string = F.getEventType(totalMinutes);
                       const topOffset: number = F.calculateTopOffset(start);
                       const startHours: string = F.formatTime(start.hours);
                       const startMinutes: string = F.formatTime(start.minutes);
                       const endHours: string = F.formatTime(end.hours);
                       const endMinutes: string = F.formatTime(end.minutes);
+                      const isShortEvent: boolean = (totalMinutes < C.SHORT_DURATION_THRESHOLD);
 
                       return (
                         <S.EventDiv key={id} $fromTop={topOffset} $height={height} $color={color} onClick={() => handleOnClickEvent(event)}>
                           <S.EventTopDiv
-                            $color={(eventType === 'SHORT') ? "transparent" : color}
+                            $color={isShortEvent ? "transparent" : color}
                             onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
                           />
                           {
-                            (eventType === 'SHORT') && (
-                              <S.ShortEventDiv>
-                                <S.ShortEventTitleP>{title}</S.ShortEventTitleP>
-                                <S.ShortEventDragButton
-                                  $color={color}
-                                  $size={20}
-                                  $svgSize={10}
-                                  onClick={(e) => handleEventActionStart(C.EVENT_ACTION.DRAG, C.NULL_DATE, event, e)}
-                                >
-                                  <I.verticalDots />
-                                </S.ShortEventDragButton >
-                              </S.ShortEventDiv>
-                            )
-                          }
-                          {
-                            (eventType === 'MEDIUM' || eventType === 'LONG') && (
-                              <>
-                                <S.EventHeader $color={color}>
-                                  <S.IconButton $color={'white'} $size={13} $svgSize={13}>
-                                    <event.icon />
-                                  </S.IconButton>
-                                  <S.EventTimeDiv>
-                                    <S.EventStartTimeDiv> {startHours}:{startMinutes} </S.EventStartTimeDiv>
-                                    <S.IconButton $color={'white'} $size={14} $svgSize={14}>
-                                      <I.right_arrow />
-                                    </S.IconButton>
-                                    <S.EventEndTimeDiv> {endHours}:{endMinutes}</S.EventEndTimeDiv>
-                                  </S.EventTimeDiv>
-                                </S.EventHeader>
-
-                                <S.EventBodyDiv >
-                                  <S.EventBigTitleP>{title}</S.EventBigTitleP>
-                                  {
-                                    (eventType === 'MEDIUM') && (
-                                      <S.MediumEventDragButton
-                                        $color={color}
-                                        $size={20}
-                                        $svgSize={10}
-                                        onClick={(e) => handleEventActionStart(C.EVENT_ACTION.DRAG, C.NULL_DATE, event, e)}
-                                      >
-                                        <I.horizontalDots />
-                                      </S.MediumEventDragButton>
-                                    )
-                                  }
-                                  {
-                                    (eventType === 'LONG') && (
-                                      <>
-                                        <S.EventDescriptionP>
-                                          {description}
-                                        </S.EventDescriptionP>
-                                        <S.LongEventDragButton
-                                          $color={color}
-                                          $size={20}
-                                          $svgSize={10}
-                                          onClick={(e) => handleEventActionStart(C.EVENT_ACTION.DRAG, C.NULL_DATE, event, e)}
-                                        >
-                                          <I.horizontalDots />
-                                        </S.LongEventDragButton>
-                                        <S.EventIconButton $color={C.TERTIARY_COLORS[color]} $size={40} $svgSize={40}>
-                                          <event.icon />
-                                        </S.EventIconButton>
-                                      </>
-                                    )
-                                  }
-                                </S.EventBodyDiv>
-                              </>
+                            isShortEvent ? (
+                              <ShortEvent title={title} />
+                            ) : (
+                              <LongEvent
+                                color={color}
+                                startHours={startHours}
+                                startMinutes={startMinutes}
+                                endHours={endHours}
+                                endMinutes={endMinutes}
+                                icon={icon}
+                                title={title}
+                                description={description}
+                              />
                             )
                           }
                           <S.EventBottomDiv
@@ -497,6 +448,64 @@ const Main: React.FC<{
       </S.ContainerMain>
     );
   };
+
+const ShortEvent: React.FC<{
+  title: string;
+}> = ({ title }) => {
+  return <S.ContainerShortEventDiv>
+    <S.ShortEventTitleP>
+      {title}
+    </S.ShortEventTitleP>
+  </S.ContainerShortEventDiv>
+};
+
+const LongEvent: React.FC<{
+  color: string
+  startHours: string;
+  startMinutes: string;
+  endHours: string;
+  endMinutes: string;
+  icon: React.ComponentType;
+  title: string;
+  description: string;
+}> = ({ color, startHours, startMinutes, endHours, endMinutes, icon, title, description }) => {
+  return <S.ContainerLongEventDiv>
+    <S.LongEventHeader $color={color}>
+      <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
+        {React.createElement(icon)}
+      </S.LongEventIconDiv>
+      <S.LongEventTimeDiv>
+        <S.LongEventStartDiv>
+          {startHours}:{startMinutes}
+        </S.LongEventStartDiv>
+        <S.LongEventArrowDiv
+          $color={'white'}
+          $size={14}
+          $svgSize={14}
+        >
+          <I.rightArrow />
+        </S.LongEventArrowDiv>
+        <S.LongEventEndDiv>
+          {endHours}:{endMinutes}
+        </S.LongEventEndDiv>
+      </S.LongEventTimeDiv>
+    </S.LongEventHeader>
+    <S.LongEventBodyDiv >
+      <S.LongEventTitleP>
+        {title}
+      </S.LongEventTitleP>
+      <S.LongEventDescriptionP>
+        {description}
+      </S.LongEventDescriptionP>
+      <S.LongEventIconBodyDiv
+        $color={C.TERTIARY_COLORS[color]}
+        $size={40}
+        $svgSize={40}>
+        {React.createElement(icon)}
+      </S.LongEventIconBodyDiv>
+    </S.LongEventBodyDiv>
+  </S.ContainerLongEventDiv>
+};
 
 
 
