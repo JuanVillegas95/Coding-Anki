@@ -72,10 +72,8 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | React.MouseEvent<HTMLButtonElement, MouseEvent> ): Time => {
-  const { clientY, currentTarget } = e; 
-  const topOffset: number = currentTarget.getBoundingClientRect().top;
-  const distanceFromTop: number = clientY - topOffset;
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, mainRef: React.RefObject<HTMLDivElement>): Time => {
+  const distanceFromTop: number = e.clientY -  mainRef.current!.getBoundingClientRect().top;
   
   const totalHours: number = pixelsToHours(distanceFromTop);
   const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
@@ -85,6 +83,34 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent> | Re
 
   return new Time(timeHour, timeMinutes);
 }
+
+const calculateEvenTimeOnDrag = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  mainRef: React.RefObject<HTMLDivElement>
+): Time => {
+  const { clientY, currentTarget } = e;
+  const containerTop = mainRef.current!.getBoundingClientRect().top;
+  const grabOffsetY = e.currentTarget.dataset.grabOffsetY ? parseFloat(e.currentTarget.dataset.grabOffsetY) : clientY - currentTarget.getBoundingClientRect().top;
+
+  // Save grab offset in data attribute
+  currentTarget.dataset.grabOffsetY = grabOffsetY.toString();
+
+  // Calculate the current mouse position relative to the container
+  const currentMouseY = clientY - containerTop;
+
+  // Adjust the event position based on the grab offset
+  const adjustedPositionY = currentMouseY - grabOffsetY;
+
+  // Convert the adjusted Y position to the corresponding time in hours
+  const adjustedHours = pixelsToHours(adjustedPositionY);
+  const totalMinutes: number = Math.floor(hoursToMinutes(adjustedHours));
+
+  const timeHour: number = Math.floor(minutesToHours(totalMinutes));
+  const timeMinutes: number = totalMinutes % 60;
+
+  return new Time(timeHour, timeMinutes);
+}
+
 
 
 // Checks if a new event overlaps with any existing events on the same date.
@@ -224,6 +250,27 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
   return dayOfTheWeek === index;
 }
 
+const calculateDayIndexOnDrag = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  mainRef: React.RefObject<HTMLDivElement>,
+  mondayDate: Date
+): number => {
+  // If the reference to the main calendar container is not available, return 0 as a default index.
+  if (!mainRef.current) return 0;
+
+  // Get the bounding rectangle of the main calendar container (width, height, top, left, right, bottom).
+  const mainRect = mainRef.current.getBoundingClientRect();
+
+  // Calculate the horizontal position of the mouse relative to the left edge of the calendar container.
+  const mouseX = e.clientX - mainRect.left;
+
+  // Calculate the width of each day column in the calendar by dividing the total width of the calendar by 7 days.
+  const dayWidth = mainRect.width / 7; // Assuming there are 7 days in a week.
+
+  // Determine the index of the day based on the mouse's horizontal position.
+  // Math.floor is used to get the largest integer less than or equal to the computed value, effectively finding the "day column" index.
+  return Math.floor(mouseX / dayWidth);
+};
 
 
 
@@ -251,4 +298,6 @@ export {
   shouldBeLocked,
   formatMonth,
   getSameDateEvents,
+  calculateEvenTimeOnDrag,
+  calculateDayIndexOnDrag,
 };

@@ -15,7 +15,7 @@ const CalendarHub: React.FC = () => {
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
-
+  // Effect for intializing calendar
   useEffect(() => {
     // TODO Validate user....
     calendar.current = new Calendar();
@@ -23,83 +23,69 @@ const CalendarHub: React.FC = () => {
     setCalendars(new Map([[calendar.current.id, calendar.current]]));
   }, []);
 
+  // Effect to synchronize scrolling between aside and main component
+  useEffect(() => {
+    const syncScroll = (): void => {
+      if (asideRef.current && mainRef.current) {
+        const maxScrollTop = asideRef.current.scrollHeight - asideRef.current.clientHeight;
+        const scrollTop = mainRef.current.scrollTop;
 
-  const updateCurrentEvent = (newEvent: Event): void => setCurrentEvent(newEvent);
+        if (scrollTop > maxScrollTop) {
+          mainRef.current.scrollTop = maxScrollTop;
+        }
 
-  const closeModal = () => {
-    setCurrentEvent(C.NULL_EVENT);
-    setIsModalOpen(false);
-  };
+        asideRef.current.scrollTop = mainRef.current.scrollTop;
+      }
+    };
 
-  const openModal = () => {
-    if (C.NULL_EVENT) setIsModalOpen(true);
-  };
+    asideRef.current?.addEventListener('scroll', syncScroll);
+    mainRef.current?.addEventListener('scroll', syncScroll);
 
-  const weekControls: {
+    return () => {
+      asideRef.current?.removeEventListener('scroll', syncScroll);
+      mainRef.current?.removeEventListener('scroll', syncScroll);
+    };
+  }, []);
+
+  const closeModal = (): void => setIsModalOpen(false);
+  const openModal = (): void => setIsModalOpen(true);
+
+  const weekHandeler: {
     nextWeek: () => void;
-    prevWeek: () => void;
-    currWeek: () => void;
+    previousWeek: () => void;
+    currentWeek: () => void;
   } = {
     nextWeek: (): void => setMondayDate(F.addDateBy(mondayDate, 7)),
-    prevWeek: (): void => setMondayDate(F.addDateBy(mondayDate, -7)),
-    currWeek: (): void => setMondayDate(F.getMostRecentMonday()),
+    previousWeek: (): void => setMondayDate(F.addDateBy(mondayDate, -7)),
+    currentWeek: (): void => setMondayDate(F.getMostRecentMonday()),
   };
 
+  const calendarEventHandler: {
+    setCurrentEvent: (newEvent: Event) => void,
+    setCurrentEventToCalendar: () => void,
+    deleteCurrentEvent: () => void,
+  } = {
+    setCurrentEvent: (newEvent: Event): void => setCurrentEvent(newEvent),
 
-  const addCurrentEventToCalendar = (): void => {
-    calendar.current.events.set(currentEvent.id, currentEvent);
-    setCalendars((prevCalendars) => {
-      const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, { ...calendar.current });
-      return updatedCalendars;
-    });
+    setCurrentEventToCalendar: (): void => {
+      calendar.current.events.set(currentEvent.id, currentEvent);
+      setCalendars((prevCalendars) => {
+        const updatedCalendars = new Map(prevCalendars);
+        updatedCalendars.set(calendar.current.id, { ...calendar.current });
+        return updatedCalendars;
+      });
+    },
+
+    deleteCurrentEvent: (): void => {
+      calendar.current.events.delete(currentEvent.id);
+      setCalendars((prevCalendars) => {
+        const updatedCalendars = new Map(prevCalendars);
+        updatedCalendars.set(calendar.current.id, { ...calendar.current });
+        return updatedCalendars;
+      });
+    },
   };
 
-  const addRecurringEventsToCalendar = (): void => {
-    let { startDate, endDate, selectedDays } = currentEvent;
-    while (startDate < endDate) {
-      startDate = F.addDateBy(startDate, 1);
-      const dayOfWeek: number = F.getDay(startDate);
-      if (!selectedDays[dayOfWeek]) continue;
-
-      const newEvent: Event = { ...currentEvent, id: uuidv4(), startDate: startDate };
-      calendar.current.events.set(newEvent.id, newEvent);
-      let recurringEventIDs = calendar.current.recurringEventIDs.get(newEvent.recurringEventID);
-
-      if (recurringEventIDs === undefined) {
-        recurringEventIDs = Array(7).fill(null).map(() => []);
-        calendar.current.recurringEventIDs.set(newEvent.recurringEventID, recurringEventIDs);
-      }
-
-      recurringEventIDs[dayOfWeek].push(newEvent.id);
-      calendar.current.recurringEventIDs.set(newEvent.recurringEventID, recurringEventIDs);
-    }
-
-    setCalendars((prevCalendars) => {
-      const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, { ...calendar.current });
-      return updatedCalendars;
-    });
-  };
-
-  const deleteRecurringEventsToCalendar = (recurringEventID: string): void => {
-    calendar.current.events.get(currentEvent.id);
-    setCalendars((prevCalendars) => {
-      const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, { ...calendar.current });
-      return updatedCalendars;
-    });
-  };
-
-  const deleteCurrentEvent = (): void => {
-    calendar.current.events.delete(currentEvent.id);
-    setCalendars((prevCalendars) => {
-      const updatedCalendars = new Map(prevCalendars);
-      updatedCalendars.set(calendar.current.id, { ...calendar.current });
-      return updatedCalendars;
-    });
-    setCurrentEvent(C.NULL_EVENT);
-  };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const newTitle: string = e.target.value;
@@ -112,56 +98,32 @@ const CalendarHub: React.FC = () => {
     });
   };
 
-  const handleAsideScroll = (): void => {
-    if (asideRef.current && mainRef.current) {
-      mainRef.current.scrollTop = asideRef.current.scrollTop;
-    }
-  };
-
-  const handleMainScroll = (): void => {
-    if (asideRef.current && mainRef.current) {
-      const sidebarMaxScrollTop = asideRef.current.scrollHeight - asideRef.current.clientHeight;
-      if (mainRef.current.scrollTop > sidebarMaxScrollTop) {
-        mainRef.current.scrollTop = sidebarMaxScrollTop;
-      }
-      asideRef.current.scrollTop = mainRef.current.scrollTop;
-    }
-  };
-
-
   return <S.ContainerDiv>
     <S.CalendarDiv>
       <Header
         mondayDate={mondayDate}
-        weekControls={weekControls}
         name={calendar.current.name}
         changeCalendarName={changeCalendarName}
+        weekHandeler={weekHandeler}
       />
       <Aside
         asideRef={asideRef}
-        handleAsideScroll={handleAsideScroll}
       />
       <Section mondayDate={mondayDate} />
       <Main
         mondayDate={mondayDate}
-        mainRef={mainRef}
-        handleMainScroll={handleMainScroll}
-        currentEvent={currentEvent}
         events={calendars.get(calendar.current.id)!.events}
-        updateCurrentEvent={updateCurrentEvent}
-        addCurrentEventToCalendar={addCurrentEventToCalendar}
-        deleteCurrentEvent={deleteCurrentEvent}
+        calendarEventHandler={calendarEventHandler}
+        mainRef={mainRef}
+        currentEvent={currentEvent}
         openModal={openModal}
       />
       <EventModal
+        events={calendars.get(calendar.current.id)!.events}
+        calendarEventHandler={calendarEventHandler}
         isModalOpen={isModalOpen}
         closeModal={closeModal}
-        updateCurrentEvent={updateCurrentEvent}
         currentEvent={currentEvent}
-        events={calendars.get(calendar.current.id)!.events}
-        addCurrentEventToCalendar={addCurrentEventToCalendar}
-        deleteCurrentEvent={deleteCurrentEvent}
-        addRecurringEventsToCalendar={addRecurringEventsToCalendar}
       />
     </S.CalendarDiv>
     <FriendList />
@@ -172,18 +134,14 @@ const Header: React.FC<{
   mondayDate: Date,
   name: string,
   changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>) => void,
-  weekControls: {
+  weekHandeler: {
     nextWeek: () => void;
-    prevWeek: () => void;
-    currWeek: () => void;
+    previousWeek: () => void;
+    currentWeek: () => void;
   };
-}> = ({ name, changeCalendarName, weekControls, mondayDate }) => {
+}> = ({ name, changeCalendarName, weekHandeler, mondayDate }) => {
   const [isCalendarName, setIsCalendarName] = useState<boolean>(false);
-
-  const { nextWeek, prevWeek, currWeek } = weekControls;
-
   const toggleCalendarNameMenu = () => setIsCalendarName(!isCalendarName);
-
 
   return <S.ContainerHeader>
     <S.CalendarNameDiv>
@@ -221,14 +179,14 @@ const Header: React.FC<{
         $color={'black'}
         $size={30}
         $svgSize={15}
-        onClick={prevWeek}
+        onClick={weekHandeler.previousWeek}
       >
         <I.left />
       </S.ChangeWeekButton>
-      <S.TodayButton onClick={currWeek}>
+      <S.TodayButton onClick={weekHandeler.currentWeek}>
         Today
       </S.TodayButton>
-      <S.ChangeWeekButton $color={'black'} $size={30} $svgSize={15} onClick={nextWeek}>
+      <S.ChangeWeekButton $color={'black'} $size={30} $svgSize={15} onClick={weekHandeler.nextWeek}>
         <I.right />
       </S.ChangeWeekButton>
     </S.ChangeWeekDiv>
@@ -237,10 +195,9 @@ const Header: React.FC<{
 
 const Aside: React.FC<{
   asideRef: React.RefObject<HTMLDivElement>,
-  handleAsideScroll: () => void
-}> = ({ asideRef, handleAsideScroll }) => {
+}> = ({ asideRef }) => {
 
-  return <S.ContainerAside ref={asideRef} onScroll={handleAsideScroll}>
+  return <S.ContainerAside ref={asideRef}>
     {F.generate24HourIntervals().map((hour: string, i: number) => (
       <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0} >
         {hour}
@@ -277,137 +234,132 @@ const Main: React.FC<{
   currentEvent: Event;
   events: Map<string, Event>;
   mainRef: React.RefObject<HTMLDivElement>;
-  handleMainScroll: () => void;
   openModal: () => void;
-  deleteCurrentEvent: () => void;
-  addCurrentEventToCalendar: () => void;
-  updateCurrentEvent: (newEvent: Event) => void;
+  calendarEventHandler: {
+    setCurrentEvent: (newEvent: Event) => void;
+    setCurrentEventToCalendar: () => void;
+    deleteCurrentEvent: () => void;
+  };
 }> = ({
-  mainRef, handleMainScroll, currentEvent,
-  events, addCurrentEventToCalendar, deleteCurrentEvent,
-  mondayDate, openModal, updateCurrentEvent
+  mainRef,
+  currentEvent,
+  events,
+  mondayDate,
+  openModal,
+  calendarEventHandler,
 }) => {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isCreatingNewEvent, setIsCreatingNewEvent] = useState<boolean>(false);
     const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
     const [isEventResizing, setIsEventResizing] = useState<boolean>(false);
 
-    // Effect on updating the component 'HourLineDiv'.
+    // Update the 'HourLineDiv' every minute
     useEffect(() => {
       const interval = setInterval(() => {
         setCurrentDate(new Date());
       }, 60000);
+
       return () => clearInterval(interval);
     }, []);
 
-    const handleEventActionStart = (
-      action: C.EVENT_ACTION,
-      date: Date,
-      event: Event,
-      e: any,
-    ): void => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.button !== C.LEFT_MOUSE_CLICK || currentEvent !== C.NULL_EVENT) return;
+    const handleEventCreate = {
+      mouseDown: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        mainRef: React.RefObject<HTMLDivElement>,
+        date: Date
+      ): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
-      switch (action) {
-        case C.EVENT_ACTION.CREATE: {
-          setIsCreatingNewEvent(true);
-          const newEventStart: Time = F.calculateEventTime(e);
-          const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
-          if (eventOverlapping) return;
-          const newEvent = new Event(date, newEventStart);
-          updateCurrentEvent(newEvent);
-          break;
-        }
-        case C.EVENT_ACTION.DRAG: {
-          setIsEventDragging(true);
-          updateCurrentEvent(event);
-          break;
-        }
-        case C.EVENT_ACTION.RESIZE: {
-          setIsEventResizing(true);
-          updateCurrentEvent(event);
-          break;
-        }
-      }
-    };
+        const newEventStart: Time = F.calculateEventTime(e, mainRef);
+        const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
+        if (eventOverlapping) return;
+        setIsCreatingNewEvent(true);
+        const newEvent = new Event(date, newEventStart);
+        calendarEventHandler.setCurrentEvent(newEvent);
+      },
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
-      e.preventDefault();
-      if (e.button !== C.LEFT_MOUSE_CLICK || currentEvent === C.NULL_EVENT) return;
+      mouseMove: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        mainRef: React.RefObject<HTMLDivElement>
+      ): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
 
-      if (isCreatingNewEvent) {
         const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
-        newEvent.end = F.calculateEventTime(e);
+        newEvent.end = F.calculateEventTime(e, mainRef);
         newEvent.height = F.calculateEventHeight(newEvent);
         newEvent.duration = F.calculateEventDuration(newEvent);
         newEvent.id = currentEvent.id;
         newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
-
         if (!F.isNewEventValid(newEvent, events)) return;
-        updateCurrentEvent(newEvent);
-        addCurrentEventToCalendar();
-      } else if (isEventDragging) {
-        const newStart: Time = F.calculateEventTime(e);
-        const updatedEvent: Event = { ...currentEvent, start: newStart };
-        updateCurrentEvent(updatedEvent);
-        addCurrentEventToCalendar();
-      } else if (isEventResizing) {
+        calendarEventHandler.setCurrentEvent(newEvent);
+        calendarEventHandler.setCurrentEventToCalendar();
+      },
 
-
-      }
-    };
-
-    const handleEventActionEnd = (
-      e: any
-    ): void => {
-      e.preventDefault();
-      if (e.button !== C.LEFT_MOUSE_CLICK || currentEvent === C.NULL_EVENT) return;
-
-      if (isCreatingNewEvent) {
-        if (!F.isNewEventValid(currentEvent, events)) {
-          deleteCurrentEvent();
-          return;
-        }
-        openModal();
-        updateCurrentEvent(currentEvent);
+      mouseUp: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
         setIsCreatingNewEvent(false);
-      } else if (isEventDragging) {
-        setIsEventDragging(false);
-        updateCurrentEvent(C.NULL_EVENT);
-      } else if (isEventResizing) {
-
-        setIsEventResizing(false);
-      }
+        openModal();
+      },
     };
 
-    // const handleOnClickEvent = (event: Event) => {
-    //   updateCurrentEvent(event);
-    //   openModal();
-    // };
+    const handleEventDrag = {
+      mouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
+        setIsEventDragging(true);
+        delete e.currentTarget.dataset.grabOffsetY;
+        calendarEventHandler.setCurrentEvent(event);
+      },
 
-    return <S.ContainerMain
-      ref={mainRef}
-      onScroll={handleMainScroll}
-      onMouseLeave={(e) => handleEventActionEnd(e)}
-    >
-      {
-        F.range(7).map((i) => {
+      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
+
+        // Calculate new start time and day
+        const newStart: Time = F.calculateEvenTimeOnDrag(e, mainRef);
+        const newDayIndex: number = F.calculateDayIndexOnDrag(e, mainRef, mondayDate); // New function to calculate day index
+        const newDate: Date = F.addDateBy(mondayDate, newDayIndex);
+
+        const updatedEvent: Event = { ...currentEvent, start: newStart, startDate: newDate };
+
+        if (!F.isNewEventValid(updatedEvent, events)) return;
+        calendarEventHandler.setCurrentEvent(updatedEvent);
+        calendarEventHandler.setCurrentEventToCalendar();
+      },
+
+      mouseUp: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
+        setIsEventDragging(false);
+      },
+    };
+
+    const handleOnMouseLeave = (): void => {
+      setIsCreatingNewEvent(false);
+      setIsEventDragging(false);
+      setIsEventResizing(false);
+    };
+
+    return (
+      <S.ContainerMain ref={mainRef} onMouseLeave={handleOnMouseLeave}>
+        {F.range(7).map((i) => {
           const day: Date = F.addDateBy(mondayDate, i);
           const filteredEvents: Event[] = F.getSameDateEvents(events, day);
 
-          return <S.CellColumnDiv
-            key={i}
-            onMouseDown={(e) => handleEventActionStart(C.EVENT_ACTION.CREATE, day, C.NULL_EVENT, e)}
-            onMouseUp={handleEventActionEnd}
-            onMouseMove={handleMouseMove}
-          >
-            {
-              F.range(48).map((j) => <S.CellDiv key={j} />)
-            }
-            {
-              filteredEvents.map((event: Event) => {
+          return (
+            <S.CellColumnDiv
+              key={i}
+              onMouseDown={(e) => handleEventCreate.mouseDown(e, mainRef, day)}
+              onMouseMove={(e) => handleEventCreate.mouseMove(e, mainRef)}
+              onMouseUp={(e) => handleEventCreate.mouseUp(e)}
+            >
+              {F.range(48).map((j) => (
+                <S.CellDiv key={j} />
+              ))}
+              {filteredEvents.map((event: Event) => {
                 const { id, height, start, end, duration, color, icon, title, description } = event;
                 const totalMinutes: number = F.timeToMinutes(duration);
                 const topOffset: number = F.calculateTopOffset(start);
@@ -415,23 +367,21 @@ const Main: React.FC<{
                 const startMinutes: string = F.formatTime(start.minutes);
                 const endHours: string = F.formatTime(end.hours);
                 const endMinutes: string = F.formatTime(end.minutes);
-                const isShortEvent: boolean = (totalMinutes < C.SHORT_DURATION_THRESHOLD);
+                const isShortEvent: boolean = totalMinutes < C.SHORT_DURATION_THRESHOLD;
 
-                return <S.EventDiv
-                  key={id}
-                  $fromTop={topOffset}
-                  $height={height} $color={color}
-                  $isDragged={isEventDragging}
-                  // onClick={() => handleOnClickEvent(event)}
-                  onMouseDown={(e) => handleEventActionStart(C.EVENT_ACTION.DRAG, C.NULL_DATE, event, e)}
-                  onMouseUp={(e) => handleEventActionEnd(e)}
-                >
-                  <S.EventTopDiv
-                    $color={isShortEvent ? "transparent" : color}
-                    onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
-                  />
-                  {
-                    isShortEvent ? (
+                return (
+                  <S.EventDiv
+                    key={id}
+                    $fromTop={topOffset}
+                    $height={height}
+                    $color={color}
+                    $isDragged={isEventDragging}
+                    onMouseDown={(e) => handleEventDrag.mouseDown(e, event)}
+                    onMouseMove={(e) => handleEventDrag.mouseMove(e)}
+                    onMouseUp={(e) => handleEventDrag.mouseUp(e)}
+                  >
+                    <S.EventTopDiv $color={isShortEvent ? "transparent" : color} />
+                    {isShortEvent ? (
                       <ShortEvent title={title} />
                     ) : (
                       <LongEvent
@@ -444,18 +394,19 @@ const Main: React.FC<{
                         title={title}
                         description={description}
                       />
-                    )
-                  }
-                  <S.EventBottomDiv
-                    onClick={(e) => handleEventActionStart(C.EVENT_ACTION.RESIZE, C.NULL_DATE, event, e)}
-                  />
-                </S.EventDiv >
+                    )}
+                    <S.EventBottomDiv />
+                  </S.EventDiv>
+                );
               })}
-          </S.CellColumnDiv>
-        })
-      }
-      <S.HourLineDiv $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))} />
-    </S.ContainerMain>
+            </S.CellColumnDiv>
+          );
+        })}
+        <S.HourLineDiv
+          $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}
+        />
+      </S.ContainerMain>
+    );
   };
 
 const ShortEvent: React.FC<{
@@ -516,18 +467,17 @@ const LongEvent: React.FC<{
   </S.ContainerLongEventDiv>
 };
 
-
-
 const EventModal: React.FC<{
   events: Map<string, Event>;
   isModalOpen: boolean;
   currentEvent: Event;
   closeModal: () => void;
-  deleteCurrentEvent: () => void;
-  updateCurrentEvent: (newEvent: Event) => void;
-  addCurrentEventToCalendar: () => void;
-  addRecurringEventsToCalendar: () => void
-}> = ({ isModalOpen, closeModal, deleteCurrentEvent, currentEvent, updateCurrentEvent, addCurrentEventToCalendar, events, addRecurringEventsToCalendar }) => {
+  calendarEventHandler: {
+    setCurrentEvent: (newEvent: Event) => void,
+    setCurrentEventToCalendar: () => void,
+    deleteCurrentEvent: () => void,
+  };
+}> = ({ isModalOpen, closeModal, currentEvent, events, calendarEventHandler }) => {
   const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
   const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
   const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
@@ -539,9 +489,8 @@ const EventModal: React.FC<{
       if (C.ESCAPE_KEYS.includes(e.key) && isModalOpen) closeModal();
       else if (C.ENTER_KEY === e.key) {
         if (currentEvent.recurringEventID != '') {
-          addRecurringEventsToCalendar();
         } else {
-          addCurrentEventToCalendar();
+          calendarEventHandler.setCurrentEventToCalendar();
         }
       }
     }
@@ -564,7 +513,7 @@ const EventModal: React.FC<{
     const title: string = e.target.value;
 
     const updatedEvent: Event = { ...currentEvent, title };
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleIcon = (icon: React.ComponentType): void => {
@@ -573,14 +522,14 @@ const EventModal: React.FC<{
     if (color) {
       updatedEvent = { ...currentEvent, color, colorIcon: icon };
     }
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
     const description: string = e.target.value;
 
     const updatedEvent: Event = { ...currentEvent, description };
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string) => {
@@ -598,14 +547,14 @@ const EventModal: React.FC<{
         break;
       default:
     }
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
     const isSelected: boolean = e.target.checked;
     const updatedEvent: Event = { ...currentEvent };
     updatedEvent.selectedDays[index] = isSelected;
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
@@ -620,12 +569,12 @@ const EventModal: React.FC<{
       updatedEvent = { ...currentEvent, recurringEventID: '' };
     }
 
-    updateCurrentEvent(updatedEvent);
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
   const handleDeleteEvent = (e: any): void => {
     e.preventDefault();
-    deleteCurrentEvent();
+    calendarEventHandler.deleteCurrentEvent();
     closeModal();
   };
 
@@ -642,9 +591,8 @@ const EventModal: React.FC<{
     closeModal();
     //TODO check if collisions and check if the event fulfills the conditions
     if (currentEvent.recurringEventID != '') {
-      addRecurringEventsToCalendar();
     } else {
-      addCurrentEventToCalendar();
+      calendarEventHandler.setCurrentEventToCalendar();
     }
   };
 
@@ -678,8 +626,7 @@ const EventModal: React.FC<{
     updatedEvent.height = F.calculateEventHeight(updatedEvent);
 
     // Finally update the current event
-    updateCurrentEvent(updatedEvent);
-
+    calendarEventHandler.setCurrentEvent(updatedEvent);
   };
 
 
@@ -867,7 +814,6 @@ const DaySelector: React.FC<{
     </>
   );
 };
-
 
 const FriendList: React.FC<{}> = () => {
   const [isClicked, setIsClicked] = useState<boolean>(true);

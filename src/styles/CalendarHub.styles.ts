@@ -258,22 +258,6 @@ const LongEventIconBodyDiv = styled(IconDiv)`
 `
 
 
-const HourLineDiv = styled.div<{ $fromTop: number }>`
-  position: absolute;
-  z-index: 2;
-  width: calc(100%);
-  top: ${({ $fromTop }) => $fromTop}px;
-  color: red; 
-  display: flex;
-  align-items: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  pointer-events: none;
-  flex: 1;
-  height: 1px;
-  background-color: red; 
-`;
-
 
 const ContainerModalDiv = styled.div<{ $block: string,  }>`
     display: ${({$block}) => $block};
@@ -838,6 +822,28 @@ const EventTopDiv = styled.div.attrs<{ $color: string; }>(
 
 
 
+
+
+const HourLineDiv = styled.div.attrs<{ $fromTop: number }>(
+  ({ $fromTop }) => ({
+    style: {
+      top: `${$fromTop}px`
+  },
+  }))<{ $fromTop: number }>`
+  position: absolute;
+  z-index: 2;
+  width: calc(100%);
+  color: red; 
+  display: flex;
+  align-items: center;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500; 
+  pointer-events: none;
+  flex: 1;
+  height: 1px;
+  background-color: red; 
+`;
+
 const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>(
   ({ $fromTop, $height, $color }) => ({
   style: {
@@ -860,8 +866,6 @@ const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: s
   }
   letter-spacing: 0.5px;
 `;
-
-
 
 export{
   // Calendar Components
