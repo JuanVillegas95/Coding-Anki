@@ -65,7 +65,9 @@ const CalendarHub: React.FC = () => {
     setCurrentEventToCalendar: () => void,
     deleteCurrentEvent: () => void,
   } = {
-    setCurrentEvent: (newEvent: Event): void => setCurrentEvent(newEvent),
+    setCurrentEvent: (newEvent: Event): void => {
+      setCurrentEvent((prevEvent) => { return { ...prevEvent, ...newEvent } })
+    },
 
     setCurrentEventToCalendar: (): void => {
       calendar.current.events.set(currentEvent.id, currentEvent);
@@ -117,6 +119,7 @@ const CalendarHub: React.FC = () => {
         mainRef={mainRef}
         currentEvent={currentEvent}
         openModal={openModal}
+        setCurrentEvent={setCurrentEvent}
       />
       <EventModal
         events={calendars.get(calendar.current.id)!.events}
@@ -235,6 +238,7 @@ const Main: React.FC<{
   events: Map<string, Event>;
   mainRef: React.RefObject<HTMLDivElement>;
   openModal: () => void;
+  setCurrentEvent: React.Dispatch<React.SetStateAction<Event>>;
   calendarEventHandler: {
     setCurrentEvent: (newEvent: Event) => void;
     setCurrentEventToCalendar: () => void;
@@ -247,6 +251,7 @@ const Main: React.FC<{
   mondayDate,
   openModal,
   calendarEventHandler,
+  setCurrentEvent,
 }) => {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isCreatingNewEvent, setIsCreatingNewEvent] = useState<boolean>(false);
@@ -281,11 +286,27 @@ const Main: React.FC<{
 
       mouseMove: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        mainRef: React.RefObject<HTMLDivElement>
+        mainRef: React.RefObject<HTMLDivElement>,
+        day: Date
       ): void => {
         e.preventDefault();
-        if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
+        if (isEventDragging) {
+          const currentEventDayOfTheWeek: number = F.getDay(currentEvent.startDate);
+          const currentDayOfTheWeek: number = F.getDay(day);
 
+          let updatedDate: Date = currentEvent.startDate;
+          if (currentDayOfTheWeek > currentEventDayOfTheWeek) {
+            updatedDate = F.addDateBy(currentEvent.startDate, 1);
+          } else if (currentDayOfTheWeek < currentEventDayOfTheWeek) {
+            updatedDate = F.addDateBy(currentEvent.startDate, -1);
+          }
+          const updatedEvent: Event = { ...currentEvent, startDate: updatedDate };
+          calendarEventHandler.setCurrentEvent(updatedEvent);
+          calendarEventHandler.setCurrentEventToCalendar();
+        }
+
+
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
         const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
         newEvent.end = F.calculateEventTime(e, mainRef);
         newEvent.height = F.calculateEventHeight(newEvent);
@@ -316,18 +337,14 @@ const Main: React.FC<{
 
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         e.preventDefault();
+
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
-
-        // Calculate new start time and day
         const newStart: Time = F.calculateEvenTimeOnDrag(e, mainRef);
-        const newDayIndex: number = F.calculateDayIndexOnDrag(e, mainRef, mondayDate); // New function to calculate day index
-        const newDate: Date = F.addDateBy(mondayDate, newDayIndex);
-
-        const updatedEvent: Event = { ...currentEvent, start: newStart, startDate: newDate };
-
+        const updatedEvent: Event = { ...currentEvent, start: newStart };
         if (!F.isNewEventValid(updatedEvent, events)) return;
         calendarEventHandler.setCurrentEvent(updatedEvent);
         calendarEventHandler.setCurrentEventToCalendar();
+        console.log("HanfleEventDrag")
       },
 
       mouseUp: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
@@ -352,9 +369,11 @@ const Main: React.FC<{
           return (
             <S.CellColumnDiv
               key={i}
+              data-day={F.getDay(day)}
               onMouseDown={(e) => handleEventCreate.mouseDown(e, mainRef, day)}
-              onMouseMove={(e) => handleEventCreate.mouseMove(e, mainRef)}
-              onMouseUp={(e) => handleEventCreate.mouseUp(e)}
+              onMouseMove={(e) => handleEventCreate.mouseMove(e, mainRef, day)}
+              onMouseUp={
+                (e) => handleEventCreate.mouseUp(e)}
             >
               {F.range(48).map((j) => (
                 <S.CellDiv key={j} />
