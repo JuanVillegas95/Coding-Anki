@@ -271,7 +271,7 @@ const Main: React.FC<{
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
-        const newEventStart: Time = F.calculateEventTime(e, mainRef);
+        const newEventStart: Time = F.calculateEventTime(e);
         const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
         if (eventOverlapping) return;
         setIsCreatingNewEvent(true);
@@ -286,7 +286,7 @@ const Main: React.FC<{
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
         const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
-        newEvent.end = F.calculateEventTime(e, mainRef);
+        newEvent.end = F.calculateEventTime(e);
         newEvent.height = F.calculateEventHeight(newEvent);
         newEvent.duration = F.calculateEventDuration(newEvent);
         newEvent.id = currentEvent.id;
@@ -313,7 +313,7 @@ const Main: React.FC<{
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
 
         const newStart: Time = F.calculateEvenTimeOnDrag(e, eventDivRef, mainRef);
-        const newEnd: Time = F.calculateEventTime(e, mainRef); //TODO CALCUALTE WITH HEIGTH
+        const newEnd: Time = F.calculateEventTime(e); //TODO CALCUALTE WITH HEIGTH
 
         const updatedEvent: Event = {
           ...currentEvent,

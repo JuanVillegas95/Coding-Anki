@@ -72,8 +72,8 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, mainRef: React.RefObject<HTMLDivElement>): Time => {
-  const distanceFromTop: number = e.clientY -  mainRef.current!.getBoundingClientRect().top;
+const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
+  const distanceFromTop: number = e.clientY -  e.currentTarget.getBoundingClientRect().top;
   
   const totalHours: number = pixelsToHours(distanceFromTop);
   const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
@@ -113,46 +113,6 @@ const calculateEvenTimeOnDrag = (
   return new Time(timeHour, timeMinutes);
 }
 
-
-const calculateEventDateOnDrag = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  eventDivRef: React.RefObject<HTMLDivElement>,
-  currentDate: Date
-): Date => {
-  // Get the width of the event div
-  const eventWidth = eventDivRef.current?.clientWidth;
-  
-  // Get the left position of the event div
-  const eventLeft = eventDivRef.current?.getBoundingClientRect().left;
-  
-  // Get the mouse X position relative to the viewport
-  const mouseX = e.clientX;
-
-  // Define a threshold distance (in pixels) to consider as "extreme"
-  const threshold = 5;
-
-  // Determine if the mouse is near the left side
-  const isNearLeft = eventLeft !== undefined && mouseX <= eventLeft + threshold;
-
-  // Determine if the mouse is near the right side
-  const isNearRight =
-    eventLeft !== undefined &&
-    eventWidth !== undefined &&
-    mouseX >= eventLeft + eventWidth - threshold;
-
-  if (isNearLeft) {
-    currentDate = addDateBy(currentDate,-1);
-    console.log("left")
-  }
-
-  if (isNearRight) {
-    currentDate = addDateBy(currentDate,1);
-    
-  }
-
-  // Return the current date or perform other actions
-  return currentDate;
-};
 
 
 // Checks if a new event overlaps with any existing events on the same date.
@@ -323,5 +283,4 @@ export {
   formatMonth,
   getSameDateEvents,
   calculateEvenTimeOnDrag,
-  calculateEventDateOnDrag
 };
