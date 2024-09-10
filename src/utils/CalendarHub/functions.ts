@@ -86,14 +86,16 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, mai
 
 const calculateEvenTimeOnDrag = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  eventDivRef: React.RefObject<HTMLDivElement>,
   mainRef: React.RefObject<HTMLDivElement>
 ): Time => {
-  const { clientY, currentTarget } = e;
+  const { clientY, } = e;
   const containerTop = mainRef.current!.getBoundingClientRect().top;
-  const grabOffsetY = e.currentTarget.dataset.grabOffsetY ? parseFloat(e.currentTarget.dataset.grabOffsetY) : clientY - currentTarget.getBoundingClientRect().top;
+
+  const grabOffsetY = eventDivRef.current!.dataset.grabOffsetY ? parseFloat(eventDivRef.current!.dataset.grabOffsetY) : clientY - eventDivRef.current!.getBoundingClientRect().top;
 
   // Save grab offset in data attribute
-  currentTarget.dataset.grabOffsetY = grabOffsetY.toString();
+  eventDivRef.current!.dataset.grabOffsetY = grabOffsetY.toString();
 
   // Calculate the current mouse position relative to the container
   const currentMouseY = clientY - containerTop;
@@ -111,6 +113,46 @@ const calculateEvenTimeOnDrag = (
   return new Time(timeHour, timeMinutes);
 }
 
+
+const calculateEventDateOnDrag = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  eventDivRef: React.RefObject<HTMLDivElement>,
+  currentDate: Date
+): Date => {
+  // Get the width of the event div
+  const eventWidth = eventDivRef.current?.clientWidth;
+  
+  // Get the left position of the event div
+  const eventLeft = eventDivRef.current?.getBoundingClientRect().left;
+  
+  // Get the mouse X position relative to the viewport
+  const mouseX = e.clientX;
+
+  // Define a threshold distance (in pixels) to consider as "extreme"
+  const threshold = 5;
+
+  // Determine if the mouse is near the left side
+  const isNearLeft = eventLeft !== undefined && mouseX <= eventLeft + threshold;
+
+  // Determine if the mouse is near the right side
+  const isNearRight =
+    eventLeft !== undefined &&
+    eventWidth !== undefined &&
+    mouseX >= eventLeft + eventWidth - threshold;
+
+  if (isNearLeft) {
+    currentDate = addDateBy(currentDate,-1);
+    console.log("left")
+  }
+
+  if (isNearRight) {
+    currentDate = addDateBy(currentDate,1);
+    
+  }
+
+  // Return the current date or perform other actions
+  return currentDate;
+};
 
 
 // Checks if a new event overlaps with any existing events on the same date.
@@ -194,6 +236,8 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   const endBeforeStart: boolean= isEndBeforeStart(newEvent);
   if(endBeforeStart) return false
 
+  // const isStartDateValid: Time = newEvent.start.hours;
+
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false
 
@@ -250,27 +294,7 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
   return dayOfTheWeek === index;
 }
 
-const calculateDayIndexOnDrag = (
-  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  mainRef: React.RefObject<HTMLDivElement>,
-  mondayDate: Date
-): number => {
-  // If the reference to the main calendar container is not available, return 0 as a default index.
-  if (!mainRef.current) return 0;
 
-  // Get the bounding rectangle of the main calendar container (width, height, top, left, right, bottom).
-  const mainRect = mainRef.current.getBoundingClientRect();
-
-  // Calculate the horizontal position of the mouse relative to the left edge of the calendar container.
-  const mouseX = e.clientX - mainRect.left;
-
-  // Calculate the width of each day column in the calendar by dividing the total width of the calendar by 7 days.
-  const dayWidth = mainRect.width / 7; // Assuming there are 7 days in a week.
-
-  // Determine the index of the day based on the mouse's horizontal position.
-  // Math.floor is used to get the largest integer less than or equal to the computed value, effectively finding the "day column" index.
-  return Math.floor(mouseX / dayWidth);
-};
 
 
 
@@ -299,5 +323,5 @@ export {
   formatMonth,
   getSameDateEvents,
   calculateEvenTimeOnDrag,
-  calculateDayIndexOnDrag,
+  calculateEventDateOnDrag
 };

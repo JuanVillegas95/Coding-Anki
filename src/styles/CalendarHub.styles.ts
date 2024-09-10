@@ -867,6 +867,10 @@ const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: s
   letter-spacing: 0.5px;
 `;
 
+const EventBodyDiv = styled.div`
+  width: 100%;
+  height: 100%;
+`
 export{
   // Calendar Components
   CalendarDiv,
@@ -921,6 +925,7 @@ export{
   EventBottomDiv,
   RecurringEventButton,
   EventInputCheckBox,
+  EventBodyDiv,
 
   // Long Event Components
   LongEventTitleP,
