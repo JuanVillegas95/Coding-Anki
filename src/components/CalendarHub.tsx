@@ -233,6 +233,7 @@ const Main: React.FC<{
 }) => {
     const eventDivRef = useRef<HTMLDivElement>(null);
     const columnDivRef = useRef<HTMLDivElement>(null);
+    // const columnRefs = useRef<(HTMLDivElement)[]>(Array(7).fill(null));
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -265,7 +266,6 @@ const Main: React.FC<{
     const EventCreateHandeler = {
       mouseDown: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        mainRef: React.RefObject<HTMLDivElement>,
         date: Date
       ): void => {
         e.preventDefault();
@@ -281,7 +281,6 @@ const Main: React.FC<{
 
       mouseMove: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        mainRef: React.RefObject<HTMLDivElement>,
       ): void => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
@@ -311,21 +310,19 @@ const Main: React.FC<{
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
-
-        const newStart: Time = F.calculateEvenTimeOnDrag(e, eventDivRef, mainRef);
-        const newEnd: Time = F.calculateEventTime(e); //TODO CALCUALTE WITH HEIGTH
-
+        const newStart: Time = F.calculateEvenTimeOnDrag(e, eventDivRef, columnDivRef);
+        // const newEnd: Time = F.calculateEventTime(e); //TODO CALCUALTE WITH HEIGTH
         const updatedEvent: Event = {
           ...currentEvent,
           start: newStart,
-          end: newEnd
+          // end: newEnd
         };
         if (!F.isNewEventValid(updatedEvent, events)) return;
 
         setCurrentEvent((prevEvent) => ({
           ...prevEvent,
           start: newStart,
-          end: newEnd
+          // end: newEnd
 
         }));
         calendarHandler.setEvent(updatedEvent);
@@ -371,8 +368,6 @@ const Main: React.FC<{
         }
       },
 
-
-
     };
 
     const EventResizeHandeler = {
@@ -407,11 +402,11 @@ const Main: React.FC<{
 
             return (
               <S.CellColumnDiv
+                ref={columnDivRef}
                 data-key={i}
                 key={i}
-                onMouseDown={(e) => EventCreateHandeler.mouseDown(e, mainRef, day)}
-                onMouseMove={(e) => EventCreateHandeler.mouseMove(e, mainRef)}
-
+                onMouseDown={(e) => EventCreateHandeler.mouseDown(e, day)}
+                onMouseMove={(e) => EventCreateHandeler.mouseMove(e)}
               >
                 {F.range(48).map((j) => (
                   <S.CellDiv key={j} />
@@ -438,9 +433,9 @@ const Main: React.FC<{
                     >
                       <S.EventTopDiv $color={isShortEvent ? "transparent" : color} />
                       <S.EventBodyDiv
-                      // onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
-                      // onMouseMove={(e) => EventDragHandeler.mouseMove(e)}
-                      // onMouseLeave={(e) => EventDragHandeler.mouseLeave(e)}
+                        onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
+                        onMouseMove={(e) => EventDragHandeler.mouseMove(e)}
+                        onMouseLeave={(e) => EventDragHandeler.mouseLeave(e)}
                       >
                         {isShortEvent ? (
                           <ShortEvent title={title} />

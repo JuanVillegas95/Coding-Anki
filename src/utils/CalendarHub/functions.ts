@@ -80,18 +80,16 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Ti
   
   const timeHour: number = Math.floor(minutesToHours(totalMinutes));
   const timeMinutes: number = totalMinutes % 60;
-
   return new Time(timeHour, timeMinutes);
 }
 
 const calculateEvenTimeOnDrag = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   eventDivRef: React.RefObject<HTMLDivElement>,
-  mainRef: React.RefObject<HTMLDivElement>
+  columnDivRef: React.RefObject<HTMLDivElement>,
 ): Time => {
   const { clientY, } = e;
-  const containerTop = mainRef.current!.getBoundingClientRect().top;
-
+  const containerTop = columnDivRef.current!.getBoundingClientRect().top;
   const grabOffsetY = eventDivRef.current!.dataset.grabOffsetY ? parseFloat(eventDivRef.current!.dataset.grabOffsetY) : clientY - eventDivRef.current!.getBoundingClientRect().top;
 
   // Save grab offset in data attribute
@@ -165,7 +163,7 @@ const calculateEventDuration = ({ start, end }: Event): Time => {
   return new Time(eventHours,eventMinutes);
 }
 
-const isEndBeforeStart = ({ start, end }: Event): boolean => {
+const isEndBeforeStart = ({ start, end }: Event): boolean => { ///! NOW  CHECK THIS WHEN MOUSE ON DRAGO
   const startTotalMinutes: number = timeToMinutes(start);
   const endTotalMinutes: number = timeToMinutes(end);
 
@@ -194,9 +192,10 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   if(totalMinutes < C.MAX_DURATION_MINUTES) return false
 
   const endBeforeStart: boolean= isEndBeforeStart(newEvent);
-  if(endBeforeStart) return false
-
-  // const isStartDateValid: Time = newEvent.start.hours;
+  // console.log(endBeforeStart,"endBeforeStart")
+  // if(endBeforeStart) return false
+  const isStartDateValid: boolean = (newEvent.start.hours < 0 || newEvent.start.hours > 23) ? false : true;
+  if(!isStartDateValid) return false;
 
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false
