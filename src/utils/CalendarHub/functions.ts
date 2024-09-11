@@ -227,12 +227,13 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 };
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
+
   const totalMinutes: number = timeToMinutes(newEvent.duration);
 
   if(totalMinutes < C.MAX_DURATION_MINUTES) return false
 
-  // const isTimeValid: boolean = (newEvent.start.hours < 0 || newEvent.end.hours > 23) ? false : true;
-  // if(!isTimeValid) return false;
+  const isTimeValid: boolean = (newEvent.start.hours < 0 || newEvent.end.hours > 23) ? false : true;
+  if(!isTimeValid) return false;
 
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false

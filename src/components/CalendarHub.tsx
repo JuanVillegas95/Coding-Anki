@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { throttle } from 'lodash';
 import { Event, Time, Friend, Calendar } from '@/utils/CalendarHub/classes';
 import { v4 as uuidv4 } from 'uuid';
 import * as C from '@/utils/CalendarHub/constants';
@@ -240,9 +239,6 @@ const Main: React.FC<{
     const [isEventResizingTop, setIsEventResizingTop] = useState<boolean>(false);
     const [isEventResizingBottom, setIsEventResizingBottom] = useState<boolean>(false);
 
-    // Declare animationFrame in the component scope
-    let animationFrame: number | null = null;
-
     // Update the 'HourLineDiv' every minute
     useEffect(() => {
       const interval = setInterval(() => {
@@ -367,33 +363,62 @@ const Main: React.FC<{
         setCurrentEvent(event);
       },
 
-      mouseMove: throttle((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        if (animationFrame) cancelAnimationFrame(animationFrame);
+      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 
-        animationFrame = requestAnimationFrame(() => {
-          e.preventDefault();
-          if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom) return;
-          const newEnd: Time = F.calculateEventTime(e, columnDivRef);
-          // const newEnd: Time = F.calculateEndTimeOnResize(e, columnDivRef, currentEvent);
-          const newEvent: Event = { ...currentEvent, end: newEnd };
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom) return;
+        const newEnd: Time = F.calculateEventTime(e, columnDivRef);
+        const newEvent: Event = { ...currentEvent, end: newEnd };
 
-          const updatedEvent: Event = {
-            ...currentEvent,
-            end: newEnd,
-            height: F.calculateEventHeight(newEvent),
-            duration: F.calculateEventDuration(newEvent),
-          };
-          if (!F.isNewEventValid(updatedEvent, events)) return;
+        const updatedEvent: Event = {
+          ...currentEvent,
+          end: newEnd,
+          height: F.calculateEventHeight(newEvent),
+          duration: F.calculateEventDuration(newEvent),
+        };
+        if (!F.isNewEventValid(updatedEvent, events)) return;
 
-          setCurrentEvent((prevEvent) => ({
-            ...prevEvent,
-            end: newEnd,
-            height: F.calculateEventHeight(newEvent),
-            duration: F.calculateEventDuration(newEvent),
-          }));
-          calendarHandler.setEvent(updatedEvent);
-        });
-      }, 16), // Throttle to 60fps
+        setCurrentEvent((prevEvent) => ({
+          ...prevEvent,
+          end: newEnd,
+          height: F.calculateEventHeight(newEvent),
+          duration: F.calculateEventDuration(newEvent),
+        }));
+        calendarHandler.setEvent(updatedEvent);
+      }
+    };
+
+    const EventResizeTopHandeler = {
+      mouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
+        setIsEventResizingTop(true);
+        setCurrentEvent(event);
+      },
+
+      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+        e.preventDefault();
+        if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingTop) return;
+        const newStart: Time = F.calculateEventTime(e, columnDivRef);
+        const newEvent: Event = { ...currentEvent, start: newStart };
+
+        const updatedEvent: Event = {
+          ...currentEvent,
+          start: newStart,
+          height: F.calculateEventHeight(newEvent),
+          duration: F.calculateEventDuration(newEvent),
+        };
+        if (!F.isNewEventValid(updatedEvent, events)) return;
+
+        setCurrentEvent((prevEvent) => ({
+          ...prevEvent,
+          start: newStart,
+          height: F.calculateEventHeight(newEvent),
+          duration: F.calculateEventDuration(newEvent),
+        }));
+        calendarHandler.setEvent(updatedEvent);
+      }
     };
 
     const stopEventAction = (): void => {
@@ -419,6 +444,7 @@ const Main: React.FC<{
                 (e) => {
                   EventCreateHandeler.mouseMove(e)
                   EventResizeBottomHandeler.mouseMove(e)
+                  EventResizeTopHandeler.mouseMove(e)
                 }
               }
             >
@@ -444,7 +470,10 @@ const Main: React.FC<{
                     $color={color}
                     $isDragged={isEventDragging}
                   >
-                    <S.EventTopDiv $color={isShortEvent ? "transparent" : color} />
+                    <S.EventTopDiv
+                      $color={isShortEvent ? "transparent" : color}
+                      onMouseDown={(e) => EventResizeTopHandeler.mouseDown(e, event)}
+                    />
                     <S.EventBodyDiv
                       onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
                       onMouseMove={(e) => EventDragHandeler.mouseMove(e)}
