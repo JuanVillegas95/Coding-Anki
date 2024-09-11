@@ -231,9 +231,7 @@ const Main: React.FC<{
   mondayDate,
   calendarHandler,
 }) => {
-    const eventDivRef = useRef<HTMLDivElement>(null);
     const columnDivRef = useRef<HTMLDivElement>(null);
-    // const columnRefs = useRef<(HTMLDivElement)[]>(Array(7).fill(null));
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -271,7 +269,7 @@ const Main: React.FC<{
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
-        const newEventStart: Time = F.calculateEventTime(e);
+        const newEventStart: Time = F.calculateEventTime(e, columnDivRef);
         const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
         if (eventOverlapping) return;
         setIsCreatingNewEvent(true);
@@ -285,7 +283,7 @@ const Main: React.FC<{
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isCreatingNewEvent) return;
         const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
-        newEvent.end = F.calculateEventTime(e);
+        newEvent.end = F.calculateEventTime(e, columnDivRef);
         newEvent.height = F.calculateEventHeight(newEvent);
         newEvent.duration = F.calculateEventDuration(newEvent);
         newEvent.id = currentEvent.id;
@@ -301,7 +299,6 @@ const Main: React.FC<{
         e.preventDefault();
         e.stopPropagation();
         if (e.button !== C.LEFT_MOUSE_CLICK) return;
-        delete eventDivRef.current!.dataset.grabOffsetY
         setIsEventDragging(true);
         setCurrentEvent(event);
       },
@@ -310,25 +307,22 @@ const Main: React.FC<{
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
-        const newStart: Time = F.calculateEvenTimeOnDrag(e, eventDivRef, columnDivRef);
-        // const newEnd: Time = F.calculateEventTime(e); //TODO CALCUALTE WITH HEIGTH
+        const [newStart, newEnd] = F.calculateTimeOnDrag(e, columnDivRef, currentEvent);
+
         const updatedEvent: Event = {
           ...currentEvent,
           start: newStart,
-          // end: newEnd
+          end: newEnd,
         };
         if (!F.isNewEventValid(updatedEvent, events)) return;
 
         setCurrentEvent((prevEvent) => ({
           ...prevEvent,
           start: newStart,
-          // end: newEnd
-
+          end: newEnd,
         }));
         calendarHandler.setEvent(updatedEvent);
       },
-
-
 
       mouseLeave: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         if (!isEventDragging) return;
@@ -375,10 +369,7 @@ const Main: React.FC<{
         setIsEventResizing(true);
       },
       mouseMove: (triggerSource: string): void => {
-        if (!isEventResizing) return;
-        if (triggerSource === "TOP") {
-          // const 
-        }
+
       },
       mouseDown: (): void => {
         setIsEventResizing(false);
@@ -429,7 +420,6 @@ const Main: React.FC<{
                       $height={height}
                       $color={color}
                       $isDragged={isEventDragging}
-                      ref={eventDivRef}
                     >
                       <S.EventTopDiv $color={isShortEvent ? "transparent" : color} />
                       <S.EventBodyDiv

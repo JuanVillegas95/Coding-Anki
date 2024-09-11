@@ -72,8 +72,11 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Time => {
-  const distanceFromTop: number = e.clientY -  e.currentTarget.getBoundingClientRect().top;
+const calculateEventTime = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>, 
+  columnDivRef: React.RefObject<HTMLDivElement>,
+  ): Time => {
+  const distanceFromTop: number = e.clientY -  columnDivRef.current!.getBoundingClientRect().top;
   
   const totalHours: number = pixelsToHours(distanceFromTop);
   const totalMinutes: number = Math.floor(hoursToMinutes(totalHours));
@@ -83,33 +86,47 @@ const calculateEventTime = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Ti
   return new Time(timeHour, timeMinutes);
 }
 
-const calculateEvenTimeOnDrag = (
+const calculateTimeOnDrag = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-  eventDivRef: React.RefObject<HTMLDivElement>,
   columnDivRef: React.RefObject<HTMLDivElement>,
-): Time => {
-  const { clientY, } = e;
-  const containerTop = columnDivRef.current!.getBoundingClientRect().top;
-  const grabOffsetY = eventDivRef.current!.dataset.grabOffsetY ? parseFloat(eventDivRef.current!.dataset.grabOffsetY) : clientY - eventDivRef.current!.getBoundingClientRect().top;
+  event: Event
+): [Time, Time] => {
+  // Destructuring to extract start and end times
+  let { hours: startHour, minutes: startMinutes } = event.start;
+  let { hours: endHour, minutes: endMinutes } = event.end;
 
-  // Save grab offset in data attribute
-  eventDivRef.current!.dataset.grabOffsetY = grabOffsetY.toString();
+  // Calculate the distance from the top of the column to the mouse position
+  const columnTop = columnDivRef.current!.getBoundingClientRect().top;
+  const distanceFromTop = e.clientY - columnTop - event.height / 2;
 
-  // Calculate the current mouse position relative to the container
-  const currentMouseY = clientY - containerTop;
+  // Convert distance to hours and minutes
+  const startHoursTotal = pixelsToHours(distanceFromTop);
+  const startMinutesTotal = Math.floor(hoursToMinutes(startHoursTotal));
 
-  // Adjust the event position based on the grab offset
-  const adjustedPositionY = currentMouseY - grabOffsetY;
+  const heightHoursTotal = pixelsToHours(event.height);
+  const heightMinutesTotal = Math.floor(hoursToMinutes(heightHoursTotal));
 
-  // Convert the adjusted Y position to the corresponding time in hours
-  const adjustedHours = pixelsToHours(adjustedPositionY);
-  const totalMinutes: number = Math.floor(hoursToMinutes(adjustedHours));
+  // Calculate total minutes for the end time
+  const endMinutesTotal = heightMinutesTotal + startMinutesTotal;
 
-  const timeHour: number = Math.floor(minutesToHours(totalMinutes));
-  const timeMinutes: number = totalMinutes % 60;
+  // Ensure the calculated times are within a valid range (0-23 hours)
+  const newStartHour = Math.floor(minutesToHours(startMinutesTotal));
+  const newEndHour = Math.floor(minutesToHours(endMinutesTotal));
 
-  return new Time(timeHour, timeMinutes);
-}
+  if (newEndHour <= 23 && newStartHour >= 0) {
+    // Update end time values
+    endHour = newEndHour;
+    endMinutes = endMinutesTotal % 60;
+
+    // Update start time values
+    startHour = newStartHour;
+    startMinutes = startMinutesTotal % 60;
+  }
+
+  // Return the updated start and end times
+  return [new Time(startHour, startMinutes), new Time(endHour, endMinutes)];
+};
+
 
 
 
@@ -191,11 +208,8 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
 
   if(totalMinutes < C.MAX_DURATION_MINUTES) return false
 
-  const endBeforeStart: boolean= isEndBeforeStart(newEvent);
-  // console.log(endBeforeStart,"endBeforeStart")
-  // if(endBeforeStart) return false
-  const isStartDateValid: boolean = (newEvent.start.hours < 0 || newEvent.start.hours > 23) ? false : true;
-  if(!isStartDateValid) return false;
+  // const isTimeValid: boolean = (newEvent.start.hours < 0 || newEvent.end.hours > 23) ? false : true;
+  // if(!isTimeValid) return false;
 
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false
@@ -208,7 +222,6 @@ const formatMonth = (month: Date): string =>{
 }
 
 const getMonth = (mondayDate: Date): string => {
-
 
   const month: string = formatMonth(mondayDate);
   for(let i = 0; i<7; i++){
@@ -281,5 +294,6 @@ export {
   shouldBeLocked,
   formatMonth,
   getSameDateEvents,
-  calculateEvenTimeOnDrag,
+  calculateTimeOnDrag,
+  
 };
