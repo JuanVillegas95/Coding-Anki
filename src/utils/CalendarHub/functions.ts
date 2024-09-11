@@ -86,6 +86,31 @@ const calculateEventTime = (
   return new Time(timeHour, timeMinutes);
 }
 
+const calculateEndTimeOnResize = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  columnDivRef: React.RefObject<HTMLDivElement>,
+  event: Event
+): Time => {
+  let { hours: endHour, minutes: endMinutes } = event.end;
+  // Calculate the distance from the top of the column to the mouse position
+  const columnTop = columnDivRef.current!.getBoundingClientRect().top;
+  const distanceFromTop = e.clientY - columnTop + 6;
+
+  // Convert distance to hours and minutes
+  const startHoursTotal = pixelsToHours(distanceFromTop);
+  const startMinutesTotal = Math.floor(hoursToMinutes(startHoursTotal));
+
+  // Ensure the calculated times are within a valid range (0-23 hours)
+  const newStartHour = Math.floor(minutesToHours(startMinutesTotal));
+
+    // Update start time values
+    let startHour = newStartHour;
+    let startMinutes = startMinutesTotal % 60;
+
+  // Return the updated start and end times
+  return new Time(startHour, startMinutes);
+};
+
 const calculateTimeOnDrag = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   columnDivRef: React.RefObject<HTMLDivElement>,
@@ -126,8 +151,6 @@ const calculateTimeOnDrag = (
   // Return the updated start and end times
   return [new Time(startHour, startMinutes), new Time(endHour, endMinutes)];
 };
-
-
 
 
 // Checks if a new event overlaps with any existing events on the same date.
@@ -295,5 +318,5 @@ export {
   formatMonth,
   getSameDateEvents,
   calculateTimeOnDrag,
-  
+  calculateEndTimeOnResize,
 };
