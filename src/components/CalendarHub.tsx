@@ -95,8 +95,8 @@ const CalendarHub: React.FC = () => {
     });
   };
 
-  return <S.ContainerDiv>
-    <S.CalendarDiv>
+  return <S.CalendarContainerDiv>
+    <S.CalendarWrapperDiv>
       <Header
         mondayDate={mondayDate}
         name={calendar.current.name}
@@ -111,9 +111,9 @@ const CalendarHub: React.FC = () => {
         calendarHandler={calendarHandler}
         mainRef={mainRef}
       />
-    </S.CalendarDiv>
+    </S.CalendarWrapperDiv>
     <FriendList />
-  </S.ContainerDiv>
+  </S.CalendarContainerDiv>
 };
 
 const Header: React.FC<{
@@ -254,13 +254,14 @@ const Main: React.FC<{
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
 
-    const EventCreateHandeler = {
-      mouseDown: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        date: Date
-      ): void => {
+    const EventOnMouseDown: {
+      create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
+      drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+      bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+      top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    } = {
+      create: (e, date): void => {
         e.preventDefault();
-
         if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
         const newEventStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
@@ -271,7 +272,44 @@ const Main: React.FC<{
         setCurrentEvent(new Event(date, newEventStart));
       },
 
-      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+      drag: (e, event): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
+
+        setIsEventDragging(true);
+        setCurrentEvent(event);
+      },
+
+      bottom: (e, event): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
+
+        setIsEventResizingBottom(true);
+        setCurrentEvent(event);
+      },
+
+      top: (e, event): void => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.button !== C.LEFT_MOUSE_CLICK) return;
+
+        setIsEventResizingTop(true);
+        setCurrentEvent(event);
+      }
+    };
+
+    const EventOnMouseMove: {
+      create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+      drag: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        colRef: React.RefObject<HTMLDivElement>
+      ) => void;
+      bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+      top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    } = {
+      create: (e) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventCreating) return;
 
@@ -285,21 +323,8 @@ const Main: React.FC<{
         if (!F.isNewEventValid(newEvent, events)) return;
         calendarHandler.setEvent(newEvent);
       },
-    };
 
-    const EventDragHandeler = {
-      mouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.button !== C.LEFT_MOUSE_CLICK) return;
-        setIsEventDragging(true);
-        setCurrentEvent(event);
-      },
-
-      mouseMove: (
-        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-        colRef: React.RefObject<HTMLDivElement>
-      ) => {
+      drag: (e, colRef) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
 
@@ -314,18 +339,8 @@ const Main: React.FC<{
         setCurrentEvent({ ...updatedEvent });
         calendarHandler.setEvent(updatedEvent);
       },
-    };
 
-    const EventResizeBottomHandeler = {
-      mouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.button !== C.LEFT_MOUSE_CLICK) return;
-        setIsEventResizingBottom(true);
-        setCurrentEvent(event);
-      },
-
-      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      bottom: (e) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom) return;
         const newEnd: Time = F.calculateEventTime(e, columnDivRefs[0]);
@@ -341,19 +356,9 @@ const Main: React.FC<{
 
         setCurrentEvent({ ...updatedEvent });
         calendarHandler.setEvent(updatedEvent);
-      }
-    };
-
-    const EventResizeTopHandeler = {
-      mouseDown: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.button !== C.LEFT_MOUSE_CLICK) return;
-        setIsEventResizingTop(true);
-        setCurrentEvent(event);
       },
 
-      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      top: (e) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingTop) return;
         const newStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
@@ -394,66 +399,25 @@ const Main: React.FC<{
                 ref={colRef}
                 data-key={index}
                 key={index}
-                onMouseDown={(e) => EventCreateHandeler.mouseDown(e, day)}
+                onMouseDown={(e) => EventOnMouseDown.create(e, day)}
                 onMouseMove={
                   (e) => {
-                    EventCreateHandeler.mouseMove(e)
-                    EventDragHandeler.mouseMove(e, colRef)
-                    EventResizeBottomHandeler.mouseMove(e)
-                    EventResizeTopHandeler.mouseMove(e)
+                    EventOnMouseMove.create(e)
+                    EventOnMouseMove.drag(e, colRef)
+                    EventOnMouseMove.top(e)
+                    EventOnMouseMove.bottom(e)
                   }
                 }
               >
-                {F.range(48).map((j) => (
-                  <S.CellDiv key={j} />
+                {F.range(48).map((j) => <S.CellDiv key={j} />)}
+                {filteredEvents.map((event: Event, index: number) => (
+                  <EventCard
+                    key={index}
+                    event={event}
+                    isEventDragging={isEventDragging}
+                    EventOnMouseDown={EventOnMouseDown}
+                  />
                 ))}
-                {filteredEvents.map((event: Event) => {
-                  const { id, height, start, end, duration, color, icon, title, description } = event;
-
-                  const totalMinutes: number = F.timeToMinutes(duration);
-                  const topOffset: number = F.calculateTopOffset(start);
-                  const startHours: string = F.formatTime(start.hours);
-                  const startMinutes: string = F.formatTime(start.minutes);
-                  const endHours: string = F.formatTime(end.hours);
-                  const endMinutes: string = F.formatTime(end.minutes);
-                  const isShortEvent: boolean = totalMinutes < C.SHORT_DURATION_THRESHOLD;
-
-                  return (
-                    <S.EventDiv
-                      key={id}
-                      $fromTop={topOffset}
-                      $height={height}
-                      $color={color}
-                      $isDragged={isEventDragging}
-                    >
-                      <S.EventTopDiv
-                        $color={isShortEvent ? "transparent" : color}
-                        onMouseDown={(e) => EventResizeTopHandeler.mouseDown(e, event)}
-                      />
-                      <S.EventBodyDiv
-                        onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
-                      >
-                        {isShortEvent ? (
-                          <ShortEvent title={title} />
-                        ) : (
-                          <LongEvent
-                            color={color}
-                            startHours={startHours}
-                            startMinutes={startMinutes}
-                            endHours={endHours}
-                            endMinutes={endMinutes}
-                            icon={icon}
-                            title={title}
-                            description={description}
-                          />
-                        )}
-                      </S.EventBodyDiv>
-                      <S.EventBottomDiv
-                        onMouseDown={(e) => EventResizeBottomHandeler.mouseDown(e, event)}
-                      />
-                    </S.EventDiv>
-                  );
-                })}
               </S.CellColumnDiv>
             );
           })
@@ -472,7 +436,60 @@ const Main: React.FC<{
     );
   };
 
+const EventCard: React.FC<{
+  event: Event;
+  isEventDragging: boolean;
+  EventOnMouseDown: {
+    create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
+    drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+  }
+}> = ({ event, isEventDragging, EventOnMouseDown }) => {
+  const { id, height, start, end, duration, color, icon, title, description } = event;
 
+  const totalMinutes: number = F.timeToMinutes(duration);
+  const topOffset: number = F.calculateTopOffset(start);
+  const startHours: string = F.formatTime(start.hours);
+  const startMinutes: string = F.formatTime(start.minutes);
+  const endHours: string = F.formatTime(end.hours);
+  const endMinutes: string = F.formatTime(end.minutes);
+  const isShortEvent: boolean = totalMinutes < C.SHORT_DURATION_THRESHOLD;
+
+  return <S.EventDiv
+    key={id}
+    $fromTop={topOffset}
+    $height={height}
+    $color={color}
+    $isDragged={isEventDragging}
+  >
+    <S.EventTopDiv
+      $color={isShortEvent ? "transparent" : color}
+      onMouseDown={(e) => EventOnMouseDown.top(e, event)}
+    />
+    <S.EventBodyDiv
+      onMouseDown={(e) => EventOnMouseDown.drag(e, event)}
+    >
+      {isShortEvent ? (
+        <ShortEvent title={title} />
+      ) : (
+        <LongEvent
+          color={color}
+          startHours={startHours}
+          startMinutes={startMinutes}
+          endHours={endHours}
+          endMinutes={endMinutes}
+          icon={icon}
+          title={title}
+          description={description}
+        />
+      )}
+    </S.EventBodyDiv>
+    <S.EventBottomDiv
+      onMouseDown={(e) => EventOnMouseDown.bottom(e, event)}
+    />
+  </S.EventDiv>
+};
 
 const ShortEvent: React.FC<{
   title: string;

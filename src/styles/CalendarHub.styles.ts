@@ -49,7 +49,7 @@ const IconMenuButton = styled(IconButton)`
     cursor: pointer;
   }
 `
-const ContainerDiv = styled.div`
+const CalendarContainerDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -59,7 +59,7 @@ const ContainerDiv = styled.div`
 `;
 
 
-const CalendarDiv = styled.div`
+const CalendarWrapperDiv = styled.div`
   width: ${C.CALENDAR_WIDTH}px;
   height: ${C.CALENDAR_HEIGHT}px;
   min-width: ${C.CALENDAR_WIDTH - 200}px;
@@ -873,7 +873,7 @@ const EventBodyDiv = styled.div`
 `
 export{
   // Calendar Components
-  CalendarDiv,
+  CalendarWrapperDiv,
   CalendarNameInput,
   CalendarNameP,
   CalendarNameDiv,
@@ -888,7 +888,7 @@ export{
 
   // Container Components 
   // TODO things that are not containers should be wrappers or viceversa
-  ContainerDiv,
+  CalendarContainerDiv,
   ContainerShortEventDiv,
   ContainerLongEventDiv,
   ContainerHeader,
