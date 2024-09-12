@@ -254,7 +254,7 @@ const Main: React.FC<{
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
 
-    const EventOnMouseDown: {
+    const eventOnMouseDown: {
       create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
       drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
       bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
@@ -300,7 +300,7 @@ const Main: React.FC<{
       }
     };
 
-    const EventOnMouseMove: {
+    const eventOnMouseMove: {
       create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
       drag: (
         e: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -326,6 +326,7 @@ const Main: React.FC<{
 
       drag: (e, colRef) => {
         e.preventDefault();
+        e.stopPropagation();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
 
         const [start, end] = F.calculateTimeOnDrag(e, columnDivRefs[0], currentEvent);
@@ -342,6 +343,7 @@ const Main: React.FC<{
 
       bottom: (e) => {
         e.preventDefault();
+        e.stopPropagation();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom) return;
         const newEnd: Time = F.calculateEventTime(e, columnDivRefs[0]);
         const newEvent: Event = { ...currentEvent, end: newEnd };
@@ -360,6 +362,7 @@ const Main: React.FC<{
 
       top: (e) => {
         e.preventDefault();
+        e.stopPropagation();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingTop) return;
         const newStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
         const newEvent: Event = { ...currentEvent, start: newStart };
@@ -383,6 +386,12 @@ const Main: React.FC<{
       setIsEventResizingTop(false);
     };
 
+    const eventOnClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event): void => {
+      setCurrentEvent(event);
+      openModal();
+    };
+
+
     return (
       <S.ContainerMain
         ref={mainRef}
@@ -399,13 +408,13 @@ const Main: React.FC<{
                 ref={colRef}
                 data-key={index}
                 key={index}
-                onMouseDown={(e) => EventOnMouseDown.create(e, day)}
+                onMouseDown={(e) => eventOnMouseDown.create(e, day)}
                 onMouseMove={
                   (e) => {
-                    EventOnMouseMove.create(e)
-                    EventOnMouseMove.drag(e, colRef)
-                    EventOnMouseMove.top(e)
-                    EventOnMouseMove.bottom(e)
+                    eventOnMouseMove.create(e)
+                    eventOnMouseMove.drag(e, colRef)
+                    eventOnMouseMove.top(e)
+                    eventOnMouseMove.bottom(e)
                   }
                 }
               >
@@ -415,7 +424,8 @@ const Main: React.FC<{
                     key={index}
                     event={event}
                     isEventDragging={isEventDragging}
-                    EventOnMouseDown={EventOnMouseDown}
+                    eventOnMouseDown={eventOnMouseDown}
+                    eventOnClick={eventOnClick}
                   />
                 ))}
               </S.CellColumnDiv>
@@ -439,13 +449,14 @@ const Main: React.FC<{
 const EventCard: React.FC<{
   event: Event;
   isEventDragging: boolean;
-  EventOnMouseDown: {
+  eventOnMouseDown: {
     create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
     drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
     bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
     top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
-  }
-}> = ({ event, isEventDragging, EventOnMouseDown }) => {
+  };
+  eventOnClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+}> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick }) => {
   const { id, height, start, end, duration, color, icon, title, description } = event;
 
   const totalMinutes: number = F.timeToMinutes(duration);
@@ -462,13 +473,14 @@ const EventCard: React.FC<{
     $height={height}
     $color={color}
     $isDragged={isEventDragging}
+    onClick={(e) => eventOnClick(e, event)}
   >
     <S.EventTopDiv
       $color={isShortEvent ? "transparent" : color}
-      onMouseDown={(e) => EventOnMouseDown.top(e, event)}
+      onMouseDown={(e) => eventOnMouseDown.top(e, event)}
     />
     <S.EventBodyDiv
-      onMouseDown={(e) => EventOnMouseDown.drag(e, event)}
+      onMouseDown={(e) => eventOnMouseDown.drag(e, event)}
     >
       {isShortEvent ? (
         <ShortEvent title={title} />
@@ -486,7 +498,7 @@ const EventCard: React.FC<{
       )}
     </S.EventBodyDiv>
     <S.EventBottomDiv
-      onMouseDown={(e) => EventOnMouseDown.bottom(e, event)}
+      onMouseDown={(e) => eventOnMouseDown.bottom(e, event)}
     />
   </S.EventDiv>
 };
