@@ -230,7 +230,6 @@ const Main: React.FC<{
   mondayDate,
   calendarHandler,
 }) => {
-    const columnDivRef = useRef<HTMLDivElement>(null);
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -238,6 +237,10 @@ const Main: React.FC<{
     const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
     const [isEventResizingTop, setIsEventResizingTop] = useState<boolean>(false);
     const [isEventResizingBottom, setIsEventResizingBottom] = useState<boolean>(false);
+    const columnDivRefs: React.RefObject<HTMLDivElement>[] = Array.from(
+      { length: 7 },
+      () => useRef<HTMLDivElement>(null)
+    );
 
     // Update the 'HourLineDiv' every minute
     useEffect(() => {
@@ -248,14 +251,6 @@ const Main: React.FC<{
       return () => clearInterval(interval);
     }, []);
 
-    useEffect(() => {
-      console.log("-------------------------------");
-      console.log(isEventCreating, "isEventCreating");
-      console.log(isEventDragging, "isEventDragging");
-      console.log(isEventResizingBottom, "isEventResizingBottom");
-      console.log("-------------------------------");
-    }, [isEventCreating, isEventDragging, isEventResizingBottom]);
-
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
 
@@ -265,25 +260,28 @@ const Main: React.FC<{
         date: Date
       ): void => {
         e.preventDefault();
+
         if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
-        const newEventStart: Time = F.calculateEventTime(e, columnDivRef);
-        const eventOverlapping = F.isEventOverlapping(events, date, newEventStart);
-        if (eventOverlapping) return;
+        const newEventStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
+
+        if (F.isEventOverlapping(events, date, newEventStart)) return;
+
         setIsEventCreating(true);
-        const newEvent = new Event(date, newEventStart);
-        setCurrentEvent(newEvent);
+        setCurrentEvent(new Event(date, newEventStart));
       },
 
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventCreating) return;
+
         const newEvent: Event = new Event(currentEvent.startDate, currentEvent.start);
-        newEvent.end = F.calculateEventTime(e, columnDivRef);
+        newEvent.end = F.calculateEventTime(e, columnDivRefs[0]);
         newEvent.height = F.calculateEventHeight(newEvent);
         newEvent.duration = F.calculateEventDuration(newEvent);
         newEvent.id = currentEvent.id;
         newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
+
         if (!F.isNewEventValid(newEvent, events)) return;
         calendarHandler.setEvent(newEvent);
       },
@@ -298,59 +296,23 @@ const Main: React.FC<{
         setCurrentEvent(event);
       },
 
-      mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      mouseMove: (
+        e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        colRef: React.RefObject<HTMLDivElement>
+      ) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
-        const [newStart, newEnd] = F.calculateTimeOnDrag(e, columnDivRef, currentEvent);
 
-        const updatedEvent: Event = {
-          ...currentEvent,
-          start: newStart,
-          end: newEnd,
-        };
+        const [start, end] = F.calculateTimeOnDrag(e, columnDivRefs[0], currentEvent);
+        const currentEventDayWeek: number = F.getDay(currentEvent.startDate);
+        const enteredEventDayWeek: number = parseInt(colRef.current!.dataset.key as string);
+        const startDate: Date = F.addDateBy(currentEvent.startDate, Math.sign(enteredEventDayWeek - currentEventDayWeek));
+
+        const updatedEvent: Event = { ...currentEvent, start, end, startDate };
         if (!F.isNewEventValid(updatedEvent, events)) return;
 
-        setCurrentEvent((prevEvent) => ({
-          ...prevEvent,
-          start: newStart,
-          end: newEnd,
-        }));
+        setCurrentEvent({ ...updatedEvent });
         calendarHandler.setEvent(updatedEvent);
-      },
-
-      mouseLeave: (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
-        if (!isEventDragging) return;
-
-        const currentEventDayOfTheWeek: number = F.getDay(currentEvent.startDate);
-
-        const relatedTarget = e.relatedTarget as HTMLElement;
-        const parentElement = relatedTarget?.parentElement;
-        const dataKey = parentElement?.getAttribute("data-key");
-
-        const currentDayOfTheWeek: number | undefined = dataKey ? parseInt(dataKey, 10) : undefined;
-
-        if (currentDayOfTheWeek !== undefined && !isNaN(currentDayOfTheWeek)) {
-          let newStartDate: Date = currentEvent.startDate;
-
-          if (currentDayOfTheWeek > currentEventDayOfTheWeek) {
-            newStartDate = F.addDateBy(currentEvent.startDate, 1);
-          } else if (currentDayOfTheWeek < currentEventDayOfTheWeek) {
-            newStartDate = F.addDateBy(currentEvent.startDate, -1);
-          }
-
-          const updatedEvent: Event = {
-            ...currentEvent,
-            startDate: newStartDate,
-          };
-
-          if (!F.isNewEventValid(updatedEvent, events)) return;
-
-          setCurrentEvent((prevEvent) => ({
-            ...prevEvent,
-            startDate: newStartDate,
-          }));
-          calendarHandler.setEvent(updatedEvent);
-        }
       },
     };
 
@@ -364,10 +326,9 @@ const Main: React.FC<{
       },
 
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom) return;
-        const newEnd: Time = F.calculateEventTime(e, columnDivRef);
+        const newEnd: Time = F.calculateEventTime(e, columnDivRefs[0]);
         const newEvent: Event = { ...currentEvent, end: newEnd };
 
         const updatedEvent: Event = {
@@ -378,12 +339,7 @@ const Main: React.FC<{
         };
         if (!F.isNewEventValid(updatedEvent, events)) return;
 
-        setCurrentEvent((prevEvent) => ({
-          ...prevEvent,
-          end: newEnd,
-          height: F.calculateEventHeight(newEvent),
-          duration: F.calculateEventDuration(newEvent),
-        }));
+        setCurrentEvent({ ...updatedEvent });
         calendarHandler.setEvent(updatedEvent);
       }
     };
@@ -400,9 +356,8 @@ const Main: React.FC<{
       mouseMove: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
         e.preventDefault();
         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingTop) return;
-        const newStart: Time = F.calculateEventTime(e, columnDivRef);
+        const newStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
         const newEvent: Event = { ...currentEvent, start: newStart };
-
         const updatedEvent: Event = {
           ...currentEvent,
           start: newStart,
@@ -411,12 +366,7 @@ const Main: React.FC<{
         };
         if (!F.isNewEventValid(updatedEvent, events)) return;
 
-        setCurrentEvent((prevEvent) => ({
-          ...prevEvent,
-          start: newStart,
-          height: F.calculateEventHeight(newEvent),
-          duration: F.calculateEventDuration(newEvent),
-        }));
+        setCurrentEvent({ ...updatedEvent });
         calendarHandler.setEvent(updatedEvent);
       }
     };
@@ -429,81 +379,85 @@ const Main: React.FC<{
     };
 
     return (
-      <S.ContainerMain ref={mainRef} onMouseLeave={stopEventAction} onMouseUp={stopEventAction}>
-        {F.range(7).map((i) => {
-          const day: Date = F.addDateBy(mondayDate, i);
-          const filteredEvents: Event[] = F.getSameDateEvents(events, day);
+      <S.ContainerMain
+        ref={mainRef}
+        onMouseLeave={stopEventAction}
+        onMouseUp={stopEventAction}
+      >
+        {
+          columnDivRefs.map((colRef: React.RefObject<HTMLDivElement>, index: number) => {
+            const day: Date = F.addDateBy(mondayDate, index);
+            const filteredEvents: Event[] = F.getSameDateEvents(events, day);
 
-          return (
-            <S.CellColumnDiv
-              ref={columnDivRef}
-              data-key={i}
-              key={i}
-              onMouseDown={(e) => EventCreateHandeler.mouseDown(e, day)}
-              onMouseMove={
-                (e) => {
-                  EventCreateHandeler.mouseMove(e)
-                  EventResizeBottomHandeler.mouseMove(e)
-                  EventResizeTopHandeler.mouseMove(e)
+            return (
+              <S.CellColumnDiv
+                ref={colRef}
+                data-key={index}
+                key={index}
+                onMouseDown={(e) => EventCreateHandeler.mouseDown(e, day)}
+                onMouseMove={
+                  (e) => {
+                    EventCreateHandeler.mouseMove(e)
+                    EventDragHandeler.mouseMove(e, colRef)
+                    EventResizeBottomHandeler.mouseMove(e)
+                    EventResizeTopHandeler.mouseMove(e)
+                  }
                 }
-              }
-            >
-              {F.range(48).map((j) => (
-                <S.CellDiv key={j} />
-              ))}
-              {filteredEvents.map((event: Event) => {
-                const { id, height, start, end, duration, color, icon, title, description } = event;
+              >
+                {F.range(48).map((j) => (
+                  <S.CellDiv key={j} />
+                ))}
+                {filteredEvents.map((event: Event) => {
+                  const { id, height, start, end, duration, color, icon, title, description } = event;
 
-                const totalMinutes: number = F.timeToMinutes(duration);
-                const topOffset: number = F.calculateTopOffset(start);
-                const startHours: string = F.formatTime(start.hours);
-                const startMinutes: string = F.formatTime(start.minutes);
-                const endHours: string = F.formatTime(end.hours);
-                const endMinutes: string = F.formatTime(end.minutes);
-                const isShortEvent: boolean = totalMinutes < C.SHORT_DURATION_THRESHOLD;
+                  const totalMinutes: number = F.timeToMinutes(duration);
+                  const topOffset: number = F.calculateTopOffset(start);
+                  const startHours: string = F.formatTime(start.hours);
+                  const startMinutes: string = F.formatTime(start.minutes);
+                  const endHours: string = F.formatTime(end.hours);
+                  const endMinutes: string = F.formatTime(end.minutes);
+                  const isShortEvent: boolean = totalMinutes < C.SHORT_DURATION_THRESHOLD;
 
-                return (
-                  <S.EventDiv
-                    key={id}
-                    $fromTop={topOffset}
-                    $height={height}
-                    $color={color}
-                    $isDragged={isEventDragging}
-                  >
-                    <S.EventTopDiv
-                      $color={isShortEvent ? "transparent" : color}
-                      onMouseDown={(e) => EventResizeTopHandeler.mouseDown(e, event)}
-                    />
-                    <S.EventBodyDiv
-                      onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
-                      onMouseMove={(e) => EventDragHandeler.mouseMove(e)}
-                      onMouseLeave={(e) => EventDragHandeler.mouseLeave(e)}
+                  return (
+                    <S.EventDiv
+                      key={id}
+                      $fromTop={topOffset}
+                      $height={height}
+                      $color={color}
+                      $isDragged={isEventDragging}
                     >
-                      {isShortEvent ? (
-                        <ShortEvent title={title} />
-                      ) : (
-                        <LongEvent
-                          color={color}
-                          startHours={startHours}
-                          startMinutes={startMinutes}
-                          endHours={endHours}
-                          endMinutes={endMinutes}
-                          icon={icon}
-                          title={title}
-                          description={description}
-                        />
-                      )}
-                    </S.EventBodyDiv>
-                    <S.EventBottomDiv
-                      onMouseDown={(e) => EventResizeBottomHandeler.mouseDown(e, event)}
-                      onMouseMove={(e) => EventResizeBottomHandeler.mouseMove(e)}
-                    />
-                  </S.EventDiv>
-                );
-              })}
-            </S.CellColumnDiv>
-          );
-        })}
+                      <S.EventTopDiv
+                        $color={isShortEvent ? "transparent" : color}
+                        onMouseDown={(e) => EventResizeTopHandeler.mouseDown(e, event)}
+                      />
+                      <S.EventBodyDiv
+                        onMouseDown={(e) => EventDragHandeler.mouseDown(e, event)}
+                      >
+                        {isShortEvent ? (
+                          <ShortEvent title={title} />
+                        ) : (
+                          <LongEvent
+                            color={color}
+                            startHours={startHours}
+                            startMinutes={startMinutes}
+                            endHours={endHours}
+                            endMinutes={endMinutes}
+                            icon={icon}
+                            title={title}
+                            description={description}
+                          />
+                        )}
+                      </S.EventBodyDiv>
+                      <S.EventBottomDiv
+                        onMouseDown={(e) => EventResizeBottomHandeler.mouseDown(e, event)}
+                      />
+                    </S.EventDiv>
+                  );
+                })}
+              </S.CellColumnDiv>
+            );
+          })
+        }
         <S.HourLineDiv
           $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}
         />
