@@ -2,16 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
 import * as F from '@/utils/CalendarHub/functions';
 import * as C from '@/utils/CalendarHub/constants';
-import { Event, Time } from '@/utils/CalendarHub/classes';
+import { Event, Time, Toast } from '@/utils/CalendarHub/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
 
 const ScheduleGridMain: React.FC<{
-    toastHandeler: {
-        push: (newToast: Toast) => void;
-        pop: () => void;
-        getTail: () => Toast;
-    }
+    addToast: (newToast: Toast) => void;
     mondayDate: Date;
     events: Map<string, Event>;
     mainRef: React.RefObject<HTMLDivElement>;

@@ -57,4 +57,31 @@ body {
   background-color: #F8F0EC;
 }
 
+@page {
+  size: landscape;
+  margin: 0; 
+}
 
+@media print {
+  body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .printable-content {
+    transform: scale(0.9); /* Adjust scale to shrink content */
+    transform-origin: top left; /* Set the scaling origin */
+    width: 100%; /* Ensure it takes full width */
+  }
+
+  .no-print {
+    display: none;
+  }
+
+  /* Force background colors and images to print */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

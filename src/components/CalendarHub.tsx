@@ -122,29 +122,31 @@ const CalendarHub: React.FC = () => {
   };
 
   return <S.CalendarWrapperDiv>
-    <S.CalendarContainerDiv>
-      <CalendarHeader
-        mondayDate={mondayDate}
-        name={calendar.current.name}
-        changeCalendarName={changeCalendarName}
-        weekHandler={weekHandler}
-      />
-      <TimeColumnAside asideRef={asideRef} />
-      <DaySection mondayDate={mondayDate} />
-      <ScheduleGridMain
-        mondayDate={mondayDate}
-        events={calendarHandler.getEvents()}
-        calendarHandler={calendarHandler}
-        toastHandeler={toastHandeler}
-        mainRef={mainRef}
-      />
-    </S.CalendarContainerDiv>
+    <S.PrintableContent>
+      <S.CalendarContainerDiv>
+        <CalendarHeader
+          mondayDate={mondayDate}
+          name={calendar.current.name}
+          changeCalendarName={changeCalendarName}
+          weekHandler={weekHandler}
+        />
+        <TimeColumnAside asideRef={asideRef} />
+        <DaySection mondayDate={mondayDate} />
+        <ScheduleGridMain
+          mondayDate={mondayDate}
+          events={calendarHandler.getEvents()}
+          calendarHandler={calendarHandler}
+          addToast={toastHandeler.push}
+          mainRef={mainRef}
+        />
+      </S.CalendarContainerDiv>
+    </S.PrintableContent>
     <MenuAside />
     {
       (toasts.size > 0) && (
         <ToastMessage
           toast={toastHandeler.getTail()}
-          toastHandeler={toastHandeler}
+          popToast={toastHandeler.pop}
         />)
     }
   </S.CalendarWrapperDiv>

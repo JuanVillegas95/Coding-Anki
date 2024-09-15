@@ -5,12 +5,8 @@ import { TOAST_TYPE } from '@/utils/CalendarHub/constants';
 
 const ToastMessage: React.FC<{
     toast: Toast,
-    toastHandeler: {
-        push: (newToast: Toast) => void;
-        pop: () => void;
-        getTail: () => Toast;
-    }
-}> = ({ toast, toastHandeler }) => {
+    popToast: () => void;
+}> = ({ toast, popToast }) => {
     const [isVisible, setIsVisible] = useState<boolean>(true);
 
     const onAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>) => {
@@ -22,7 +18,7 @@ const ToastMessage: React.FC<{
         if (e.animationName === "toastAnimOut") {
             setTimeout(() => {
                 setIsVisible(!isVisible);
-                toastHandeler.pop();
+                popToast();
             }, 1000)
         }
     }

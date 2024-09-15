@@ -1026,7 +1026,21 @@ const ToastDescriptionP = styled.p`
     overflow: hidden;
 `;
 
+const PrintableContent = styled.div`
+    @media print {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      visibility: visible;
+      transform: scale(0.9); 
+      transform-origin: top left;
+      width: 100%; 
+    }
+`;
+
 export{
+  PrintableContent,
   ToastWrapperDiv,
   ToastContainerDiv,
   ToatstIconDiv,
