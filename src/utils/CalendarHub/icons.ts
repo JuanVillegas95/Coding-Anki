@@ -16,7 +16,17 @@ import verticalDots from "@/svg/grip-dots-vertical.svg"
 import dropdown from "@/svg/angle-right.svg"
 import emptyCircle from "@/svg/empty-circle.svg"
 import fullCircle from "@/svg/full-circle.svg"
+
+
 import users from "@/svg/users.svg"
+import add from "@/svg/add.svg"
+import disk from "@/svg/disk.svg"
+import download from "@/svg/download.svg"
+import print from "@/svg/print.svg"
+import upload from "@/svg/upload.svg"
+import confetti from "@/svg/confetti.svg"
+import trash from "@/svg/trash.svg"
+import replace from "@/svg/replace.svg"
 
 import phone from "@/svg/phone.svg"
 import information from "@/svg/information.svg"
@@ -33,7 +43,13 @@ import teal from "@/svg/teal.svg"
 import red from "@/svg/red.svg"
 import yellow from "@/svg/yellow.svg"
 
+import error from "@/svg/bad.svg"
+import success from "@/svg/good.svg"
+import info from "@/svg/info.svg"
+
 export {
+  add, disk, download, print, upload, confetti, trash, replace,
+  success, error, info,
   link,
   heart,
   rightArrow,

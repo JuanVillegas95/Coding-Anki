@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
 import * as I  from "@/utils/CalendarHub/icons"
-import { StaticImageData } from 'next/image';
 
 // USER PREMIUM CAN CHOOSE THE COLOR, UPLOUAD ICONS, HAVE 10 CALENDARS, SYNC WITH MULTIPLE USERS
 class Friend {
@@ -79,7 +78,6 @@ class Event {
   duration: Time;
   icon: React.ComponentType;
   color: string;
-  colorIcon: React.ComponentType; // todo delete this property
   recurringEventID: string;
   selectedDays: boolean[];
 
@@ -90,8 +88,7 @@ class Event {
     this.end = new Time(-1, -1);
     this.title = "";
     this.description = "";
-    this.color = "gray";
-    this.colorIcon = I.gray;
+    this.color = "purple";
     this.height = -1;
     this.duration = new Time(-1, -1);
     this.icon = I.star;
@@ -111,4 +108,17 @@ class Time {
   }
 }
 
-export { Event, Time, Calendar, User, Friend, FriendStatus};
+class Toast {
+  id: string
+  description: string;
+  type: 'success' | 'info' | 'error'; 
+
+  constructor(id: string, description: string, type: 'success' | 'info' | 'error') { 
+    this.id = id;
+    this.description = description;
+    this.type = type;
+  }
+}
+
+
+export { Event, Time, Calendar, User, Friend, FriendStatus, Toast};

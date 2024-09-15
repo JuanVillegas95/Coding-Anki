@@ -35,6 +35,7 @@ const IconDiv = styled.div<{$color: string, $size: number, $svgSize: number}>`
   }
 `;
 
+
 const IconMenuButton = styled(IconButton)`
   position: relative;
   display: flex;
@@ -49,21 +50,23 @@ const IconMenuButton = styled(IconButton)`
     cursor: pointer;
   }
 `
-const CalendarContainerDiv = styled.div`
+const CalendarWrapperDiv = styled.div`
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  gap: 5px;
 `;
 
 
-const CalendarWrapperDiv = styled.div`
+const CalendarContainerDiv = styled.div`
   width: ${C.CALENDAR_WIDTH}px;
   height: ${C.CALENDAR_HEIGHT}px;
   min-width: ${C.CALENDAR_WIDTH - 200}px;
-  margin: 0 30px;
+  margin-left: 30px;
   padding-bottom: 5px;
   border-radius: 1.5%;
   background-color: white;
@@ -75,7 +78,6 @@ const CalendarWrapperDiv = styled.div`
 
   ${C.HIDE_SCROLL_BAR} 
 `;
-
 
 
 const ContainerHeader = styled.header`
@@ -259,8 +261,7 @@ const LongEventIconBodyDiv = styled(IconDiv)`
 
 
 
-const ContainerModalDiv = styled.div<{ $block: string,  }>`
-    display: ${({$block}) => $block};
+const ContainerModalDiv = styled.div`
     position: fixed;
     top: 0;
     left: 0;
@@ -376,6 +377,19 @@ const ItemButton = styled(ClickableButton)`
     background-color: lightgray;
   }
 `;
+
+const ItemButtonColor = styled(ClickableButton)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  svg{
+  }
+  &:hover{
+    background-color: lightgray;
+  }
+`;
+
 
 const TimeP = styled.p` // TODO IMPROVE THIS
   color: black;
@@ -542,20 +556,7 @@ const ArrowButton = styled(ClickableButton)`
 `
 
 
-const FriendContainerDiv = styled.div<{ $isClicked: boolean }>`
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background-color: white;
-  height: auto;
-  width: 180px;
-  border-radius: 10px;
-  transition: transform 0.5s ease;
-  transform: ${({ $isClicked }) => $isClicked ? 'translateX(0px)' : 'translateX(400px)'};
-  justify-content: center;
-`;
+
 
 const FriendHeader = styled.header`
   position: relative;
@@ -635,26 +636,6 @@ const DropdownButton = styled(ClickableButton)<{ $isClicked: boolean} >`
   margin-left: auto;
 `
 
-const slideInFromBottom = keyframes`
-  from {
-    opacity: 0;
-    transform: translateY(20px); 
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-`;
-
-const FriendCalendarNameLi = styled.li<{ $isVisible: boolean, $delay: number }>`
-  animation: ${({ $isVisible, $delay }) => $isVisible ? "none" : css`${slideInFromBottom} ${$delay}s ease-in-out`};
-  will-change: transform, opacity; 
-  padding: 5px;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  width: 100%;
-`;
 
 const LinkedButton = styled(DropdownButton)`
   background-color: transparent;
@@ -721,7 +702,6 @@ const CalendarNameLi = styled.li<{ $isVisible: boolean; $delay: number }>`
   &:hover {
     cursor: pointer;
     background-color: #F8F8F8;
-
   }
 `;
 
@@ -821,28 +801,40 @@ const EventTopDiv = styled.div.attrs<{ $color: string; }>(
 `;
 
 
-
-
-
 const HourLineDiv = styled.div.attrs<{ $fromTop: number }>(
   ({ $fromTop }) => ({
     style: {
       top: `${$fromTop}px`
   },
   }))<{ $fromTop: number }>`
-  position: absolute;
-  z-index: 2;
-  width: calc(100%);
-  color: red; 
-  display: flex;
-  align-items: center;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 500; 
-  pointer-events: none;
-  flex: 1;
-  height: 1px;
-  background-color: red; 
+    position: absolute;
+    z-index: 2;
+    width: calc(100%);
+    color: red; 
+    display: flex;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500; 
+    pointer-events: none;
+    flex: 1;
+    height: 1px;
+    background-color: red; 
 `;
+
+
+const colorDivFirst = styled.div<{ $color: string}>`
+  background-color: ${({ $color} ) => `var(--primary-${$color})`};
+  width: 100%;
+  height: 100%;
+  border-radius: 30%;
+`
+
+const colorDiv = styled.div<{ $color: string}>`
+  background-color: ${({ $color} ) => `var(--primary-${$color})`};
+  width: 50%;
+  height: 50%;
+  border-radius: 30%;
+`
 
 const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>(
   ({ $fromTop, $height, $color }) => ({
@@ -871,7 +863,180 @@ const EventBodyDiv = styled.div`
   width: 100%;
   height: 100%;
 `
+
+
+
+const MenuP = styled.p`
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+`
+
+const MenuContainerDiv = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+`
+
+const FriendContainerDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  height: auto;
+  width: 100%;
+  border-radius: 10px;
+  transition: transform 0.5s ease;
+  justify-content: center;
+  margin-left: 25px;
+`;
+
+const MenuWrapperAside = styled.aside`
+  width: 200px;
+  margin-right: 30px;
+  height: ${C.CALENDAR_HEIGHT}px;
+`
+
+const slideInFromBottom = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(60px); 
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideInFromTop = keyframes`
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-800px); 
+  }
+`;
+
+
+
+const MenuButton = styled(ClickableButton)`
+  border-radius: 10px;
+  background-color: white;
+  height: 60px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  &:hover {
+    background-color: #F8F8F8;
+  }
+  padding: 20px;
+`;
+
+
+const FriendCalendarNameLi = styled.li<{ $isVisible: boolean, $delay: number }>`
+  animation: ${({ $isVisible, $delay }) => $isVisible ? "none" : css`${slideInFromBottom} ${$delay}s ease-in-out`};
+  will-change: transform, opacity; 
+  padding: 5px;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  width: 100%;
+`;
+
+const ToastWrapperDiv = styled.div`
+  position: absolute;
+  top: 10px;
+  left: 45%;
+`;
+
+const toastAnimIn = keyframes`
+  from {
+    transform: translateY(-100px);
+  }
+  to {
+    transform: translateY(0px); 
+  }
+`;
+toastAnimIn.name = "toastAnimIn"
+
+const toastAnimOut = keyframes`
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-100px); 
+  }
+`;
+
+toastAnimOut.name = "toastAnimOut"
+
+const wiggle = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-5px);
+  }
+  40% {
+    transform: translateY(3px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+  80% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+`;
+wiggle.name = "wiggle"
+
+const ToastContainerDiv = styled.div<{ $isVisible: boolean }>`
+  width: 250px;
+  height: 65px;
+  background-color: white;
+  border: 1px solid lightgray;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 8px;
+  padding: 15px;
+  gap: 10px;
+  animation: ${({ $isVisible }) =>
+    $isVisible
+      ? css`
+        ${toastAnimIn} .5s ease-in-out forwards, ${wiggle} .8s ease-out .5s;
+        `
+      : css`
+        ${toastAnimOut} .5s ease-in-out forwards;
+        `
+  };
+`;
+
+const ToatstIconDiv = styled(IconDiv)`
+`;
+const ToastDescriptionP = styled.p`
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500; 
+    overflow: hidden;
+`;
+
 export{
+  ToastWrapperDiv,
+  ToastContainerDiv,
+  ToatstIconDiv,
+  ToastDescriptionP,
+
+  colorDiv,
+  MenuButton,
+  MenuP,
+  MenuWrapperAside,
+
   // Calendar Components
   CalendarWrapperDiv,
   CalendarNameInput,
@@ -899,6 +1064,7 @@ export{
   ContainerModalDiv,
   ContainerMenuDiv,
   ContainerDaySelectorDiv,
+  MenuContainerDiv,
 
   // Header and Menu Items
   MenuItemDiv,
@@ -926,6 +1092,7 @@ export{
   RecurringEventButton,
   EventInputCheckBox,
   EventBodyDiv,
+  ItemButtonColor,
 
   // Long Event Components
   LongEventTitleP,
@@ -980,4 +1147,5 @@ export{
   FriendNameLi,
   FriendCalendarNameLi,
   FriendNameP,
+  colorDivFirst,
 }

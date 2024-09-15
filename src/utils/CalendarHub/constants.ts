@@ -42,6 +42,24 @@ enum EVENT_ACTION {
 const NULL_CALENDAR: Calendar = new Calendar("-1","-1");
 const NULL_CALENDARS: Map<string, Calendar>= new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
+const TOAST_TYPE: { [key: string]: React.ComponentType } = {
+  "success": I.success,
+  "info": I.info,
+  "error": I.error,
+};
+
+const COLORS_ARRAY: string[] = [
+  "gray",
+   "orange",
+   "pink",
+   "purple",
+   "brown",
+  "blue",
+   "teal",
+   "red",
+   "yellow"
+];
+
 const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
   I.cart,
@@ -55,16 +73,17 @@ const ICONS_ARRAY: React.ComponentType[] = [
 ];
 
 
-const COLORS_MAP = new Map<React.ComponentType, string>([ 
-  [I.gray, "gray"],
-  [I.orange, "orange"],
-  [I.pink, "pink"],
-  [I.purple, "purple"],
-  [I.brown, "brown"],
-  [I.blue, "blue"],
-  [I.teal, "teal"],
-  [I.red, "red"],
-  [I.yellow, "yellow"]
+
+const MENU_MAP = new Map<React.ComponentType, string>([ 
+  [I.disk, "Save"],
+  [I.replace, "Change"],
+  [I.confetti, "New"],
+  [I.trash, "Delete"],
+  [I.users, "Friends"],
+  [I.download, "Import"],
+  [I.upload, "Export"],
+  [I.print, "Print"],
+  [I.interrogation, "Help"],
 ]);
 
 const HIDE_SCROLL_BAR: string = `
@@ -126,11 +145,13 @@ export {
   HEADER_FONT_SIZE,
   HIDE_SCROLL_BAR,
   ICONS_ARRAY,
-  COLORS_MAP,
   TERTIARY_COLORS,
   SHORT_DURATION_THRESHOLD,
   NULL_DATE,
   EVENT_ACTION,
   ESCAPE_KEYS,
   ENTER_KEY,
+  MENU_MAP,
+  COLORS_ARRAY,
+  TOAST_TYPE
 };
