@@ -3,7 +3,7 @@ import * as S from '@/styles/CalendarHub.styles';
 import * as I from '@/utils/CalendarHub/icons';
 import * as C from '@/utils/CalendarHub/constants';
 import * as F from '@/utils/CalendarHub/functions';
-import { Event } from '@/utils/CalendarHub/classes';
+import { Event, Toast } from '@/utils/CalendarHub/classes';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
@@ -11,6 +11,8 @@ import IconMenu from './IconMenu';
 import DaySelector from './DaySelector';
 
 const EventModal: React.FC<{
+    updateCurrentEvent: (event: Event) => void;
+    addToast: (newToast: Toast) => void;
     isModalOpen: boolean;
     events: Map<string, Event>;
     currentEvent: Event;
@@ -20,7 +22,7 @@ const EventModal: React.FC<{
         deleteEvent: (event: Event) => void;
         getEvents: () => Map<string, Event>;
     };
-}> = ({ isModalOpen, closeModal, currentEvent, events, calendarHandler }) => {
+}> = ({ isModalOpen, closeModal, currentEvent, events, calendarHandler, updateCurrentEvent, addToast }) => {
     const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
@@ -44,24 +46,38 @@ const EventModal: React.FC<{
         setIsColorMenu(!isColorMenu);
     };
 
-    const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const title = e.target.value;
-        calendarHandler.setEvent({ ...currentEvent, title });
+    const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const title = e.target.value.trim();
+        if (title.length > 50) {
+            addToast(new Toast(
+                "Invalid title length",
+                "Event title must be under 50 characters.",
+                "info"
+            ));
+            return;
+        }
+        updateCurrentEvent({ ...currentEvent, title });
     };
 
-    const handleIcon = (icon: React.ComponentType) => {
-        calendarHandler.setEvent({ ...currentEvent, icon });
+    const handleIcon = (icon: React.ComponentType): void => updateCurrentEvent({ ...currentEvent, icon });
+
+    const handleColor = (color: string): void => updateCurrentEvent({ ...currentEvent, color });
+
+
+    const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+        const description = e.target.value.trim();
+        if (description.length > 200) {
+            addToast(new Toast(
+                "Invalid description",
+                "Event description must be at least 10 characters long.",
+                "info"
+            ));
+            return;
+        }
+        updateCurrentEvent({ ...currentEvent, description });
     };
 
-    const handleColor = (color: string) => {
-        calendarHandler.setEvent({ ...currentEvent, color });
-    };
-
-    const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const description = e.target.value;
-        calendarHandler.setEvent({ ...currentEvent, description });
-    };
-
+    // !HERE I STOPED
     const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string) => {
         const updatedEvent: Event = { ...currentEvent };
         const newDate = new Date(e.target.value);
@@ -106,7 +122,6 @@ const EventModal: React.FC<{
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         closeModal();
-        // TODO: Perform checks and save the event if valid
         calendarHandler.setEvent(currentEvent);
     };
 
@@ -130,90 +145,95 @@ const EventModal: React.FC<{
         calendarHandler.setEvent(updatedEvent);
     };
 
-    return (
-        <S.ContainerModalDiv >
-            <S.ModalForm onSubmit={handleSubmit}>
-                <S.ModalCloseButton $color={'black'} $size={30} $svgSize={15} onClick={handleCloseModal}>
-                    {React.createElement(I.cross)}
-                </S.ModalCloseButton>
+    return <S.ContainerModalDiv >
+        <S.ModalForm onSubmit={handleSubmit}>
+            <S.ModalCloseButton $color={'black'} $size={30} $svgSize={15} onClick={handleCloseModal}>
+                {React.createElement(I.cross)}
+            </S.ModalCloseButton>
 
-                <S.Row1Div>
-                    <S.TitleInput value={currentEvent.title} onChange={handleTitle} />
-                    <IconMenu
-                        toggleIconMenu={toggleIconMenu}
-                        isIconMenu={isIconMenu}
-                        handleIcon={handleIcon}
-                        currentEventIcon={currentEvent.icon}
-                        iconArray={C.ICONS_ARRAY}
-                    />
-                    <S.IconMenuButton $color={""} $size={50} $svgSize={25} onClick={toggleColorMenu}>
-                        <S.colorDivFirst $color={currentEvent.color} />
-                        {isColorMenu && (
-                            <S.ContainerMenuDiv $block={isColorMenu ? 'block' : 'none'}>
-                                <S.MenuItemDiv>
-                                    {C.COLORS_ARRAY.map((color, index) => (
-                                        <S.ItemButton key={index} $color={""} $size={49} $svgSize={25} onClick={() => handleColor(color)} >
-                                            <S.colorDiv $color={color} />
+            <S.Row1Div>
+                <S.TitleInput value={currentEvent.title} onChange={handleTitle} />
+                <IconMenu
+                    toggleIconMenu={toggleIconMenu}
+                    isIconMenu={isIconMenu}
+                    handleIcon={handleIcon}
+                    currentEventIcon={currentEvent.icon}
+                    iconArray={C.ICONS_ARRAY}
+                />
+                <S.IconMenuButton $color={C.COLORS[currentEvent.color].primary} $size={50} $svgSize={25} onClick={toggleColorMenu}>
+                    <S.colorDivFirst $color={C.COLORS[currentEvent.color].primary} />
+                    {isColorMenu && (
+                        <S.ContainerMenuDiv $block={isColorMenu ? 'block' : 'none'}>
+                            <S.MenuItemDiv>
+                                {
+                                    Array.from(Object.keys(C.COLORS)).map((color, index) => (
+                                        <S.ItemButton
+                                            key={index}
+                                            $color={""}
+                                            $size={49}
+                                            $svgSize={25} onClick={() => handleColor(color)} >
+                                            <S.colorDiv $color={C.COLORS[color].primary} />
                                         </S.ItemButton>
-                                    ))}
-                                </S.MenuItemDiv>
-                            </S.ContainerMenuDiv>
-                        )}
-                    </S.IconMenuButton>
-                </S.Row1Div>
+                                    ))
+                                }
+                            </S.MenuItemDiv>
+                        </S.ContainerMenuDiv>
+                    )}
+                </S.IconMenuButton>
+            </S.Row1Div>
 
-                <S.Row2Div>
-                    <S.ModalTextArea
-                        value={currentEvent.description}
-                        onChange={handleDescription}
-                    />
-                </S.Row2Div>
+            <S.Row2Div>
+                <S.ModalTextArea
+                    value={currentEvent.description}
+                    onChange={handleDescription}
+                />
+            </S.Row2Div>
 
-                <S.Row3Div>
-                    <TimeInput
+            <S.Row3Div>
+                <TimeInput
+                    text={'Start'}
+                    time={currentEvent.start}
+                    handleTime={handleTime}
+                />
+                <TimeInput
+                    text={'End'}
+                    time={currentEvent.end}
+                    handleTime={handleTime}
+                />
+                <S.RecurringEventButton onClick={handleRecurringEvent}>
+                    Recurring
+                </S.RecurringEventButton>
+            </S.Row3Div>
+
+            {isRecurringEvent && (
+                <S.Row4Div>
+                    <DateInput
                         text={'Start'}
-                        time={currentEvent.start}
-                        handleTime={handleTime}
+                        date={currentEvent.startDate}
+                        handleDate={handleDate}
                     />
-                    <TimeInput
+                    <DateInput
                         text={'End'}
-                        time={currentEvent.end}
-                        handleTime={handleTime}
+                        date={F.addDateBy(currentEvent.startDate, 1)}
+                        handleDate={handleDate}
                     />
-                    <S.RecurringEventButton onClick={handleRecurringEvent}>
-                        Recurring
-                    </S.RecurringEventButton>
-                </S.Row3Div>
-
-                {isRecurringEvent && (
-                    <S.Row4Div>
-                        <DateInput
-                            text={'Start'}
-                            date={currentEvent.startDate}
-                            handleDate={handleDate}
+                    <S.ContainerDaySelectorDiv>
+                        <DaySelector
+                            selectedDays={currentEvent.selectedDays}
+                            startDate={currentEvent.startDate}
+                            handleSelectedDays={handleSelectedDays}
                         />
-                        <DateInput
-                            text={'End'}
-                            date={F.addDateBy(currentEvent.startDate, 1)}
-                            handleDate={handleDate}
-                        />
-                        <S.ContainerDaySelectorDiv>
-                            <DaySelector
-                                selectedDays={currentEvent.selectedDays}
-                                startDate={currentEvent.startDate}
-                                handleSelectedDays={handleSelectedDays}
-                            />
-                        </S.ContainerDaySelectorDiv>
-                    </S.Row4Div>
-                )}
+                    </S.ContainerDaySelectorDiv>
+                </S.Row4Div>
+            )}
 
-                <S.Row5Div>
-                    <S.SaveButton type="submit">Save</S.SaveButton>
-                    <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
-                </S.Row5Div>
-            </S.ModalForm>
-        </S.ContainerModalDiv>
-    );
+            <S.Row5Div>
+                <S.SaveButton type="submit">Save</S.SaveButton>
+                <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
+            </S.Row5Div>
+        </S.ModalForm>
+    </S.ContainerModalDiv>
+
 };
 
 export default EventModal;

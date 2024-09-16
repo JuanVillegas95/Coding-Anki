@@ -4,9 +4,9 @@ import * as I from '@/utils/CalendarHub/icons';
 import * as C from '@/utils/CalendarHub/constants';
 
 const FriendList: React.FC<{
-    toggleIsClicked: (name: string) => void;
+    closeFriendList: () => void;
 }>
-    = ({ toggleIsClicked }) => {
+    = ({ closeFriendList }) => {
         const [linkedCalendar, setLinkedCalendar] = useState<string>("");
         const [linkedUser, setLinkedUser] = useState<string>("");
 
@@ -23,7 +23,7 @@ const FriendList: React.FC<{
 
         return <>
             <S.FriendHeader>
-                <S.FriendCloseButton $size={10} $svgSize={10} $color={'black'} onClick={() => toggleIsClicked("Friends")}>
+                <S.FriendCloseButton $size={10} $svgSize={10} $color={'black'} onClick={closeFriendList}>
                     <I.cross />
                 </S.FriendCloseButton>
                 <S.FriendSearchDiv>

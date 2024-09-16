@@ -16,7 +16,7 @@ const ScheduleGridMain: React.FC<{
         deleteEvent: (event: Event) => void;
         getEvents: () => Map<string, Event>;
     };
-}> = ({ mainRef, events, mondayDate, calendarHandler }) => {
+}> = ({ mainRef, events, mondayDate, calendarHandler, addToast }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -38,6 +38,8 @@ const ScheduleGridMain: React.FC<{
         return () => clearInterval(interval);
     }, []);
 
+    const updateCurrentEvent = (newEvent: Event): void => setCurrentEvent((prevEvent) => ({ ...prevEvent, ...newEvent }));
+
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
 
@@ -45,6 +47,8 @@ const ScheduleGridMain: React.FC<{
     const eventOnMouseDown = {
         create: (e: React.MouseEvent<HTMLDivElement>, date: Date) => {
             e.preventDefault();
+            e.stopPropagation();
+
             if (e.button !== C.LEFT_MOUSE_CLICK) return;
 
             const newEventStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
@@ -86,9 +90,10 @@ const ScheduleGridMain: React.FC<{
     const eventOnMouseMove = {
         create: (e: React.MouseEvent<HTMLDivElement>) => {
             e.preventDefault();
+            e.stopPropagation();
             if (e.button !== C.LEFT_MOUSE_CLICK || !isEventCreating) return;
 
-            const newEvent = new Event(currentEvent.startDate, currentEvent.start);
+            const newEvent: Event = { ...currentEvent }
             newEvent.end = F.calculateEventTime(e, columnDivRefs[0]);
             newEvent.height = F.calculateEventHeight(newEvent);
             newEvent.duration = F.calculateEventDuration(newEvent);
@@ -96,6 +101,7 @@ const ScheduleGridMain: React.FC<{
             newEvent.selectedDays[F.getDay(newEvent.startDate)] = true;
 
             if (!F.isNewEventValid(newEvent, events)) return;
+            setCurrentEvent(newEvent);
             calendarHandler.setEvent(newEvent);
         },
 
@@ -111,7 +117,6 @@ const ScheduleGridMain: React.FC<{
 
             const updatedEvent: Event = { ...currentEvent, start, end, startDate };
             if (!F.isNewEventValid(updatedEvent, events)) return;
-
             setCurrentEvent(updatedEvent);
             calendarHandler.setEvent(updatedEvent);
         },
@@ -154,16 +159,15 @@ const ScheduleGridMain: React.FC<{
     };
 
     const stopEventAction = (): void => {
-        if (isEventCreating) openModal();
+        if (isEventCreating && F.isNewEventValid(currentEvent, events)) openModal();
         setIsEventCreating(false);
         setIsEventDragging(false);
         setIsEventResizingBottom(false);
         setIsEventResizingTop(false);
     };
 
-    const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, event: Event): void => {
-        e.preventDefault();
-        e.stopPropagation();
+    const eventOnClick = (event: Event): void => {
+        console.log(isEventCreating, isEventDragging, isEventResizingBottom, isEventResizingTop)
         setCurrentEvent(event);
         openModal();
     };
@@ -214,6 +218,8 @@ const ScheduleGridMain: React.FC<{
                     closeModal={closeModal}
                     currentEvent={currentEvent}
                     isModalOpen={isModalOpen}
+                    addToast={addToast}
+                    updateCurrentEvent={updateCurrentEvent}
                 />
             }
         </S.ContainerMain>

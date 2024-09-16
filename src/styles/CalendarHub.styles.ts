@@ -720,7 +720,7 @@ const ContainerLongEventDiv = styled.div`
 `
 
 const LongEventHeader = styled.header<{$color: string}>`
-  background-color: var(--primary-${({ $color }) => $color});
+  background-color: ${({ $color}) => $color};
   height: 20px;
   width: 100%;
   display: flex;
@@ -787,7 +787,7 @@ const EventBottomDiv = styled.div`
 const EventTopDiv = styled.div.attrs<{ $color: string; }>(
   ({ $color }) => ({ 
     style: { 
-      backgroundColor: `var(--primary-${$color})`
+      backgroundColor: `${$color}`
     }
   }))`
   width: 100%;
@@ -823,28 +823,34 @@ const HourLineDiv = styled.div.attrs<{ $fromTop: number }>(
 
 
 const colorDivFirst = styled.div<{ $color: string}>`
-  background-color: ${({ $color} ) => `var(--primary-${$color})`};
+  background-color: ${({ $color} ) => `${$color}`};
   width: 100%;
   height: 100%;
   border-radius: 30%;
 `
 
 const colorDiv = styled.div<{ $color: string}>`
-  background-color: ${({ $color} ) => `var(--primary-${$color})`};
+  background-color: ${({ $color} ) => `${$color}`};
   width: 50%;
   height: 50%;
   border-radius: 30%;
 `
 
-const EventDiv = styled.div.attrs<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>(
-  ({ $fromTop, $height, $color }) => ({
+const EventDiv = styled.div.attrs<{ 
+  $fromTop: number; 
+  $height: number; 
+  $borderColor: string, 
+  $backgroundColor: string,
+  $isDragged: boolean
+}>(
+  ({ $fromTop, $height, $backgroundColor, $borderColor}) => ({
   style: {
     top: `${$fromTop}px`,
     height: `${$height}px`,
-    border: `1px solid var(--primary-${$color})`,
-    backgroundColor: `var(--secondary-${$color})`,
+    border: `1px solid ${$borderColor}`,
+    backgroundColor: `${$backgroundColor}`,
   },
-}))<{ $fromTop: number; $height: number; $color: string, $isDragged: boolean}>`
+}))<{ $isDragged: boolean}>`
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -868,7 +874,7 @@ const EventBodyDiv = styled.div`
 
 const MenuP = styled.p`
   font-family: 'Poppins', sans-serif;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
 `
 
@@ -878,7 +884,7 @@ const MenuContainerDiv = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  row-gap: 20px;
+  row-gap: 15px;
 `
 
 const FriendContainerDiv = styled.div`
@@ -922,11 +928,10 @@ const slideInFromTop = keyframes`
 `;
 
 
-
 const MenuButton = styled(ClickableButton)`
   border-radius: 10px;
   background-color: white;
-  height: 60px;
+  height: 25px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -951,6 +956,7 @@ const ToastWrapperDiv = styled.div`
   position: absolute;
   top: 10px;
   left: 45%;
+  z-index: 100;
 `;
 
 const toastAnimIn = keyframes`
@@ -1029,11 +1035,11 @@ const ToastDescriptionP = styled.p`
 const PrintableContent = styled.div`
     @media print {
       position: absolute;
-      left: 0;
+      left: -10px;
       top: 0;
       width: 100%;
       visibility: visible;
-      transform: scale(0.9); 
+      transform: scale(0.9,1.1); 
       transform-origin: top left;
       width: 100%; 
     }

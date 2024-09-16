@@ -1,6 +1,7 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
 import * as I from '@/utils/CalendarHub/icons';
+import * as C from "@/utils/CalendarHub/constants"
 
 const LongEvent: React.FC<{
     color: string;
@@ -14,7 +15,7 @@ const LongEvent: React.FC<{
 }> = ({ color, startHours, startMinutes, endHours, endMinutes, icon, title, description }) => {
     return (
         <S.ContainerLongEventDiv>
-            <S.LongEventHeader $color={color}>
+            <S.LongEventHeader $color={C.COLORS[color].primary}>
                 <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
                     {React.createElement(icon)}
                 </S.LongEventIconDiv>
@@ -33,7 +34,7 @@ const LongEvent: React.FC<{
             <S.LongEventBodyDiv>
                 <S.LongEventTitleP>{title}</S.LongEventTitleP>
                 <S.LongEventDescriptionP>{description}</S.LongEventDescriptionP>
-                <S.LongEventIconBodyDiv $color={color} $size={40} $svgSize={40}>
+                <S.LongEventIconBodyDiv $color={C.COLORS[color].tertiary} $size={40} $svgSize={40}>
                     {React.createElement(icon)}
                 </S.LongEventIconBodyDiv>
             </S.LongEventBodyDiv>

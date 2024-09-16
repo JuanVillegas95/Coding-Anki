@@ -13,47 +13,38 @@ const unmountedStyle = {
 };
 
 const MenuAside: React.FC = () => {
-    const [buttonStates, setButtonStates] = useState<Record<string, boolean>>({});
+    const [isFriends, setIsFriends] = useState<boolean>(false)
 
-    useEffect(() => {
-        if (buttonStates["Print"]) {
-            window.print();
+    const closeFriendList = () => setIsFriends(false);
+
+    const handleButtonClick = (label: string) => {
+        switch (label) {
+            case "Friends": { setIsFriends(!isFriends) }; break;
+            case "Print": { window.print() }; break;
         }
-
-    }, [buttonStates])
-    const handleButtonClick = (name: string): void => {
-        setButtonStates((prevStates) => ({
-            ...prevStates,
-            [name]: !prevStates[name],
-        }));
-    };
-
-
+    }
     return (
         <S.MenuWrapperAside>
-            {buttonStates["Friends"] ? <S.FriendContainerDiv>
-                <FriendList toggleIsClicked={handleButtonClick} />
-            </S.FriendContainerDiv>
-                : <S.MenuContainerDiv>
-                    {Array.from(C.MENU_MAP.keys()).map(
-                        (icon: React.ComponentType, index: number) => {
-                            const name: string = C.MENU_MAP.get(icon)!;
-                            return (
-                                <S.MenuButton
-                                    key={index}
-                                    $size={150}
-                                    $svgSize={25}
-                                    $color={'black'}
-                                    onClick={() => handleButtonClick(name)}
-                                >
-                                    <S.MenuP>{name}</S.MenuP>
-                                    {React.createElement(icon)}
-                                </S.MenuButton>
-                            );
+            <S.MenuContainerDiv>
+                {Object.entries(C.MENU).map(([label, icon], index: number) => {
+                    return <React.Fragment>
+                        <S.MenuButton
+                            key={index}
+                            $size={150}
+                            $svgSize={20}
+                            $color={'black'}
+                            onClick={() => handleButtonClick(label)}
+                        >
+                            <S.MenuP>{label}</S.MenuP>
+                            {React.createElement(icon)}
+                        </S.MenuButton>
+                        {isFriends && label === "Friends" && <S.FriendContainerDiv>
+                            <FriendList closeFriendList={closeFriendList} />
+                        </S.FriendContainerDiv>
                         }
-                    )}
-                </S.MenuContainerDiv>
-            }
+                    </React.Fragment>
+                })}
+            </S.MenuContainerDiv>
         </S.MenuWrapperAside>
     );
 };

@@ -14,10 +14,11 @@ import * as S from '@/styles/CalendarHub.styles';
 const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
+  const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
+
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
-  const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
 
 
   // Initialization logic and scroll synchronization effects

@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const HOUR_WIDTH: number = 60;
 const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hour
+
 const CALENDAR_WIDTH: number = 1150;
 const CALENDAR_HEIGHT: number = 750;
 const HEADER_HEIGHT: number = 85;
@@ -13,7 +14,6 @@ const SUBHEADER_FONT_SIZE: number = 15;
 const HOURS_FONT_SIZE: number = 12.5;
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
 const DAYS: string[]= ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
 
 
 const SHORT_DURATION_THRESHOLD = 60;  // Less than 60 minutes is a "SHORT" event.
@@ -42,23 +42,11 @@ enum EVENT_ACTION {
 const NULL_CALENDAR: Calendar = new Calendar("-1","-1");
 const NULL_CALENDARS: Map<string, Calendar>= new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
-const TOAST_TYPE: { [key: string]: React.ComponentType } = {
-  "success": I.success,
-  "info": I.info,
-  "error": I.error,
+const TOAST_TYPE: Record<'success' | 'info' | 'error', React.ComponentType> = {
+  success: I.success,
+  info: I.info,
+  error: I.error,
 };
-
-const COLORS_ARRAY: string[] = [
-  "gray",
-   "orange",
-   "pink",
-   "purple",
-   "brown",
-  "blue",
-   "teal",
-   "red",
-   "yellow"
-];
 
 const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
@@ -73,18 +61,17 @@ const ICONS_ARRAY: React.ComponentType[] = [
 ];
 
 
-
-const MENU_MAP = new Map<React.ComponentType, string>([ 
-  [I.disk, "Save"],
-  [I.replace, "Change"],
-  [I.confetti, "New"],
-  [I.trash, "Delete"],
-  [I.users, "Friends"],
-  [I.download, "Import"],
-  [I.upload, "Export"],
-  [I.print, "Print"],
-  [I.interrogation, "Help"],
-]);
+const MENU: Record<string, React.ComponentType> = {
+  Save: I.disk,
+  Change: I.replace,
+  New: I.confetti,
+  Delete: I.trash,
+  Friends: I.users,
+  Import: I.download,
+  Export: I.upload,
+  Print: I.print,
+  Help: I.interrogation,
+};
 
 const HIDE_SCROLL_BAR: string = `
 &::-webkit-scrollbar {
@@ -96,17 +83,59 @@ const HIDE_SCROLL_BAR: string = `
 scrollbar-width: none; 
 `
 
-const TERTIARY_COLORS: { [colorName: string]: string } = {
-  purple: "#B198FF", 
-  blue: "#DAF5FC",   
-  pink: "#FCD8EF",  
-  orange: "#FFE9DC",
-  gray: "#D3D3D3",   
-  brown: "#DEB887",  
-  teal: "#66C2C2",   
-  red: "#FFB3B3",    
-  yellow: "#FFFACD"  
+
+const COLORS : Record<string, {  
+  primary: string;
+  secondary: string;
+  tertiary: string;
+}> = {
+  purple: {
+    primary: '#571BFB',
+    secondary: 'rgba(87, 27, 251, 0.1)',
+    tertiary: '#B198FF',
+  },
+  blue: {
+    primary: '#01A2EA',
+    secondary: 'rgba(1, 162, 234, 0.1)',
+    tertiary: '#DAF5FC',
+  },
+  pink: {
+    primary: '#FE3CBB',
+    secondary: 'rgba(254, 60, 187, 0.1)',
+    tertiary: '#FCD8EF',
+  },
+  orange: {
+    primary: '#FF7E00',
+    secondary: 'rgba(255, 126, 0, 0.1)',
+    tertiary: '#FFE9DC',
+  },
+  gray: {
+    primary: '#808080',
+    secondary: 'rgba(128, 128, 128, 0.1)',
+    tertiary: '#D3D3D3',
+  },
+  brown: {
+    primary: '#8B4513',
+    secondary: 'rgba(139, 69, 19, 0.1)',
+    tertiary: '#DEB887',
+  },
+  teal: {
+    primary: '#008080',
+    secondary: 'rgba(0, 128, 128, 0.1)',
+    tertiary: '#66C2C2',
+  },
+  red: {
+    primary: '#FF0000',
+    secondary: 'rgba(255, 0, 0, 0.1)',
+    tertiary: '#FFB3B3',
+  },
+  yellow: {
+    primary: '#FFD700',
+    secondary: 'rgba(255, 215, 0, 0.1)',
+    tertiary: '#FFFACD',
+  },
 };
+
 
 const USER: User = new User(
   uuidv4(), // Generating a unique user ID
@@ -145,13 +174,12 @@ export {
   HEADER_FONT_SIZE,
   HIDE_SCROLL_BAR,
   ICONS_ARRAY,
-  TERTIARY_COLORS,
   SHORT_DURATION_THRESHOLD,
   NULL_DATE,
   EVENT_ACTION,
   ESCAPE_KEYS,
   ENTER_KEY,
-  MENU_MAP,
-  COLORS_ARRAY,
-  TOAST_TYPE
+  MENU,
+  TOAST_TYPE,
+  COLORS
 };

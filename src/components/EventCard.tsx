@@ -15,7 +15,7 @@ const EventCard: React.FC<{
         bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
         top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
     };
-    eventOnClick: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    eventOnClick: (event: Event) => void;
 }> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick }) => {
     const { id, height, start, end, duration, color, icon, title, description } = event;
 
@@ -28,15 +28,18 @@ const EventCard: React.FC<{
             key={id}
             $fromTop={topOffset}
             $height={height}
-            $color={color}
+            $backgroundColor={C.COLORS[color].secondary}
+            $borderColor={C.COLORS[color].primary}
             $isDragged={isEventDragging}
-            onClick={(e) => eventOnClick(e, event)}
+            onClick={() => eventOnClick(event)}
         >
             <S.EventTopDiv
-                $color={isShortEvent ? "transparent" : color}
+                $color={isShortEvent ? "transparent" : C.COLORS[color].primary}
                 onMouseDown={(e) => eventOnMouseDown.top(e, event)}
+                onClick={(e) => { e.stopPropagation() }}
             />
-            <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)}>
+            <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)}
+            >
                 {isShortEvent ? (
                     <ShortEvent title={title} />
                 ) : (

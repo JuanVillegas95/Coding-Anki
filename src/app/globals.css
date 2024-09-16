@@ -1,42 +1,4 @@
-:root {
-  /* Existing colors */
-  --primary-purple: #571BFB;
-  --secondary-purple: rgba(87, 27, 251, 0.1);
-  --tertiary-purple: #B198FF;
 
-  --primary-blue: #01A2EA;
-  --secondary-blue: rgba(1, 162, 234, 0.1);
-  --tertiary-blue: #DAF5FC;
-
-  --primary-pink: #FE3CBB;
-  --secondary-pink: rgba(254, 60, 187, 0.1);
-  --tertiary-pink: #FCD8EF;
-
-  --primary-orange: #FF7E00;
-  --secondary-orange: rgba(255, 126, 0, 0.1);
-  --tertiary-orange: #FFE9DC;
-
-  --primary-gray: #808080;
-  --secondary-gray: rgba(128, 128, 128, 0.1);
-  --tertiary-gray: #D3D3D3;
-
-  --primary-brown: #8B4513;
-  --secondary-brown: rgba(139, 69, 19, 0.1);
-  --tertiary-brown: #DEB887;
-
-  /* New colors */
-  --primary-teal: #008080;
-  --secondary-teal: rgba(0, 128, 128, 0.1); /* Converted #008080 to rgba */
-  --tertiary-teal: #66C2C2;
-
-  --primary-red: #FF0000;
-  --secondary-red: rgba(255, 0, 0, 0.1); /* Converted #FF0000 to rgba */
-  --tertiary-red: #FFB3B3;
-
-  --primary-yellow: #FFD700;
-  --secondary-yellow: rgba(255, 215, 0, 0.1); /* Converted #FFD700 to rgba */
-  --tertiary-yellow: #FFFACD;
-}
 
 
 @font-face {
@@ -68,18 +30,6 @@ body {
     margin: 0;
     padding: 0;
   }
-
-  .printable-content {
-    transform: scale(0.9); /* Adjust scale to shrink content */
-    transform-origin: top left; /* Set the scaling origin */
-    width: 100%; /* Ensure it takes full width */
-  }
-
-  .no-print {
-    display: none;
-  }
-
-  /* Force background colors and images to print */
   * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
