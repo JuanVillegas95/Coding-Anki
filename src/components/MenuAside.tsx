@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
 import * as C from '@/utils/CalendarHub/constants';
+import * as I from '@/utils/CalendarHub/icons';
 import FriendList from '@/components/FriendList';
+import CalendarList from '@/components/CalendarList';
 
-// THIS MIGHT BE A GOOD IDEA
-const mountedStyle = {
-    animation: "inAnimation 250ms ease-in"
-};
-const unmountedStyle = {
-    animation: "outAnimation 270ms ease-out",
-    animationFillMode: "forwards"
-};
 
 const MenuAside: React.FC = () => {
-    const [isFriends, setIsFriends] = useState<boolean>(false)
+    const [isFriend, setIsFriend] = useState<boolean>(false)
+    const [isChange, setIsChange] = useState<boolean>(false)
 
-    const closeFriendList = () => setIsFriends(false);
+
+    const closeFriendList = () => setIsFriend(false);
+    const closeCalendarList = () => setIsChange(false);
+
 
     const handleButtonClick = (label: string) => {
         switch (label) {
-            case "Friends": { setIsFriends(!isFriends) }; break;
+            case "Friends": { setIsFriend(true) }; break;
+            case "Change": { setIsChange(true) }; break;
             case "Print": { window.print() }; break;
         }
     }
@@ -27,24 +26,45 @@ const MenuAside: React.FC = () => {
         <S.MenuWrapperAside>
             <S.MenuContainerDiv>
                 {Object.entries(C.MENU).map(([label, icon], index: number) => {
-                    return <React.Fragment>
+                    const isFriendsList: boolean = isFriend && label === "Friends";
+                    const isCalendarList: boolean = isChange && label === "Change";
+
+                    // Set onClick only if neither isFriendsList nor isCalendarList is true
+                    const handleClick = !isFriendsList && !isCalendarList ? () => handleButtonClick(label) : undefined;
+
+                    return (
                         <S.MenuButton
                             key={index}
                             $size={150}
                             $svgSize={20}
                             $color={'black'}
-                            onClick={() => handleButtonClick(label)}
+                            $isFriendsList={isFriendsList}
+                            $isCalendarList={isCalendarList}
+                            onClick={handleClick} // Assign onClick conditionally
                         >
-                            <S.MenuP>{label}</S.MenuP>
-                            {React.createElement(icon)}
+                            {isCalendarList ? (
+                                <CalendarList
+                                    label={label}
+                                    icon={icon}
+                                    closeCalendarList={closeCalendarList}
+                                />
+                            ) : isFriendsList ? (
+                                <FriendList
+                                    label={label}
+                                    icon={icon}
+                                    closeFriendList={closeFriendList}
+                                />
+                            ) : (
+                                <S.MenuWrapperDiv>
+                                    <S.MenuP>{label}</S.MenuP>
+                                    {React.createElement(icon)}
+                                </S.MenuWrapperDiv>
+                            )}
                         </S.MenuButton>
-                        {isFriends && label === "Friends" && <S.FriendContainerDiv>
-                            <FriendList closeFriendList={closeFriendList} />
-                        </S.FriendContainerDiv>
-                        }
-                    </React.Fragment>
+                    );
                 })}
             </S.MenuContainerDiv>
+
         </S.MenuWrapperAside>
     );
 };

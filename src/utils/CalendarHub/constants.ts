@@ -145,11 +145,26 @@ const USER: User = new User(
   new Map([
     ["work", new Calendar(uuidv4(), "Work Calendar")],
     ["personal", new Calendar(uuidv4(), "Personal Calendar asdkjhbasjhdajshdjhasgd")],
-    ["yeah", new Calendar(uuidv4(), "School Calendar")]
+    ["perasonal", new Calendar(uuidv4(), "Personal Calendara asdkjhbasjhdajshdjhasgd")],
+    ["asdsadasdasd", new Calendar(uuidv4(), "safsaf")],
+    ["asdgfdsfgdf", new Calendar(uuidv4(), "asfsafasf")],
+    ["fasfassaf", new Calendar(uuidv4(), "asfasf")],
+    ["safsafasfsa", new Calendar(uuidv4(), "asfasf")],
+    ["fasfasfasfas", new Calendar(uuidv4(), "afsaf")],
+    ["fsafasfdasfasfas", new Calendar(uuidv4(), "asf")],
+    ["asfasfas", new Calendar(uuidv4(), "asf")],
+    ["fasfasf", new Calendar(uuidv4(), "asfsaf")],
+    ["afsfasfsafasf", new Calendar(uuidv4(), "afsf")],
+    
+    ["yeah", new Calendar(uuidv4(), "School Calendar")],
   ]), // Initializes a map with two calendars
   [
     new Friend(uuidv4(), "Rosie", ["yeah1", "yeah2", "yeah3"], FriendStatus.Accepted), // Initializes friends list with one accepted friend
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending) // Another friend with a pending request
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
+    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
   ]
 );
 
