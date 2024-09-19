@@ -17,7 +17,12 @@ const ScheduleGridMain: React.FC<{
         deleteEvent: (event: Event) => void;
         getEvents: () => Map<string, Event>;
     };
-}> = ({ mainRef, events, mondayDate, calendarHandler, addToast }) => {
+    warningHandeler: {
+        setConflicting: (conflictEvent: Event) => void;
+        setCurrent: (conflictEvent: Event) => void;
+        clearEvents: () => void;
+    }
+}> = ({ mainRef, events, mondayDate, calendarHandler, addToast, warningHandeler }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -222,6 +227,7 @@ const ScheduleGridMain: React.FC<{
                     isModalOpen={isModalOpen}
                     addToast={addToast}
                     updateCurrentEvent={updateCurrentEvent}
+                    warningHandeler={warningHandeler}
                 />
             }
         </S.ContainerMain>

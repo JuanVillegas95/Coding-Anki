@@ -201,6 +201,25 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
   return false; 
 };
 
+const getConflictingEvent = (newEvent: Event, events: Map<string, Event>): Event | null => {
+  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.startDate);
+  const newEventStartMinutes = timeToMinutes(newEvent.start);
+  const newEventEndMinutes = timeToMinutes(newEvent.end);
+
+  for (const event of sameDateEvents) {
+    const { start, end, id } = event;
+    if (newEvent.id === id) continue; 
+    
+    const eventStartMinutes = timeToMinutes(start);
+    const eventEndMinutes = timeToMinutes(end);
+
+    if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes)  return event; 
+    
+  }
+  return null; 
+};
+
+
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
 
   const totalMinutes: number = timeToMinutes(newEvent.duration);
@@ -273,6 +292,7 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
 
 
 export {
+  getConflictingEvent,
   range,
   areDatesTheSame,
   addDateBy,

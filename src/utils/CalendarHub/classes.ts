@@ -74,7 +74,7 @@ class Event {
   title: string;
   description: string;
   startDate: Date;
-  endDate: Date;
+  endDate: Date | null;
   start: Time;
   end: Time;
   height: number;
@@ -88,7 +88,7 @@ class Event {
   constructor(startDate: Date = new Date(), start: Time = new Time(), eventGroupID: string | null = null) {
     this.id = uuidv4();
     this.startDate = startDate;
-    this.endDate = new Date();
+    this.endDate = null;
     this.start = start;
     this.end = new Time(-1, -1);
     this.title = "";

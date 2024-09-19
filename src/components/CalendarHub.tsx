@@ -16,7 +16,7 @@ const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
-  const [warningEvents, setWarningEvents] = useState<[Event, Event]>([C.NULL_EVENT, C.NULL_EVENT]);
+  const [warningEvents, setWarningEvents] = useState<[Event | null, Event | null]>([null, null]);
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -50,6 +50,26 @@ const CalendarHub: React.FC = () => {
       mainRef.current?.removeEventListener('scroll', syncScroll);
     };
   }, []);
+
+
+  const warningHandler: {
+    setConflicting: (conflictEvent: Event) => void;
+    setCurrent: (conflictEvent: Event) => void;
+    clearEvents: () => void;
+  } = {
+    setConflicting: (conflictEvent: Event): void => {
+      setWarningEvents((prev) => [prev[0], conflictEvent]);
+    },
+
+    setCurrent: (currentEvent: Event): void => {
+      setWarningEvents((prev) => [currentEvent, prev[1]]);
+    },
+
+    clearEvents: (): void => {
+      setWarningEvents([null, null]);
+    },
+  };
+
 
   const toastHandeler: {
     push: (newToast: Toast) => void;
@@ -150,6 +170,7 @@ const CalendarHub: React.FC = () => {
           calendarHandler={calendarHandler}
           addToast={toastHandeler.push}
           mainRef={mainRef}
+          warningHandeler={warningHandler}
         />
       </S.CalendarContainerDiv>
     </S.PrintableContent>
@@ -162,8 +183,13 @@ const CalendarHub: React.FC = () => {
         toast={toastHandeler.getTail()}
         popToast={toastHandeler.pop}
       />)}
-    {((warningEvents[0] === C.NULL_EVENT) && (warningEvents[1] === C.NULL_EVENT)) && (
-      <WarningModal currentEvent={warningEvents[0]} conflictEvent={warningEvents[1]} />)}
+    {(warningEvents[0] && warningEvents[1]) && (
+      <WarningModal
+        currentEvent={warningEvents[0]}
+        conflictEvent={warningEvents[1]}
+        calendarHandler={calendarHandler}
+        warningHandler={warningHandler}
+      />)}
   </React.Fragment>
 
 };

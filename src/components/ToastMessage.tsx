@@ -12,11 +12,13 @@ const ToastMessage: React.FC<{
     const onAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>): void => {
         if (e.animationName === "toastAnimIn") {
             setTimeout(() => {
-                setIsVisible(false);
+                setIsVisible(!isVisible);
             }, 2000);
         }
         if (e.animationName === "toastAnimOut") {
             setTimeout(() => {
+                setIsVisible(!isVisible);
+
                 popToast();
             }, 1000);
         }

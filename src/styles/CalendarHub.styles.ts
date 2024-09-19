@@ -1159,8 +1159,9 @@ const WarrningEventWrapperDiv = styled.div`
 `
 
 const WarrningEventh2 = styled.h2`
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
+  margin-bottom: 10px;
 `
 const WarningForm = styled.form`
   display: flex;
