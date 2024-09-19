@@ -1,13 +1,9 @@
-
-
-
 @font-face {
   font-family: 'Mona Sans';
   src: url('/fonts/Mona-Sans.ttf');
   font-weight: 600;
   font-style: normal; 
 }
-
 
 * {
   margin: 0;

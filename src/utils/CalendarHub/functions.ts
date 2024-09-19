@@ -178,11 +178,11 @@ const calculateEventDuration = ({ start, end }: Event): Time => {
   return new Time(eventHours,eventMinutes);
 }
 
-const isEndBeforeStart = ({ start, end }: Event): boolean => { ///! NOW  CHECK THIS WHEN MOUSE ON DRAGO
+const isEndBeforeStart = ({ start, end }: Event): boolean => { 
   const startTotalMinutes: number = timeToMinutes(start);
   const endTotalMinutes: number = timeToMinutes(end);
 
-  return endTotalMinutes <= startTotalMinutes;
+  return endTotalMinutes < startTotalMinutes;
 };
 
 const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
@@ -209,6 +209,9 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
 
   const isTimeValid: boolean = (newEvent.start.hours < 0 || newEvent.end.hours > 23) ? false : true;
   if(!isTimeValid) return false;
+
+  const isEndValid: boolean = isEndBeforeStart(newEvent);
+  if(isEndValid) return false
 
   const eventColliding: boolean= isEventColliding(newEvent,events);
   if(eventColliding) return false
@@ -294,4 +297,5 @@ export {
   formatMonth,
   getSameDateEvents,
   calculateTimeOnDrag,
+  isEndBeforeStart,
 };

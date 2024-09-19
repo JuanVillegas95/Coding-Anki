@@ -5,6 +5,7 @@ import * as C from '@/utils/CalendarHub/constants';
 import { Event, Time, Toast } from '@/utils/CalendarHub/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
+import WarningModal from './WarningModal';
 
 const ScheduleGridMain: React.FC<{
     addToast: (newToast: Toast) => void;
@@ -166,8 +167,9 @@ const ScheduleGridMain: React.FC<{
         setIsEventResizingTop(false);
     };
 
-    const eventOnClick = (event: Event): void => {
-        console.log(isEventCreating, isEventDragging, isEventResizingBottom, isEventResizingTop)
+    const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, event: Event): void => {
+        e.preventDefault();
+        e.stopPropagation();
         setCurrentEvent(event);
         openModal();
     };

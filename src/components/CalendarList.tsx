@@ -7,13 +7,13 @@ const CalendarList: React.FC<{
     label: string;
     icon: React.ComponentType;
     closeCalendarList: () => void;
+    setCalendarName: (name: string) => void;
+
 }>
-    = ({ closeCalendarList, label, icon }) => {
+    = ({ closeCalendarList, label, icon, setCalendarName }) => {
         const [selectedCalendar, setSelectedCalendar] = useState<string>("")
 
-        const handleOnClick = (name: string) => setSelectedCalendar(name)
-
-
+        const handleOnClick = (name: string) => setCalendarName(name)
 
         return <S.FriendsWrapperDiv>
             <S.FriendHeader onClick={closeCalendarList}>

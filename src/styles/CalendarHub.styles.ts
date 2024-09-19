@@ -535,7 +535,6 @@ const DeleteButton = styled.button`
   padding: 10px;
   background-color: #f44336; 
   border-radius: 8px;
-
   color: white;
   border: none;
   font-size: 1.2rem;
@@ -919,7 +918,7 @@ const FindFriendSection = styled.section`
 
 
 const ToastWrapperDiv = styled.div`
-  position: absolute;
+  position: fixed;
   top: 10px;
   left: 45%;
   z-index: 100;
@@ -988,9 +987,12 @@ const ToastContainerDiv = styled.div<{ $isVisible: boolean }>`
         ${toastAnimOut} .5s ease-in-out forwards;
         `
   };
+  &:hover{
+    border: 1px solid black;
+  }
 `;
 
-const ToatstIconDiv = styled(IconDiv)`
+const ToastIconDiv = styled(IconDiv)`
 `;
 const ToastDescriptionP = styled.p`
     font-family: 'Poppins', sans-serif;
@@ -1094,7 +1096,102 @@ const FriendCalendarSelect = styled.select`
   }
 `
 
+const WarningWrapperDiv = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 4;
+`;
+
+const WarningContainerDiv = styled.div`
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 450px;
+    flex: 0 1 500px;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 1rem;
+`;
+
+const WarningMain = styled.main`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  padding: 15px 30px;
+`;
+
+const WarningFooter = styled.footer`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  border-top: 1px solid lightgrey;
+  padding: 10px;
+  margin-top: 15px;
+  gap: 20px;
+`;
+
+const WarningHeader = styled.header`
+  padding: 10px;
+  border-bottom: 1px solid lightgray;
+  text-align: center;
+`;
+
+const WarningP = styled.p`
+
+`;
+
+const Warningh1 = styled.h1`
+  font-size: 20px;
+  font-weight: 500;
+`;
+
+const WarrningEventWrapperDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const WarrningEventh2 = styled.h2`
+  font-size: 18px;
+  font-weight: 500;
+`
+const WarningForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  margin: 10px 0;
+`
+const WarningInput = styled.input.attrs({ type: "radio", name: "warning" })`
+`
+
+const WarningLabel = styled.label`
+`
+
+const OptionWrapperDiv = styled.div`
+  margin-left: 30px;
+  margin-bottom: 10px;
+`
+
 export{
+  OptionWrapperDiv,
+  WarningInput,
+  WarningLabel,
+  WarningForm,
+  WarrningEventh2,
+  WarrningEventWrapperDiv,
+  Warningh1,
+  WarningMain,
+  WarningFooter,
+  WarningHeader,
+  WarningP,
+  WarningWrapperDiv,
+  WarningContainerDiv,
   CalerndarLi,
   CalendarListContainerDiv,
   FriendCalendarSelect,
@@ -1106,7 +1203,7 @@ export{
   PrintableContent,
   ToastWrapperDiv,
   ToastContainerDiv,
-  ToatstIconDiv,
+  ToastIconDiv,
   ToastDescriptionP,
   FriendsWrapperDiv,
 

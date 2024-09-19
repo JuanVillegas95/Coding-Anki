@@ -39,3 +39,20 @@
 
 - Use **`Container`** when you are building the main layout structure of your application or components that involve a sequence of elements with defined positioning rules.
 - Use **`Wrapper`** when you need to control the positioning of a specific element or a small group of elements relative to their surroundings.
+
+
+So
+x is true y show meanu
+x is from true to false first (animation of Menu leaving) then set x to false [Here animation 0, x timeout]
+if x false use effect on y set y true
+
+
+
+MeanuAnimationIn MenuAnimationOut
+Me
+
+Render   Anim
+0         0       
+0         1       animaiton in -> change Render to 1 1.-
+1         0 
+1         1       animation out

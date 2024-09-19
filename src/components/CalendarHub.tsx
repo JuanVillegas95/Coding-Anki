@@ -1,12 +1,13 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import { Event, Calendar, Toast } from '@/utils/CalendarHub/classes';
+import React, { useState, useEffect, useRef } from "react";
+import { Event, Calendar, Toast } from "@/utils/CalendarHub/classes";
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
 import DaySection from "@/components/DaySection"
 import ScheduleGridMain from "@/components/ScheduleGridMain";
 import MenuAside from "@/components/MenuAside";
 import ToastMessage from "@/components/ToastMessage";
+import WarningModal from "@/components/WarningModal";
 import * as C from '@/utils/CalendarHub/constants';
 import * as F from '@/utils/CalendarHub/functions';
 import * as S from '@/styles/CalendarHub.styles';
@@ -15,7 +16,7 @@ const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
-
+  const [warningEvents, setWarningEvents] = useState<[Event, Event]>([C.NULL_EVENT, C.NULL_EVENT]);
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -122,7 +123,17 @@ const CalendarHub: React.FC = () => {
     });
   };
 
-  return <S.CalendarWrapperDiv>
+  const setCalendarName = (name: string) => {
+    console.log(name)
+    calendar.current.name = name;
+    setCalendars((prevCalendars) => {
+      const updatedCalendars = new Map(prevCalendars);
+      updatedCalendars.set(calendar.current.id, { ...calendar.current });
+      return updatedCalendars;
+    });
+  };
+
+  return <React.Fragment> <S.CalendarWrapperDiv>
     <S.PrintableContent>
       <S.CalendarContainerDiv>
         <CalendarHeader
@@ -142,15 +153,19 @@ const CalendarHub: React.FC = () => {
         />
       </S.CalendarContainerDiv>
     </S.PrintableContent>
-    <MenuAside />
-    {
-      (toasts.size > 0) && (
-        <ToastMessage
-          toast={toastHandeler.getTail()}
-          popToast={toastHandeler.pop}
-        />)
-    }
+    <MenuAside
+      setCalendarName={setCalendarName}
+    />
   </S.CalendarWrapperDiv>
+    {(toasts.size > 0) && (
+      <ToastMessage
+        toast={toastHandeler.getTail()}
+        popToast={toastHandeler.pop}
+      />)}
+    {((warningEvents[0] === C.NULL_EVENT) && (warningEvents[1] === C.NULL_EVENT)) && (
+      <WarningModal currentEvent={warningEvents[0]} conflictEvent={warningEvents[1]} />)}
+  </React.Fragment>
+
 };
 
 export default CalendarHub;

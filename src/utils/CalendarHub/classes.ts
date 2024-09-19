@@ -52,7 +52,10 @@ class Calendar {
   id: string;
   name: string;
   events: Map<string, Event>;
-  recurringEventIDs: Map<string, string[][]>; // The key is the eventGroupID the value is a string of 7 positions rerpsenting the day fo the week and in every position the events are stored BUCKET TRICK!!
+  
+  recurringEventIDs: Map<string, string[][]>; 
+  // The key is the eventGroupID that all the events in the same group shares.
+  // The value is a string of 7 positions representing the day of the week and in every position the keys of the events are stored BUCKET TRICK!!
   constructor(
     id: string = uuidv4(), 
     name: string = "Something is wrong", 
@@ -78,12 +81,14 @@ class Event {
   duration: Time;
   icon: React.ComponentType;
   color: string;
-  recurringEventID: string;
+
+  eventGroupID: string | null;
   selectedDays: boolean[];
 
-  constructor(startDate: Date = new Date(), start: Time = new Time(), recurringEventID: string = "") {
+  constructor(startDate: Date = new Date(), start: Time = new Time(), eventGroupID: string | null = null) {
     this.id = uuidv4();
     this.startDate = startDate;
+    this.endDate = new Date();
     this.start = start;
     this.end = new Time(-1, -1);
     this.title = "";
@@ -92,9 +97,8 @@ class Event {
     this.height = -1;
     this.duration = new Time(-1, -1);
     this.icon = I.star;
-    this.recurringEventID = recurringEventID;
+    this.eventGroupID = eventGroupID;
     this.selectedDays = Array(7).fill(false);
-    this.endDate = new Date();
   }
 }
 

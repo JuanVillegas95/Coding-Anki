@@ -47,7 +47,7 @@ const EventModal: React.FC<{
     };
 
     const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        const title = e.target.value.trim();
+        const title = e.target.value;
         if (title.length > 50) {
             addToast(new Toast(
                 "Invalid title length",
@@ -63,9 +63,8 @@ const EventModal: React.FC<{
 
     const handleColor = (color: string): void => updateCurrentEvent({ ...currentEvent, color });
 
-
     const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
-        const description = e.target.value.trim();
+        const description = e.target.value;
         if (description.length > 200) {
             addToast(new Toast(
                 "Invalid description",
@@ -77,33 +76,110 @@ const EventModal: React.FC<{
         updateCurrentEvent({ ...currentEvent, description });
     };
 
-    // !HERE I STOPED
-    const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string) => {
-        const updatedEvent: Event = { ...currentEvent };
+    //! I WAS HERE
+
+    const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string): void => {
+        const updatedEvent: Event = {
+            ...currentEvent,
+            startDate: new Date(currentEvent.startDate),
+            endDate: new Date(currentEvent.endDate),
+        };
         const newDate = new Date(e.target.value);
+        console.log(updatedEvent.endDate)
+
         if (tag === 'StartDate') updatedEvent.startDate = newDate;
-        // Add more date handling logic if needed
-        calendarHandler.setEvent(updatedEvent);
+        if (tag === 'EndDate') updatedEvent.endDate = newDate;
+        console.log(updatedEvent.endDate)
+        if (updatedEvent.startDate > updatedEvent.endDate) {
+            addToast(new Toast(
+                "Handle date",
+                "The start date cannot be after the end date",
+                "info"
+            ));
+            return;
+        }
+
+        const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
+        const dateDifference = updatedEvent.endDate.getTime() - updatedEvent.startDate.getTime();
+
+        if (dateDifference > oneYearInMs) {
+            addToast(new Toast(
+                "Handle date",
+                "The event duration cannot be greater than one year.",
+                "info"
+            ));
+            return;
+        }
+
+        updateCurrentEvent(updatedEvent);
     };
+
+
+    const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string) => {
+        const value = parseInt(e.target.value);
+        const updatedEvent: Event = {
+            ...currentEvent,
+            start: { ...currentEvent.start },
+            end: { ...currentEvent.end },
+        };
+
+        // Update the time fields based on the tag
+        switch (tag) {
+            case 'StartHour': { updatedEvent.start.hours = value; } break;
+            case 'StartMinute': { updatedEvent.start.minutes = value; } break;
+            case 'EndHour': { updatedEvent.end.hours = value; } break;
+            case 'EndMinute': { updatedEvent.end.minutes = value; } break;
+        }
+
+        // Validate that the end time is not before the start time
+        if (F.isEndBeforeStart(updatedEvent)) {
+            addToast(new Toast(
+                "Handle time",
+                "The end time cannot be before the start time",
+                "info"
+            ));
+            return;
+        }
+
+        if (F.isEventColliding(updatedEvent, events)) {
+            addToast(new Toast(
+                "Event Collision",
+                "The event overlaps with an existing event. Please choose a different time.",
+                "info"
+            ));
+            return;
+        }
+
+        // Calculate and update event duration and height
+        updatedEvent.duration = F.calculateEventDuration(updatedEvent);
+        updatedEvent.height = F.calculateEventHeight(updatedEvent);
+        updateCurrentEvent(updatedEvent);
+    };
+
+
 
     const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const isSelected = e.target.checked;
-        const updatedEvent: Event = { ...currentEvent };
+        const updatedEvent: Event = {
+            ...currentEvent,
+            selectedDays: [...currentEvent.selectedDays],
+        };
         updatedEvent.selectedDays[index] = isSelected;
         calendarHandler.setEvent(updatedEvent);
     };
+
 
     const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setIsRecurringEvent(!isRecurringEvent);
         let updatedEvent: Event;
-        if (isRecurringEvent) {
-            const recurringEventID = uuidv4(); // Generates a unique ID for the recurring event
-            updatedEvent = { ...currentEvent, recurringEventID };
-        } else {
-            updatedEvent = { ...currentEvent, recurringEventID: '' };
-        }
-        calendarHandler.setEvent(updatedEvent);
+        // if (eventGroupID) {
+        //     const eventGroupID = uuidv4(); // Generates a unique ID for the recurring event
+        //     updatedEvent = { ...currentEvent, eventGroupID };
+        // } else {
+        //     updatedEvent = { ...currentEvent, eventGroupID: '' };
+        // }
+        // calendarHandler.setEvent(updatedEvent);
     };
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -125,25 +201,7 @@ const EventModal: React.FC<{
         calendarHandler.setEvent(currentEvent);
     };
 
-    const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string) => {
-        const value = parseInt(e.target.value, 10);
-        const updatedEvent: Event = { ...currentEvent };
 
-        if (tag === 'StartHour') {
-            updatedEvent.start.hours = value;
-        } else if (tag === 'StartMinute') {
-            updatedEvent.start.minutes = value;
-        } else if (tag === 'EndHour') {
-            updatedEvent.end.hours = value;
-        } else if (tag === 'EndMinute') {
-            updatedEvent.end.minutes = value;
-        }
-
-        updatedEvent.duration = F.calculateEventDuration(updatedEvent);
-        updatedEvent.height = F.calculateEventHeight(updatedEvent);
-
-        calendarHandler.setEvent(updatedEvent);
-    };
 
     return <S.ContainerModalDiv >
         <S.ModalForm onSubmit={handleSubmit}>
@@ -160,7 +218,7 @@ const EventModal: React.FC<{
                     currentEventIcon={currentEvent.icon}
                     iconArray={C.ICONS_ARRAY}
                 />
-                <S.IconMenuButton $color={C.COLORS[currentEvent.color].primary} $size={50} $svgSize={25} onClick={toggleColorMenu}>
+                <S.IconMenuButton $color={""} $size={50} $svgSize={25} onClick={toggleColorMenu}>
                     <S.colorDivFirst $color={C.COLORS[currentEvent.color].primary} />
                     {isColorMenu && (
                         <S.ContainerMenuDiv $block={isColorMenu ? 'block' : 'none'}>
@@ -228,8 +286,8 @@ const EventModal: React.FC<{
             )}
 
             <S.Row5Div>
-                <S.SaveButton type="submit">Save</S.SaveButton>
                 <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
+                <S.SaveButton type="submit">Save</S.SaveButton>
             </S.Row5Div>
         </S.ModalForm>
     </S.ContainerModalDiv>

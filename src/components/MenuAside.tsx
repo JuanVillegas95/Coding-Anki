@@ -6,7 +6,10 @@ import FriendList from '@/components/FriendList';
 import CalendarList from '@/components/CalendarList';
 
 
-const MenuAside: React.FC = () => {
+const MenuAside: React.FC<{
+    setCalendarName: (name: string) => void;
+}
+> = ({ setCalendarName }) => {
     const [isFriend, setIsFriend] = useState<boolean>(false)
     const [isChange, setIsChange] = useState<boolean>(false)
 
@@ -47,6 +50,7 @@ const MenuAside: React.FC = () => {
                                     label={label}
                                     icon={icon}
                                     closeCalendarList={closeCalendarList}
+                                    setCalendarName={setCalendarName}
                                 />
                             ) : isFriendsList ? (
                                 <FriendList
