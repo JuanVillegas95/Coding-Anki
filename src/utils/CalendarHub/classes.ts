@@ -71,24 +71,24 @@ class Calendar {
 
 class Event {
   id: string;
+  date: Date;
   title: string;
   description: string;
-  startDate: Date;
-  endDate: Date | null;
   start: Time;
   end: Time;
   height: number;
   duration: Time;
   icon: React.ComponentType;
   color: string;
-
+    // Attributes members for reccurring behavior
+  startDate: Date;
+  endDate: Date | null;
   eventGroupID: string | null;
   selectedDays: boolean[];
 
-  constructor(startDate: Date = new Date(), start: Time = new Time(), eventGroupID: string | null = null) {
+  constructor(date: Date = new Date(), start: Time = new Time(), eventGroupID: string | null = null) {
     this.id = uuidv4();
-    this.startDate = startDate;
-    this.endDate = null;
+    this.date = date;
     this.start = start;
     this.end = new Time(-1, -1);
     this.title = "";
@@ -99,6 +99,8 @@ class Event {
     this.icon = I.star;
     this.eventGroupID = eventGroupID;
     this.selectedDays = Array(7).fill(false);
+    this.startDate = date;
+    this.endDate = null;
   }
 }
 

@@ -117,11 +117,11 @@ const ScheduleGridMain: React.FC<{
             if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
 
             const [start, end] = F.calculateTimeOnDrag(e, colRef, currentEvent);
-            const currentEventDayWeek = F.getDay(currentEvent.startDate);
+            const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
-            const startDate = F.addDateBy(currentEvent.startDate, Math.sign(enteredEventDayWeek - currentEventDayWeek));
+            const date = F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
 
-            const updatedEvent: Event = { ...currentEvent, start, end, startDate };
+            const updatedEvent: Event = { ...currentEvent, start, end, date };
             if (!F.isNewEventValid(updatedEvent, events)) return;
             setCurrentEvent(updatedEvent);
             calendarHandler.setEvent(updatedEvent);

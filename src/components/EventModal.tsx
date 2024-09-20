@@ -28,7 +28,6 @@ const EventModal: React.FC<{
         clearEvents: () => void;
     }
 }> = ({ isModalOpen, closeModal, currentEvent, events, calendarHandler, updateCurrentEvent, addToast, warningHandeler }) => {
-    const [isRecurringEvent, setIsRecurringEvent] = useState<boolean>(false);
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
 
@@ -81,7 +80,7 @@ const EventModal: React.FC<{
         updateCurrentEvent({ ...currentEvent, description });
     };
 
-    const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string) => {
+    const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string): void => {
         const value = parseInt(e.target.value);
         const updatedEvent: Event = {
             ...currentEvent,
@@ -147,31 +146,20 @@ const EventModal: React.FC<{
         updateCurrentEvent(updatedEvent);
     };
 
-
-    // ! HERE I WAS
-
-    const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-        const isSelected = e.target.checked;
-        const updatedEvent: Event = {
-            ...currentEvent,
-            selectedDays: [...currentEvent.selectedDays],
-        };
+    const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
+        const isSelected: boolean = e.target.checked;
+        const updatedEvent: Event = { ...currentEvent, selectedDays: [...currentEvent.selectedDays] };
         updatedEvent.selectedDays[index] = isSelected;
-        calendarHandler.setEvent(updatedEvent);
+        updateCurrentEvent(updatedEvent);
     };
 
 
-    const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
-        setIsRecurringEvent(!isRecurringEvent);
-        let updatedEvent: Event;
-        // if (eventGroupID) {
-        //     const eventGroupID = uuidv4(); // Generates a unique ID for the recurring event
-        //     updatedEvent = { ...currentEvent, eventGroupID };
-        // } else {
-        //     updatedEvent = { ...currentEvent, eventGroupID: '' };
-        // }
-        // calendarHandler.setEvent(updatedEvent);
+        const updatedEvent: Event = { ...currentEvent, eventGroupID: currentEvent.eventGroupID };
+        if (!updatedEvent.eventGroupID) updatedEvent.eventGroupID = uuidv4();
+        else updatedEvent.eventGroupID = null;
+        updateCurrentEvent(updatedEvent);
     };
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -183,12 +171,18 @@ const EventModal: React.FC<{
     const handleCloseModal = () => {
         setIsColorMenu(false);
         setIsIconMenu(false);
-        setIsRecurringEvent(false);
         closeModal();
     };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const updatedEvent: Event = {
+            ...currentEvent,
+            startDate: new Date(currentEvent.startDate),
+            endDate: currentEvent.endDate ? new Date(currentEvent.endDate) : null,
+            selectedDays: [...currentEvent.selectedDays],
+        }
+
         if (F.isEndBeforeStart(currentEvent)) {
             addToast(new Toast(
                 "Handle time",
@@ -197,8 +191,15 @@ const EventModal: React.FC<{
             ));
             return;
         }
+        // Reset all values that belong to recurring aspects
+        // if (currentEvent.eventGroupID) {
+        //     updatedEvent.startDate = new Date();
+        //     updatedEvent.endDate = null;
+        //     updatedEvent.selectedDays.fill(false);
+        //     updatedEvent.selectedDays[F.getDay(updatedEvent.startDate)] = true;
+        // }
         closeModal();
-        calendarHandler.setEvent(currentEvent);
+        calendarHandler.setEvent(updatedEvent);
     };
 
 
@@ -263,7 +264,7 @@ const EventModal: React.FC<{
                 </S.RecurringEventButton>
             </S.Row3Div>
 
-            {isRecurringEvent && (
+            {currentEvent.eventGroupID && (
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}
