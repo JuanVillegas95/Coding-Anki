@@ -186,7 +186,7 @@ const isEndBeforeStart = ({ start, end }: Event): boolean => {
 };
 
 const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
-  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.startDate);
+  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
 
@@ -202,7 +202,7 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
 };
 
 const getConflictingEvent = (newEvent: Event, events: Map<string, Event>): Event | null => {
-  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.startDate);
+  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
 

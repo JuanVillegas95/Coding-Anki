@@ -127,6 +127,24 @@ const CalendarHub: React.FC = () => {
       });
     },
     getEvents: () => calendars.get(calendar.current.id)!.events,
+
+    setRecurringEvents: (recurringEvent: Event) => {
+      const { startDate, endDate, selectedDays, eventGroupID } = recurringEvent;
+
+      let date = new Date(startDate);
+      while (date <= endDate!) {
+        if (selectedDays[F.getDay(date)]) {
+          const newEvent: Event = { ...recurringEvent, startDate: date };
+          const conflictEvent: Event | null = F.getConflictingEvent(newEvent, calendars.get(calendar.current.id)!.events)
+          if (conflictEvent) {
+            setWarningEvents([newEvent, conflictEvent]);
+            // calendars.get(calendar.current.id)!.events.set(newEvent.id, newEvent);
+          }
+        }
+        date = F.addDateBy(date, 1);
+      }
+    },
+
   };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {

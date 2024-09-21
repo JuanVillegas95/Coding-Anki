@@ -19,7 +19,7 @@ const WarningModal: React.FC<{
         clearEvents: () => void;
     }
 }> = ({ currentEvent, conflictEvent, calendarHandler, warningHandler }) => {
-    const isGroupID: boolean = conflictEvent.eventGroupID ? true : false;
+    const isGroupID: boolean = currentEvent.eventGroupID ? true : false;
     const isSingleEvent: string = isGroupID ? "Delete only this conflicting event" : "Delete conflicting event"
 
     const handleCloseModal = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {

@@ -99,6 +99,7 @@ const EventModal: React.FC<{
         if (conflictEvent) {
             warningHandeler.setConflicting(conflictEvent);
             warningHandeler.setCurrent(updatedEvent);
+            closeModal();
             return;
         }
 
@@ -182,7 +183,6 @@ const EventModal: React.FC<{
             endDate: currentEvent.endDate ? new Date(currentEvent.endDate) : null,
             selectedDays: [...currentEvent.selectedDays],
         }
-
         if (F.isEndBeforeStart(currentEvent)) {
             addToast(new Toast(
                 "Handle time",
@@ -192,14 +192,15 @@ const EventModal: React.FC<{
             return;
         }
         // Reset all values that belong to recurring aspects
-        // if (currentEvent.eventGroupID) {
-        //     updatedEvent.startDate = new Date();
-        //     updatedEvent.endDate = null;
-        //     updatedEvent.selectedDays.fill(false);
-        //     updatedEvent.selectedDays[F.getDay(updatedEvent.startDate)] = true;
-        // }
+        if (!currentEvent.eventGroupID) {
+            updatedEvent.startDate = currentEvent.date;
+            updatedEvent.endDate = null;
+            updatedEvent.selectedDays.fill(false);
+            updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
+            calendarHandler.setEvent(updatedEvent);
+        } else {
+        }
         closeModal();
-        calendarHandler.setEvent(updatedEvent);
     };
 
 

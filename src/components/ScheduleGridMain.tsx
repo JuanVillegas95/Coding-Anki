@@ -120,8 +120,17 @@ const ScheduleGridMain: React.FC<{
             const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
             const date = F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
+            const newSelectedDays: boolean[] = new Array(7).fill(false);
+            newSelectedDays[F.getDay(date)] = true;
+            const updatedEvent: Event = {
+                ...currentEvent,
+                start,
+                end,
+                date,
+                startDate: date,
+                selectedDays: newSelectedDays,
 
-            const updatedEvent: Event = { ...currentEvent, start, end, date };
+            };
             if (!F.isNewEventValid(updatedEvent, events)) return;
             setCurrentEvent(updatedEvent);
             calendarHandler.setEvent(updatedEvent);
