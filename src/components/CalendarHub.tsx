@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { Event, Calendar, Toast } from "@/utils/CalendarHub/classes";
+import { Event, Calendar, Toast, Warning } from "@/utils/classes";
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
 import DaySection from "@/components/DaySection"
@@ -8,15 +8,15 @@ import ScheduleGridMain from "@/components/ScheduleGridMain";
 import MenuAside from "@/components/MenuAside";
 import ToastMessage from "@/components/ToastMessage";
 import WarningModal from "@/components/WarningModal";
-import * as C from '@/utils/CalendarHub/constants';
-import * as F from '@/utils/CalendarHub/functions';
+import * as C from '@/utils/constants';
+import * as F from '@/utils/functions';
 import * as S from '@/styles/CalendarHub.styles';
 
 const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
-  const [warningEvents, setWarningEvents] = useState<[Event | null, Event | null]>([null, null]);
+  const [warning, setWarning] = useState<Warning>(C.NULL_WARNING);
   const calendar = useRef<Calendar>(C.NULL_CALENDAR);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
@@ -53,21 +53,13 @@ const CalendarHub: React.FC = () => {
 
 
   const warningHandler: {
-    setConflicting: (conflictEvent: Event) => void;
-    setCurrent: (conflictEvent: Event) => void;
-    clearEvents: () => void;
+    setWarning: (newWarning: Warning) => void;
+    clearWarning: () => void;
   } = {
-    setConflicting: (conflictEvent: Event): void => {
-      setWarningEvents((prev) => [prev[0], conflictEvent]);
+    setWarning: (newWarning: Warning): void => {
+      setWarning((prev) => ({ ...prev, ...newWarning }));
     },
-
-    setCurrent: (currentEvent: Event): void => {
-      setWarningEvents((prev) => [currentEvent, prev[1]]);
-    },
-
-    clearEvents: (): void => {
-      setWarningEvents([null, null]);
-    },
+    clearWarning: (): void => setWarning(C.NULL_WARNING),
   };
 
 
@@ -137,7 +129,7 @@ const CalendarHub: React.FC = () => {
           const newEvent: Event = { ...recurringEvent, startDate: date };
           const conflictEvent: Event | null = F.getConflictingEvent(newEvent, calendars.get(calendar.current.id)!.events)
           if (conflictEvent) {
-            setWarningEvents([newEvent, conflictEvent]);
+            // setWarningEvents([newEvent, conflictEvent]);
             // calendars.get(calendar.current.id)!.events.set(newEvent.id, newEvent);
           }
         }
@@ -201,12 +193,11 @@ const CalendarHub: React.FC = () => {
         toast={toastHandeler.getTail()}
         popToast={toastHandeler.pop}
       />)}
-    {(warningEvents[0] && warningEvents[1]) && (
+    {warning.type === C.WARNING_TYPE.NONE && (
       <WarningModal
-        currentEvent={warningEvents[0]}
-        conflictEvent={warningEvents[1]}
+        warning={warning}
         calendarHandler={calendarHandler}
-        warningHandler={warningHandler}
+        clearWarning={warningHandler.clearWarning}
       />)}
   </React.Fragment>
 

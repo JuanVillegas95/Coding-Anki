@@ -1,6 +1,6 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as F from '@/utils/CalendarHub/functions';
+import * as F from '@/utils/functions';
 
 const DateInput: React.FC<{
     text: string;

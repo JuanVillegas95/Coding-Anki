@@ -1,5 +1,5 @@
-import * as C from "@/utils/CalendarHub/constants";
-import { Time, Event } from "@/utils/CalendarHub/classes";
+import * as C from "@/utils/constants";
+import { Time, Event } from "@/utils/classes";
 import React from "react";
 
 // Utility functions

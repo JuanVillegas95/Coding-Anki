@@ -48,9 +48,10 @@ import success from "@/svg/good.svg"
 import info from "@/svg/info.svg"
 
 import calendar from "@/svg/calendar.svg"
+import group from "@/svg/group.svg"
 
 export {
-  calendar,
+  calendar, group,
   add, disk, download, print, upload, confetti, trash, replace,
   success, error, info,
   link,

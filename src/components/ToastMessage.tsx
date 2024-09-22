@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import { Toast } from '@/utils/CalendarHub/classes';
-import { TOAST_TYPE } from '@/utils/CalendarHub/constants';
+import { Toast } from '@/utils/classes';
+import { TOAST_TYPE } from '@/utils/constants';
 
 const ToastMessage: React.FC<{
     toast: Toast,
@@ -18,12 +18,10 @@ const ToastMessage: React.FC<{
         if (e.animationName === "toastAnimOut") {
             setTimeout(() => {
                 setIsVisible(!isVisible);
-
                 popToast();
             }, 1000);
         }
     };
-
 
     return (
         <S.ToastWrapperDiv>

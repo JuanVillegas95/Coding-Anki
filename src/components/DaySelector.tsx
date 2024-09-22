@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as C from '@/utils/CalendarHub/constants';
-import * as F from '@/utils/CalendarHub/functions';
+import * as C from '@/utils/constants';
+import * as F from '@/utils/functions';
 
 const DaySelector: React.FC<{
     selectedDays: boolean[];

@@ -1,8 +1,8 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import { Event } from '@/utils/CalendarHub/classes';
-import * as F from '@/utils/CalendarHub/functions';
-import * as C from '@/utils/CalendarHub/constants';
+import { Event } from '@/utils/classes';
+import * as F from '@/utils/functions';
+import * as C from '@/utils/constants';
 import ShortEvent from './ShortEvent';
 import LongEvent from './LongEvent';
 

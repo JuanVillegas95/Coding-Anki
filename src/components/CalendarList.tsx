@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as C from '@/utils/CalendarHub/constants';
-import { Calendar } from '@/utils/CalendarHub/classes';
+import * as C from '@/utils/constants';
+import { Calendar } from '@/utils/classes';
 
 const CalendarList: React.FC<{
     label: string;

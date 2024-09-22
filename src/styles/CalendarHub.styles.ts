@@ -1,4 +1,4 @@
-import * as C from "@/utils/CalendarHub/constants"
+import * as C from "@/utils/constants"
 import styled, { keyframes, css } from 'styled-components';
 
 const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size: number, $svgSize: number}>`
@@ -236,9 +236,6 @@ const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   color: ${({ $isEven }) => ($isEven ? '#A9A9A9' : 'black')};
   box-sizing: border-box;
 `;
-
-
-
 
 
 const LongEventTimeDiv = styled.div`

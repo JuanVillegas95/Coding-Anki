@@ -1,6 +1,6 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as F from '@/utils/CalendarHub/functions';
+import * as F from '@/utils/functions';
 
 const TimeColumnAside: React.FC<{ asideRef: React.RefObject<HTMLDivElement> }> = ({ asideRef }) => {
     return (

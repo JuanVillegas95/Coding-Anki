@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as F from '@/utils/CalendarHub/functions';
-import { Time } from '@/utils/CalendarHub/classes';
+import * as F from '@/utils/functions';
+import { Time } from '@/utils/classes';
 
 const TimeInput: React.FC<{
     handleTime: (e: React.ChangeEvent<HTMLSelectElement>, tag: string) => void;

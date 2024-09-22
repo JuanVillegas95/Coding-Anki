@@ -1,7 +1,7 @@
 import React from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as I from '@/utils/CalendarHub/icons';
-import * as C from "@/utils/CalendarHub/constants"
+import * as I from '@/utils/icons';
+import * as C from "@/utils/constants"
 
 const LongEvent: React.FC<{
     color: string;

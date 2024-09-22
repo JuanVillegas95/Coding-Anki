@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as F from '@/utils/CalendarHub/functions';
-import * as C from '@/utils/CalendarHub/constants';
-import { Event, Time, Toast } from '@/utils/CalendarHub/classes';
+import * as F from '@/utils/functions';
+import * as C from '@/utils/constants';
+import { Event, Time, Toast, Warning } from '@/utils/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
-import WarningModal from './WarningModal';
 
 const ScheduleGridMain: React.FC<{
     addToast: (newToast: Toast) => void;
@@ -18,9 +17,8 @@ const ScheduleGridMain: React.FC<{
         getEvents: () => Map<string, Event>;
     };
     warningHandeler: {
-        setConflicting: (conflictEvent: Event) => void;
-        setCurrent: (conflictEvent: Event) => void;
-        clearEvents: () => void;
+        setWarning: (newWarning: Warning) => void;
+        clearWarning: () => void;
     }
 }> = ({ mainRef, events, mondayDate, calendarHandler, addToast, warningHandeler }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);

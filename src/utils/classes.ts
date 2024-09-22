@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import * as I  from "@/utils/CalendarHub/icons"
+import { WARNING_TYPE, FriendStatus } from "@/utils/constants"
+import * as I  from "@/utils/icons"
 
 // USER PREMIUM CAN CHOOSE THE COLOR, UPLOUAD ICONS, HAVE 10 CALENDARS, SYNC WITH MULTIPLE USERS
 class Friend {
@@ -15,13 +16,6 @@ class Friend {
     this.status = status;
   }
 }
-
-enum FriendStatus {
-  Pending = 'pending', // Initial state when a friend request is sent
-  Accepted = 'accepted', // When the friend request is accepted
-  Declined = 'declined', // When the friend request is declined
-}
-
 
 class User {
   id: string;
@@ -80,6 +74,7 @@ class Event {
   duration: Time;
   icon: React.ComponentType;
   color: string;
+
     // Attributes members for reccurring behavior
   startDate: Date;
   endDate: Date | null;
@@ -125,6 +120,13 @@ class Toast {
     this.type = type;
   }
 }
+
+export type Warning = {
+  currentEvent: Event | null;
+  conflictEvent: Event | null;
+  type: WARNING_TYPE;
+};
+
 
 
 export { Event, Time, Calendar, User, Friend, FriendStatus, Toast};

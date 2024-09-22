@@ -1,5 +1,5 @@
-import { Event, Time, Calendar, User, Friend, FriendStatus} from "@/utils/CalendarHub/classes"
-import * as I from "@/utils/CalendarHub/icons"
+import { Event, Time, Calendar, User, Friend, Warning} from "@/utils/classes"
+import * as I from "@/utils/icons"
 import { v4 as uuidv4 } from 'uuid';
 
 const HOUR_WIDTH: number = 60;
@@ -27,18 +27,14 @@ const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
 const ENTER_KEY : string = "Enter";
 
 const NULL_TIME: Time = new Time(-1,-1);
-const NULL_DATE: Date = new Date(-500, 6, 14, 3, 15, 30, 789);
+const NULL_DATE: Date = new Date(0); 
 
 /**
  * `NULL_EVENT` acts as a marker to initiate or terminate the event creation, dragging and resizing process.
  */
 const NULL_EVENT: Event = new Event(NULL_DATE,NULL_TIME);
 
-enum EVENT_ACTION {
-  CREATE = "CREATE",
-  DRAG = "DRAG",
-  RESIZE = "RESIZE",
-}
+
 const NULL_CALENDAR: Calendar = new Calendar("-1","-1");
 const NULL_CALENDARS: Map<string, Calendar>= new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
 
@@ -47,6 +43,21 @@ const TOAST_TYPE: Record<'success' | 'info' | 'error', React.ComponentType> = {
   info: I.info,
   error: I.error,
 };
+
+// Enum for using the warning component
+  enum WARNING_TYPE {
+    NONE = "NONE", // Represents a state where no warning should be shown
+    DELETE_SINGLE = "DELETE_SINGLE", // Delete a single event
+    DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
+    CONVERT_TO_SINGLE = "CONVERT_TO_SINGLE", // Convert a recurring event (part of a groupID) to a standalone single event
+    DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY" // Delete all events on the selected day that belong to the groupID
+  }
+
+  const NULL_WARNING: Warning = {
+    currentEvent:  null,
+    conflictEvent: null, 
+    type: WARNING_TYPE.NONE, 
+  }
 
 const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
@@ -89,7 +100,7 @@ const COLORS : Record<string, {
   secondary: string;
   tertiary: string;
 }> = {
-  purple: {
+purple: {
     primary: '#571BFB',
     secondary: 'rgba(87, 27, 251, 0.1)',
     tertiary: '#B198FF',
@@ -135,7 +146,11 @@ const COLORS : Record<string, {
     tertiary: '#FFFACD',
   },
 };
-
+enum FriendStatus {
+  Pending = 'pending', // Initial state when a friend request is sent
+  Accepted = 'accepted', // When the friend request is accepted
+  Declined = 'declined', // When the friend request is declined
+}
 
 const USER: User = new User(
   uuidv4(), // Generating a unique user ID
@@ -191,10 +206,12 @@ export {
   ICONS_ARRAY,
   SHORT_DURATION_THRESHOLD,
   NULL_DATE,
-  EVENT_ACTION,
+  WARNING_TYPE,
   ESCAPE_KEYS,
   ENTER_KEY,
   MENU,
   TOAST_TYPE,
-  COLORS
+  COLORS,
+  NULL_WARNING,
+  FriendStatus
 };

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
-import * as I from '@/utils/CalendarHub/icons';
-import * as C from '@/utils/CalendarHub/constants';
-import * as F from '@/utils/CalendarHub/functions';
-import { Event, Toast } from '@/utils/CalendarHub/classes';
+import * as I from '@/utils/icons';
+import * as C from '@/utils/constants';
+import * as F from '@/utils/functions';
+import { Event, Toast, Warning } from '@/utils/classes';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
@@ -23,9 +23,8 @@ const EventModal: React.FC<{
         getEvents: () => Map<string, Event>;
     };
     warningHandeler: {
-        setConflicting: (conflictEvent: Event) => void;
-        setCurrent: (conflictEvent: Event) => void;
-        clearEvents: () => void;
+        setWarning: (newWarning: Warning) => void;
+        clearWarning: () => void;
     }
 }> = ({ isModalOpen, closeModal, currentEvent, events, calendarHandler, updateCurrentEvent, addToast, warningHandeler }) => {
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
@@ -96,11 +95,13 @@ const EventModal: React.FC<{
         }
 
         const conflictEvent: Event | null = F.getConflictingEvent(updatedEvent, events)
+
+        // ! CHECK THIS
         if (conflictEvent) {
-            warningHandeler.setConflicting(conflictEvent);
-            warningHandeler.setCurrent(updatedEvent);
-            closeModal();
-            return;
+            // warningHandeler.setConflicting(conflictEvent);
+            // warningHandeler.setCurrent(updatedEvent);
+            // closeModal();
+            // return;
         }
 
         updatedEvent.duration = F.calculateEventDuration(updatedEvent);
