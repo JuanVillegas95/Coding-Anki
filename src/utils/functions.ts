@@ -244,7 +244,7 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
 }
 
 const formatMonth = (month: Date): string =>{
-  return month.toLocaleString('default', { month: 'short' })
+  return month.toLocaleString('en-US', { month: 'short' })
 }
 
 const getMonth = (mondayDate: Date): string => {
@@ -257,7 +257,7 @@ const getMonth = (mondayDate: Date): string => {
       return `${month} - ${newMonth}`
     }
   }
-  return mondayDate.toLocaleDateString('default', { month: 'long' });
+  return mondayDate.toLocaleDateString('en-US', { month: 'long' });
 }
 
 const generate24Hours = (): string[] => {
