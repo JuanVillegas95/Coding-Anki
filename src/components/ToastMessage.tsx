@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 import { Toast } from '@/utils/classes';
 import { TOAST_ICON } from '@/utils/constants';
 

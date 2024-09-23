@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { Event, Calendar, Toast, Warning, User, Friend } from "@/utils/classes";
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
@@ -10,7 +11,8 @@ import ToastMessage from "@/components/ToastMessage";
 import WarningModal from "@/components/WarningModal";
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
+import * as T from '@/utils/types';
 
 const USER: User = new User(
   "a", // Generating a unique user ID
@@ -69,22 +71,18 @@ const CalendarHub: React.FC = () => {
   }, []);
 
 
-  const warningHandler: {
-    setWarning: (newWarning: Warning) => void;
-    clearWarning: () => void;
-  } = {
-    setWarning: (newWarning: Warning): void => {
-      setWarning((prev) => ({ ...prev, ...newWarning }));
-    },
-    clearWarning: (): void => setWarning({ conflictEvents: null, currentEvent: null, type: C.WARNING_TYPE.NONE }),
+  const warningHandler: T.WarningHandler = {
+    set: (newWarning: Warning): void => setWarning((prev) => ({ ...prev, ...newWarning })),
+    close: (): void => setWarning({
+      conflictEvents: null,
+      currentEvent: null,
+      recurringEvents: null,
+      status: C.WARNING_STATUS.NONE,
+    }),
   };
 
 
-  const toastHandeler: {
-    push: (newToast: Toast) => void;
-    pop: () => void;
-    getTail: () => Toast;
-  } = {
+  const toastHandeler: T.ToastHandler = {
     push: (newToast: Toast): void => {
       setToasts((prevToasts) => {
         if (prevToasts.has(newToast.id)) return prevToasts;
@@ -112,13 +110,13 @@ const CalendarHub: React.FC = () => {
     },
   }
 
-  const weekHandler = {
-    nextWeek: () => setMondayDate(F.addDateBy(mondayDate, 7)),
-    previousWeek: () => setMondayDate(F.addDateBy(mondayDate, -7)),
-    currentWeek: () => setMondayDate(F.getMostRecentMonday()),
+  const weekHandler: T.WeekHandler = {
+    next: () => setMondayDate(F.addDateBy(mondayDate, 7)),
+    prev: () => setMondayDate(F.addDateBy(mondayDate, -7)),
+    curr: () => setMondayDate(F.getMostRecentMonday()),
   };
 
-  const calendarHandler = {
+  const calendarHandler: T.CalendarHandler = {
     setEvent: (event: Event) => {
       calendar.current.events.set(event.id, event);
       setCalendars((prevCalendars) => {
@@ -139,22 +137,30 @@ const CalendarHub: React.FC = () => {
     getEvents: () => calendars.get(calendar.current.id)!.events,
 
     setRecurringEvents: (recurringEvent: Event) => {
-      const { startDate, endDate, selectedDays, eventGroupID } = recurringEvent;
+      const { startDate, endDate, selectedDays } = recurringEvent;
+      const conflictEvents: Event[] = [];
+      const newRecurringEvents: Event[] = [];
 
-      let date = new Date(startDate);
-      while (date <= endDate!) {
+      for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
         if (selectedDays[F.getDay(date)]) {
-          const newEvent: Event = { ...recurringEvent, startDate: date };
-          const conflictEvent: Event | null = F.getConflictingEvent(newEvent, calendars.get(calendar.current.id)!.events)
-          if (conflictEvent) {
-            // setWarningEvents([newEvent, conflictEvent]);
-            // calendars.get(calendar.current.id)!.events.set(newEvent.id, newEvent);
-          }
-        }
-        date = F.addDateBy(date, 1);
-      }
-    },
+          const newEvent: Event = { ...recurringEvent, id: uuidv4(), date: new Date(date) };
+          newRecurringEvents.push(newEvent);
 
+          const newConflictEvents: Event[] = F.getConflictingEvents(newEvent, calendars.get(calendar.current.id)!.events);
+          if (newConflictEvents.length > 0) newConflictEvents.forEach((newConflictEvent: Event) => conflictEvents.push(newConflictEvent));
+        }
+      }
+      if (conflictEvents.length > 0) {
+        warningHandler.set(new Warning(
+          C.WARNING_STATUS.EVENT_CONFLICT,
+          recurringEvent,
+          conflictEvents,
+          newRecurringEvents,
+        ))
+        return;
+      }
+      newRecurringEvents.forEach((event: Event) => calendarHandler.setEvent(event));
+    }
   };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,44 +187,42 @@ const CalendarHub: React.FC = () => {
     });
   };
 
-  return <React.Fragment> <S.CalendarWrapperDiv>
-    <S.PrintableContent>
-      <S.CalendarContainerDiv>
-        <CalendarHeader
-          mondayDate={mondayDate}
-          name={calendar.current.name}
-          changeCalendarName={changeCalendarName}
-          weekHandler={weekHandler}
-        />
-        <TimeColumnAside asideRef={asideRef} />
-        <DaySection mondayDate={mondayDate} />
-        <ScheduleGridMain
-          mondayDate={mondayDate}
-          events={calendarHandler.getEvents()}
-          calendarHandler={calendarHandler}
-          addToast={toastHandeler.push}
-          mainRef={mainRef}
-          warningHandeler={warningHandler}
-        />
-      </S.CalendarContainerDiv>
-    </S.PrintableContent>
-    <MenuAside
-      setCalendarName={setCalendarName}
-    />
-  </S.CalendarWrapperDiv>
-    {(toasts.size > 0) && (
-      <ToastMessage
-        toast={toastHandeler.getTail()}
-        popToast={toastHandeler.pop}
-      />)}
-    {warning.type === C.WARNING_TYPE.NONE && (
-      <WarningModal
-        warning={warning}
-        calendarHandler={calendarHandler}
-        clearWarning={warningHandler.clearWarning}
-      />)}
+  return <React.Fragment>
+    <S.CalendarWrapperDiv>
+      <S.PrintableContent>
+        <S.CalendarContainerDiv>
+          <CalendarHeader
+            mondayDate={mondayDate}
+            name={calendar.current.name}
+            changeCalendarName={changeCalendarName}
+            weekHandler={weekHandler}
+          />
+          <TimeColumnAside asideRef={asideRef} />
+          <DaySection mondayDate={mondayDate} />
+          <ScheduleGridMain
+            mondayDate={mondayDate}
+            events={calendarHandler.getEvents()}
+            calendarHandler={calendarHandler}
+            addToast={toastHandeler.push}
+            mainRef={mainRef}
+            warningHandeler={warningHandler}
+          />
+        </S.CalendarContainerDiv>
+      </S.PrintableContent>
+      <MenuAside
+        setCalendarName={setCalendarName}
+      />
+    </S.CalendarWrapperDiv>
+    {(toasts.size > 0) && <ToastMessage
+      toast={toastHandeler.getTail()}
+      popToast={toastHandeler.pop}
+    />}
+    {warning.status !== C.WARNING_STATUS.NONE && <WarningModal
+      warning={warning}
+      warningHandler={warningHandler}
+      calendarHandler={calendarHandler}
+    />}
   </React.Fragment>
-
 };
 
 export default CalendarHub;

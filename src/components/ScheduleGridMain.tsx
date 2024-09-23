@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
+import * as T from "@/utils/types"
 import { Event, Time, Toast, Warning } from '@/utils/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
@@ -11,15 +12,8 @@ const ScheduleGridMain: React.FC<{
     mondayDate: Date;
     events: Map<string, Event>;
     mainRef: React.RefObject<HTMLDivElement>;
-    calendarHandler: {
-        setEvent: (event: Event) => void;
-        deleteEvent: (event: Event) => void;
-        getEvents: () => Map<string, Event>;
-    };
-    warningHandeler: {
-        setWarning: (newWarning: Warning) => void;
-        clearWarning: () => void;
-    }
+    calendarHandler: T.CalendarHandler;
+    warningHandeler: T.WarningHandler;
 }> = ({ mainRef, events, mondayDate, calendarHandler, addToast, warningHandeler }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>(new Event());
     const [currentDate, setCurrentDate] = useState<Date>(new Date());

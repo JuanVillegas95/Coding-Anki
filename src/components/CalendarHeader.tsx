@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 import * as I from '@/utils/icons';
 import * as F from '@/utils/functions';
+import * as T from '@/utils/types';
 
 const CalendarHeader: React.FC<{
     mondayDate: Date,
     name: string,
     changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>) => void,
-    weekHandler: {
-        nextWeek: () => void;
-        previousWeek: () => void;
-        currentWeek: () => void;
-    };
+    weekHandler: T.WeekHandler
 }> = ({ name, changeCalendarName, weekHandler, mondayDate }) => {
     return <S.ContainerHeader>
         <S.CalendarNameDiv>
@@ -23,16 +20,16 @@ const CalendarHeader: React.FC<{
                 $color={'black'}
                 $size={30}
                 $svgSize={15}
-                onClick={weekHandler.previousWeek}
+                onClick={weekHandler.prev}
             >
                 <I.left />
             </S.ChangeWeekButton>
-            <S.TodayButton onClick={weekHandler.currentWeek}>Today</S.TodayButton>
+            <S.TodayButton onClick={weekHandler.curr}>Today</S.TodayButton>
             <S.ChangeWeekButton
                 $color={'black'}
                 $size={30}
                 $svgSize={15}
-                onClick={weekHandler.nextWeek}
+                onClick={weekHandler.next}
             >
                 <I.right />
             </S.ChangeWeekButton>

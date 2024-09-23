@@ -1,8 +1,8 @@
 import { Toast, Warning,Event } from "@/utils/classes"
 
 export type WarningHandler = {
-    setWarning: (newWarning: Warning) => void;
-    clearWarning: () => void;
+    set: (newWarning: Warning) => void;
+    close: () => void;
 };
 
 export type ToastHandler = {
@@ -12,12 +12,14 @@ export type ToastHandler = {
 };
 
 export type WeekHandler = {
-    nextWeek: () => void;
-    previousWeek: () => void;
-    currentWeek: () => void;
+    next: () => void;
+    prev: () => void;
+    curr: () => void;
 };
 
 export type CalendarHandler = {
     setEvent: (event: Event) => void;
     deleteEvent: (event: Event) => void;
+    getEvents: () => Map<string,Event>;
+    setRecurringEvents: (recurringEvent: Event) => void;
 };

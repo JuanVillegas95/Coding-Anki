@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WARNING_TYPE, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
+import { WARNING_STATUS, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
 import * as I  from "@/utils/icons"
 
 // USER PREMIUM CAN CHOOSE THE COLOR, UPLOUAD ICONS, HAVE 10 CALENDARS, SYNC WITH MULTIPLE USERS
@@ -124,16 +124,19 @@ class Toast {
 class Warning {
   currentEvent: Event | null;
   conflictEvents: Event[] | null;
-  type: WARNING_TYPE;
+  recurringEvents: Event[] | null;
+  status: WARNING_STATUS;
 
   constructor(
+    status: WARNING_STATUS = WARNING_STATUS.NONE,
     currentEvent: Event | null = null,
-    conflictEvent: Event[] | null = null,
-    type: WARNING_TYPE = WARNING_TYPE.NONE
+    conflictEvents: Event[] | null = null,
+    recurringEvents:  Event[] | null = null,
   ) {
     this.currentEvent = currentEvent;
-    this.conflictEvents = conflictEvent;
-    this.type = type;
+    this.conflictEvents = conflictEvents;
+    this.recurringEvents = recurringEvents;
+    this.status = status;
   }
 }
 

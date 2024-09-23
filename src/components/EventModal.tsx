@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
+import * as T from '@/utils/types';
 import { Event, Toast, Warning } from '@/utils/classes';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
@@ -17,15 +18,9 @@ const EventModal: React.FC<{
     events: Map<string, Event>;
     currentEvent: Event;
     closeModal: () => void;
-    calendarHandler: {
-        setEvent: (event: Event) => void;
-        deleteEvent: (event: Event) => void;
-        getEvents: () => Map<string, Event>;
-    };
-    warningHandeler: {
-        setWarning: (newWarning: Warning) => void;
-        clearWarning: () => void;
-    }
+    calendarHandler: T.CalendarHandler;
+    warningHandeler: T.WarningHandler;
+
 }> = ({ isModalOpen, closeModal, currentEvent, events, calendarHandler, updateCurrentEvent, addToast, warningHandeler }) => {
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
@@ -55,7 +50,7 @@ const EventModal: React.FC<{
             addToast(new Toast(
                 "Invalid title length",
                 "Event title must be under 40 characters.",
-                "info"
+                C.TOAST_TYPE.INFO,
             ));
             return;
         }
@@ -72,7 +67,7 @@ const EventModal: React.FC<{
             addToast(new Toast(
                 "Invalid description",
                 "Event description must be under 200 characters.",
-                "info"
+                C.TOAST_TYPE.INFO
             ));
             return;
         }
@@ -94,43 +89,54 @@ const EventModal: React.FC<{
             case 'EndMinute': { updatedEvent.end.minutes = value; } break;
         }
 
-        const conflictEvent: Event | null = F.getConflictingEvent(updatedEvent, events)
-
-        // ! CHECK THIS
-        if (conflictEvent) {
-            // warningHandeler.setConflicting(conflictEvent);
-            // warningHandeler.setCurrent(updatedEvent);
-            // closeModal();
-            // return;
-        }
-
         updatedEvent.duration = F.calculateEventDuration(updatedEvent);
         updatedEvent.height = F.calculateEventHeight(updatedEvent);
+        const newConflictEvents: Event[] = F.getConflictingEvents(updatedEvent, events);
+
+        // ! CHECK THIS
+        if (newConflictEvents.length > 0) {
+            warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_CONFLICT, updatedEvent, newConflictEvents))
+            closeModal();
+            return;
+        }
+
         updateCurrentEvent(updatedEvent);
     };
 
     const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string): void => {
+        // Extract year, month, and day from the input
         const [year, month, day] = e.target.value.split('-').map(Number);
         const newDate = new Date(year, month - 1, day);
 
+        // Normalize the new date (set time components to zero)
+        newDate.setHours(0, 0, 0, 0);
+
+        // Create a copy of the current event with normalized dates
         const updatedEvent: Event = {
             ...currentEvent,
             startDate: new Date(currentEvent.startDate),
             endDate: currentEvent.endDate ? new Date(currentEvent.endDate) : null,
         };
 
+        // Normalize the existing startDate and endDate
+        updatedEvent.startDate.setHours(0, 0, 0, 0);
+        if (updatedEvent.endDate) updatedEvent.endDate.setHours(0, 0, 0, 0);
+
+        // Update the startDate or endDate based on the tag
         if (tag === 'StartDate') updatedEvent.startDate = newDate;
         if (tag === 'EndDate') updatedEvent.endDate = newDate;
 
+        // Validate date ranges
         if (updatedEvent.endDate && updatedEvent.startDate >= updatedEvent.endDate) {
             addToast(new Toast(
                 "Handle date",
                 "The start date cannot be after the end date",
-                "info"
+                C.TOAST_TYPE.INFO
             ));
             return;
         }
 
+        // Check if the event duration exceeds one year
         const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
         if (updatedEvent.endDate) {
             const dateDifference = updatedEvent.endDate.getTime() - updatedEvent.startDate.getTime();
@@ -139,14 +145,16 @@ const EventModal: React.FC<{
                 addToast(new Toast(
                     "Handle date",
                     "The event duration cannot be greater than one year.",
-                    "info"
+                    C.TOAST_TYPE.INFO
                 ));
                 return;
             }
         }
 
+        // Update the current event with the new dates
         updateCurrentEvent(updatedEvent);
     };
+
 
     const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
         const isSelected: boolean = e.target.checked;
@@ -184,23 +192,33 @@ const EventModal: React.FC<{
             endDate: currentEvent.endDate ? new Date(currentEvent.endDate) : null,
             selectedDays: [...currentEvent.selectedDays],
         }
-        if (F.isEndBeforeStart(currentEvent)) {
-            addToast(new Toast(
-                "Handle time",
-                "The end time cannot be before the start time",
-                "info"
-            ));
-            return;
-        }
-        // Reset all values that belong to recurring aspects
-        if (!currentEvent.eventGroupID) {
+
+        if (currentEvent.eventGroupID) {
+            if (!currentEvent.endDate) {
+                console.log("not valid")
+                addToast(new Toast(
+                    "Handle end time",
+                    "End time must be valid",
+                    C.TOAST_TYPE.INFO
+                ));
+                return;
+            }
+            if (F.isEndBeforeStart(currentEvent)) {
+                addToast(new Toast(
+                    "Handle time",
+                    "The end time cannot be before the start time",
+                    C.TOAST_TYPE.INFO
+                ));
+                return;
+            }
+            calendarHandler.setRecurringEvents(updatedEvent);
+        } else {  // Reset all values that belong to recurring aspects
             updatedEvent.startDate = currentEvent.date;
             updatedEvent.endDate = null;
             updatedEvent.selectedDays.fill(false);
             updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
-            calendarHandler.setEvent(updatedEvent);
-        } else {
         }
+        calendarHandler.setEvent(updatedEvent);
         closeModal();
     };
 

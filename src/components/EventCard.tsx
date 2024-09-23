@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 import { Event } from '@/utils/classes';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';

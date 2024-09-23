@@ -201,23 +201,28 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
   return false; 
 };
 
-const getConflictingEvent = (newEvent: Event, events: Map<string, Event>): Event | null => {
+const getConflictingEvents = (newEvent: Event, events: Map<string, Event>): Event[] => {
+  const conflictingEvents: Event[] = [];
   const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
 
   for (const event of sameDateEvents) {
     const { start, end, id } = event;
-    if (newEvent.id === id) continue; 
-    
+    if (newEvent.id === id) continue; // Skip the new event itself if it’s already in the list
+
     const eventStartMinutes = timeToMinutes(start);
     const eventEndMinutes = timeToMinutes(end);
 
-    if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes)  return event; 
-    
+    // Check for time overlap
+    if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) {
+      conflictingEvents.push(event); // Add the conflicting event to the list
+    }
   }
-  return null; 
+
+  return conflictingEvents; // Return all conflicting events
 };
+
 
 
 const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
@@ -292,7 +297,7 @@ const shouldBeLocked = (date: Date, index: number): boolean => {
 
 
 export {
-  getConflictingEvent,
+  getConflictingEvents,
   range,
   areDatesTheSame,
   addDateBy,

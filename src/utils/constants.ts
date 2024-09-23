@@ -49,12 +49,17 @@ const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
 };
 
 // Warning Type Enum
-enum WARNING_TYPE {
-  NONE = "NONE", // Represents a state where no warning should be shown
-  EVENT_CONFLICT = "EVENT_CONFLICT", // Delete a single event
-  DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
+enum WARNING_STATUS {
+  NONE = "NONE", // No warning should be shown.
+  EVENT_CONFLICT = "EVENT_CONFLICT", // 
   CONVERT_TO_SINGLE = "CONVERT_TO_SINGLE", // Convert a recurring event (part of a groupID) to a standalone single event
-  DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY" // Delete all events on the selected day that belong to the groupID
+  DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
+  DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY", // Delete all events on the selected day that belong to the groupID
+}
+
+enum WARNING_ACTION {
+  CANCEL = "CANCEL", //  User chose to no perform any action
+  DELETE = "DELETE", //  User chose to delete a event(s)
 }
 
 // Friend Status Enum
@@ -158,7 +163,7 @@ export {
   HIDE_SCROLL_BAR,
   ICONS_ARRAY,
   SHORT_DURATION_THRESHOLD,
-  WARNING_TYPE,
+  WARNING_STATUS,
   ESCAPE_KEYS,
   ENTER_KEY,
   MENU,
@@ -166,4 +171,5 @@ export {
   COLORS,
   FRIEND_STATUS,
   TOAST_ICON,
+  WARNING_ACTION,
 };

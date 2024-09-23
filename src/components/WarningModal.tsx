@@ -1,59 +1,58 @@
 import React, { useState } from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import LongEvent from './LongEvent';
+import { Event, Warning, Time } from '@/utils/classes';
+import * as S from '@/utils/styles';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as I from '@/utils/icons';
-import LongEvent from './LongEvent';
-import { Event, Warning, Time } from '@/utils/classes';
+import * as T from '@/utils/types';
 
 const WarningModal: React.FC<{
     warning: Warning;
-    clearWarning: () => void;
-    calendarHandler: {
-        setEvent: (event: Event) => void;
-        deleteEvent: (event: Event) => void;
-        getEvents: () => Map<string, Event>;
+    warningHandler: T.WarningHandler;
+    calendarHandler: T.CalendarHandler;
+}> = ({ warningHandler, warning, calendarHandler, }) => {
+    const { status, currentEvent, conflictEvents, recurringEvents } = warning;
+
+    const deleteEvents = () => {
+        conflictEvents!.forEach((event) => calendarHandler.deleteEvent(event));
+        recurringEvents!.forEach((event) => calendarHandler.setEvent(event));
+        warningHandler.close();
     };
 
-}> = ({ clearWarning, calendarHandler, warning }) => {
-    const { type } = warning;
-    const currentEvent: Event = new Event()
-    const conflictEvents: Event[] = [
-        new Event(new Date(), new Time(9, 30), "uuidv4()"),
-        new Event(new Date(), new Time(14, 0), "uuidv4()"),
-        new Event(new Date(), new Time(18, 45), " uuidv4()")
-    ];
-
-    const deleteEvents = (events: Event[]): void => {
-        events.forEach((event: Event) => calendarHandler.deleteEvent(event))
-        clearWarning();
+    const deleteEvent = () => {
+        calendarHandler.deleteEvent(conflictEvents![0]);
+        calendarHandler.setEvent(currentEvent!);
+        warningHandler.close();
     };
 
-    switch (type) {
-        case C.WARNING_TYPE.EVENT_CONFLICT: return <EventConflict
-            currentEvent={currentEvent}
-            conflictEvents={conflictEvents}
-            clearWarning={clearWarning}
+    const cancelAction = () => warningHandler.close();
+
+    switch (status) {
+        case C.WARNING_STATUS.EVENT_CONFLICT: return <EventConflict
+            currentEvent={currentEvent!}
+            conflictEvents={conflictEvents!}
             deleteEvents={deleteEvents}
+            deleteEvent={deleteEvent}
+            cancelAction={cancelAction}
         />
-        case C.WARNING_TYPE.DELETE_RECURRING_SERIES: return <p>Are you sure you want to delete the entire series of events?</p>;
-        case C.WARNING_TYPE.CONVERT_TO_SINGLE: return <p>Are you sure you want to convert this event to a single event?</p>;
-        case C.WARNING_TYPE.NONE: return null;
+        case C.WARNING_STATUS.DELETE_RECURRING_SERIES: return <p>Are you sure you want to delete the entire series of events?</p>;
+        case C.WARNING_STATUS.CONVERT_TO_SINGLE: return <p>Are you sure you want to convert this event to a single event?</p>;
+        case C.WARNING_STATUS.NONE: return null;
     }
 
 };
 
-
 const EventConflict: React.FC<{
     currentEvent: Event;
     conflictEvents: Event[];
-    clearWarning: () => void;
-    deleteEvents: (events: Event[]) => void;
-}> = ({ currentEvent, conflictEvents, clearWarning, deleteEvents }) => {
+    cancelAction: () => void;
+    deleteEvents: () => void;
+    deleteEvent: () => void;
+}> = ({ currentEvent, conflictEvents, cancelAction, deleteEvents, deleteEvent }) => {
     const [conflictEventIndex, setConflictEventIndex] = useState<number>(0)
     const conflictCount: number = conflictEvents.length;
-    // const areConflicts: boolean = conflictCount > 1;
-    const areConflicts: boolean = true;
+    const areConflicts: boolean = conflictCount > 1;
 
     const moveRight = (): void => {
         setConflictEventIndex((prev) => {
@@ -97,15 +96,15 @@ const EventConflict: React.FC<{
                     {!areConflicts
                         ? <S.WarningButton
                             value={"Delete Conflicting Event"}
-                            onClick={() => deleteEvents(conflictEvents)}
+                            onClick={deleteEvent}
                         />
                         : <S.WarningButton
                             value={`Delete All ${conflictCount} Conflicting Events`}
-                            onClick={() => deleteEvents(conflictEvents)}
+                            onClick={deleteEvents}
                         />}
                     <S.WarningButton
                         value={"Cancel"} style={{ backgroundColor: 'lightgray' }}
-                        onClick={clearWarning}
+                        onClick={cancelAction}
                     />
                 </S.WarningFooter>
             </S.WarningContainerDiv>

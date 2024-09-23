@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 
 const ShortEvent: React.FC<{ title: string }> = ({ title }) => {
     return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/styles/CalendarHub.styles';
+import * as S from '@/utils/styles';
 
 const IconMenu: React.FC<{
     isIconMenu: boolean;
