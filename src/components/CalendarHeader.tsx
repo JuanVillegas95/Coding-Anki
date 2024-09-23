@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
 import * as I from '@/utils/icons';
-import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 
 const CalendarHeader: React.FC<{

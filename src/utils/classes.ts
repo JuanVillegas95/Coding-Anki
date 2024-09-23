@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WARNING_TYPE, FriendStatus } from "@/utils/constants"
+import { WARNING_TYPE, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
 import * as I  from "@/utils/icons"
 
 // USER PREMIUM CAN CHOOSE THE COLOR, UPLOUAD ICONS, HAVE 10 CALENDARS, SYNC WITH MULTIPLE USERS
@@ -7,9 +7,9 @@ class Friend {
   id: string;
   name: string; //todo remove
   calendars: string[]  //todo remove
-  status: FriendStatus;
+  status: FRIEND_STATUS;
   
-  constructor(id: string, name: string, calendars: string[], status: FriendStatus = FriendStatus.Pending) {
+  constructor(id: string, name: string, calendars: string[], status: FRIEND_STATUS = FRIEND_STATUS.PENDING) {
     this.id = id;
     this.name = name; // todo remove friend
     this.calendars = calendars; // todo remove calendars
@@ -112,21 +112,30 @@ class Time {
 class Toast {
   id: string
   description: string;
-  type: 'success' | 'info' | 'error'; 
+  type: TOAST_TYPE; 
 
-  constructor(id: string, description: string, type: 'success' | 'info' | 'error') { 
+  constructor(id: string, description: string, type: TOAST_TYPE) { 
     this.id = id;
     this.description = description;
     this.type = type;
   }
 }
 
-export type Warning = {
+class Warning {
   currentEvent: Event | null;
-  conflictEvent: Event | null;
+  conflictEvents: Event[] | null;
   type: WARNING_TYPE;
-};
+
+  constructor(
+    currentEvent: Event | null = null,
+    conflictEvent: Event[] | null = null,
+    type: WARNING_TYPE = WARNING_TYPE.NONE
+  ) {
+    this.currentEvent = currentEvent;
+    this.conflictEvents = conflictEvent;
+    this.type = type;
+  }
+}
 
 
-
-export { Event, Time, Calendar, User, Friend, FriendStatus, Toast};
+export { Event, Time, Calendar, User, Friend, Toast, Warning};

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { Event, Calendar, Toast, Warning } from "@/utils/classes";
+import { Event, Calendar, Toast, Warning, User, Friend } from "@/utils/classes";
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
 import DaySection from "@/components/DaySection"
@@ -12,12 +12,29 @@ import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 import * as S from '@/styles/CalendarHub.styles';
 
+const USER: User = new User(
+  "a", // Generating a unique user ID
+  "rosie@example.com", // Email address
+  "Rosie", // Username
+  "securepassword123", // Password
+  new Map([
+    ["work", new Calendar("work", "Work Calendar")],
+    ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],
+    ["yeah", new Calendar("yeah", "School Calendar")],
+  ]), // Initializes a map with two calendars
+  [
+    new Friend("yeah", "Rosie", ["yeah1", "yeah2", "yeah3"], C.FRIEND_STATUS.ACCEPTED), // Initializes friends list with one accepted friend
+    new Friend("yeah", "Juan", ["yeah4", "yeah5", "yeah6"], C.FRIEND_STATUS.PENDING), // Another friend with a pending request
+  ]
+);
+
+
 const CalendarHub: React.FC = () => {
-  const [calendars, setCalendars] = useState<Map<string, Calendar>>(C.NULL_CALENDARS);
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
-  const [warning, setWarning] = useState<Warning>(C.NULL_WARNING);
-  const calendar = useRef<Calendar>(C.NULL_CALENDAR);
+  const [warning, setWarning] = useState<Warning>(new Warning());
+  const [calendars, setCalendars] = useState<Map<string, Calendar>>(USER.calendars);
+  const calendar = useRef<Calendar>(USER.calendars.get("work")!);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +76,7 @@ const CalendarHub: React.FC = () => {
     setWarning: (newWarning: Warning): void => {
       setWarning((prev) => ({ ...prev, ...newWarning }));
     },
-    clearWarning: (): void => setWarning(C.NULL_WARNING),
+    clearWarning: (): void => setWarning({ conflictEvents: null, currentEvent: null, type: C.WARNING_TYPE.NONE }),
   };
 
 
@@ -118,6 +135,7 @@ const CalendarHub: React.FC = () => {
         return updatedCalendars;
       });
     },
+
     getEvents: () => calendars.get(calendar.current.id)!.events,
 
     setRecurringEvents: (recurringEvent: Event) => {
@@ -142,7 +160,7 @@ const CalendarHub: React.FC = () => {
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     if (newTitle.length > 18) {
-      toastHandeler.push(new Toast("Calendar Name", "hi", "info"))
+      toastHandeler.push(new Toast("Calendar Name", "hi", C.TOAST_TYPE.INFO))
       return;
     };
     calendar.current.name = newTitle;

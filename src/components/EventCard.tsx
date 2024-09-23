@@ -17,12 +17,12 @@ const EventCard: React.FC<{
     };
     eventOnClick: (e: React.MouseEvent<HTMLDivElement>, event: Event) => void;
 }> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick }) => {
-    const { id, height, start, end, duration, color, icon, title, description } = event;
+    const { id, height, start, end, duration, color, icon, title, description, eventGroupID } = event;
 
     const totalMinutes = F.timeToMinutes(duration);
     const topOffset = F.calculateTopOffset(start);
     const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
-
+    const borderStyle: string = eventGroupID ? "solid" : "dotted";
     return <S.EventDiv
         key={id}
         $fromTop={topOffset}
@@ -30,6 +30,7 @@ const EventCard: React.FC<{
         $backgroundColor={C.COLORS[color].secondary}
         $borderColor={C.COLORS[color].primary}
         $isDragged={isEventDragging}
+        $borderStyle={borderStyle}
         onClick={(e) => eventOnClick(e, event)}
     >
         <S.EventTopDiv

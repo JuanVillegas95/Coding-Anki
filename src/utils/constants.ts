@@ -1,7 +1,6 @@
-import { Event, Time, Calendar, User, Friend, Warning} from "@/utils/classes"
-import * as I from "@/utils/icons"
-import { v4 as uuidv4 } from 'uuid';
+import * as I from "@/utils/icons";
 
+// Constants
 const HOUR_WIDTH: number = 60;
 const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hour
 
@@ -13,52 +12,16 @@ const SUBHEADER_HEIGHT: number = 50;
 const SUBHEADER_FONT_SIZE: number = 15;
 const HOURS_FONT_SIZE: number = 12.5;
 const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
-const DAYS: string[]= ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-
-
-const SHORT_DURATION_THRESHOLD = 60;  // Less than 60 minutes is a "SHORT" event.
-
-
+const DAYS: string[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+const SHORT_DURATION_THRESHOLD: number = 60; // Less than 60 minutes is a "SHORT" event.
 const MAX_DURATION_MINUTES: number = 20;
 
-// Peripherals events
+// Peripheral events
 const LEFT_MOUSE_CLICK: number = 0;
 const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
-const ENTER_KEY : string = "Enter";
+const ENTER_KEY: string = "Enter";
 
-const NULL_TIME: Time = new Time(-1,-1);
-const NULL_DATE: Date = new Date(0); 
-
-/**
- * `NULL_EVENT` acts as a marker to initiate or terminate the event creation, dragging and resizing process.
- */
-const NULL_EVENT: Event = new Event(NULL_DATE,NULL_TIME);
-
-
-const NULL_CALENDAR: Calendar = new Calendar("-1","-1");
-const NULL_CALENDARS: Map<string, Calendar>= new Map([[NULL_CALENDAR.id, NULL_CALENDAR]])
-
-const TOAST_TYPE: Record<'success' | 'info' | 'error', React.ComponentType> = {
-  success: I.success,
-  info: I.info,
-  error: I.error,
-};
-
-// Enum for using the warning component
-  enum WARNING_TYPE {
-    NONE = "NONE", // Represents a state where no warning should be shown
-    DELETE_SINGLE = "DELETE_SINGLE", // Delete a single event
-    DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
-    CONVERT_TO_SINGLE = "CONVERT_TO_SINGLE", // Convert a recurring event (part of a groupID) to a standalone single event
-    DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY" // Delete all events on the selected day that belong to the groupID
-  }
-
-  const NULL_WARNING: Warning = {
-    currentEvent:  null,
-    conflictEvent: null, 
-    type: WARNING_TYPE.NONE, 
-  }
-
+// Icons Array
 const ICONS_ARRAY: React.ComponentType[] = [
   I.bell,
   I.cart,
@@ -71,7 +34,37 @@ const ICONS_ARRAY: React.ComponentType[] = [
   I.meh
 ];
 
+// Toast Type Enum
+enum TOAST_TYPE {
+  SUCCESS = 'SUCCESS',
+  INFO = 'INFO',
+  ERROR = 'ERROR',
+}
 
+// Toast Icon Mapping
+const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
+  [TOAST_TYPE.SUCCESS]: I.success,
+  [TOAST_TYPE.INFO]: I.info,
+  [TOAST_TYPE.ERROR]: I.error,
+};
+
+// Warning Type Enum
+enum WARNING_TYPE {
+  NONE = "NONE", // Represents a state where no warning should be shown
+  EVENT_CONFLICT = "EVENT_CONFLICT", // Delete a single event
+  DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
+  CONVERT_TO_SINGLE = "CONVERT_TO_SINGLE", // Convert a recurring event (part of a groupID) to a standalone single event
+  DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY" // Delete all events on the selected day that belong to the groupID
+}
+
+// Friend Status Enum
+enum FRIEND_STATUS {
+  PENDING = 'PENDING', // Initial state when a friend request is sent
+  ACCEPTED = 'ACCEPTED', // When the friend request is accepted
+  DECLINED = 'DECLINED', // When the friend request is declined
+}
+
+// Menu Icon Mapping
 const MENU: Record<string, React.ComponentType> = {
   Save: I.disk,
   Change: I.replace,
@@ -84,23 +77,13 @@ const MENU: Record<string, React.ComponentType> = {
   Help: I.interrogation,
 };
 
-const HIDE_SCROLL_BAR: string = `
-&::-webkit-scrollbar {
-  display: none;
-}
-
-
--ms-overflow-style: none;  
-scrollbar-width: none; 
-`
-
-
-const COLORS : Record<string, {  
+// Color Scheme
+const COLORS: Record<string, {
   primary: string;
   secondary: string;
   tertiary: string;
 }> = {
-purple: {
+  purple: {
     primary: '#571BFB',
     secondary: 'rgba(87, 27, 251, 0.1)',
     tertiary: '#B198FF',
@@ -146,46 +129,19 @@ purple: {
     tertiary: '#FFFACD',
   },
 };
-enum FriendStatus {
-  Pending = 'pending', // Initial state when a friend request is sent
-  Accepted = 'accepted', // When the friend request is accepted
-  Declined = 'declined', // When the friend request is declined
+
+// Scrollbar Hiding CSS
+const HIDE_SCROLL_BAR: string = `
+&::-webkit-scrollbar {
+  display: none;
 }
 
-const USER: User = new User(
-  uuidv4(), // Generating a unique user ID
-  "rosie@example.com", // Email address
-  "Rosie", // Username
-  "securepassword123", // Password
-  new Map([
-    ["work", new Calendar(uuidv4(), "Work Calendar")],
-    ["personal", new Calendar(uuidv4(), "Personal Calendar asdkjhbasjhdajshdjhasgd")],
-    ["perasonal", new Calendar(uuidv4(), "Personal Calendara asdkjhbasjhdajshdjhasgd")],
-    ["asdsadasdasd", new Calendar(uuidv4(), "safsaf")],
-    ["asdgfdsfgdf", new Calendar(uuidv4(), "asfsafasf")],
-    ["fasfassaf", new Calendar(uuidv4(), "asfasf")],
-    ["safsafasfsa", new Calendar(uuidv4(), "asfasf")],
-    ["fasfasfasfas", new Calendar(uuidv4(), "afsaf")],
-    ["fsafasfdasfasfas", new Calendar(uuidv4(), "asf")],
-    ["asfasfas", new Calendar(uuidv4(), "asf")],
-    ["fasfasf", new Calendar(uuidv4(), "asfsaf")],
-    ["afsfasfsafasf", new Calendar(uuidv4(), "afsf")],
-    
-    ["yeah", new Calendar(uuidv4(), "School Calendar")],
-  ]), // Initializes a map with two calendars
-  [
-    new Friend(uuidv4(), "Rosie", ["yeah1", "yeah2", "yeah3"], FriendStatus.Accepted), // Initializes friends list with one accepted friend
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
-    new Friend(uuidv4(), "Juan", ["yeah4", "yeah5", "yeah6"], FriendStatus.Pending), // Another friend with a pending request
-  ]
-);
+-ms-overflow-style: none;
+scrollbar-width: none;
+`;
 
-
+// Exporting Constants and Enums
 export {
-  USER,
   HOUR_HEIGHT,
   HOUR_WIDTH,
   HEADER_HEIGHT,
@@ -193,9 +149,6 @@ export {
   DAYS,
   MAX_DURATION_MINUTES,
   LEFT_MOUSE_CLICK,
-  NULL_EVENT,
-  NULL_CALENDAR,
-  NULL_CALENDARS,
   CALENDAR_HEIGHT,
   CALENDAR_WIDTH,
   SUBHEADER_HEIGHT,
@@ -205,13 +158,12 @@ export {
   HIDE_SCROLL_BAR,
   ICONS_ARRAY,
   SHORT_DURATION_THRESHOLD,
-  NULL_DATE,
   WARNING_TYPE,
   ESCAPE_KEYS,
   ENTER_KEY,
   MENU,
   TOAST_TYPE,
   COLORS,
-  NULL_WARNING,
-  FriendStatus
+  FRIEND_STATUS,
+  TOAST_ICON,
 };

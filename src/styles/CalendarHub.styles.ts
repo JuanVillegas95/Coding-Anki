@@ -18,7 +18,7 @@ const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size:
   }
 `;
 
-const IconDiv = styled.div<{$color: string, $size: number, $svgSize: number}>`
+const IconDiv = styled.div<{$color?: string, $size?: number, $svgSize?: number}>`
   background-color: transparent;
   border-style: none;
   width: ${({ $size }) => $size}px;
@@ -792,15 +792,16 @@ const colorDiv = styled.div<{ $color: string}>`
 const EventDiv = styled.div.attrs<{ 
   $fromTop: number; 
   $height: number; 
-  $borderColor: string, 
-  $backgroundColor: string,
-  $isDragged: boolean
+  $borderColor: string;
+  $backgroundColor: string;
+  $isDragged: boolean;
+  $borderStyle: string;
 }>(
-  ({ $fromTop, $height, $backgroundColor, $borderColor}) => ({
+  ({ $fromTop, $height, $backgroundColor, $borderColor, $borderStyle}) => ({
   style: {
     top: `${$fromTop}px`,
     height: `${$height}px`,
-    border: `1px solid ${$borderColor}`,
+    border: `1px ${$borderStyle} ${$borderColor}`,
     backgroundColor: `${$backgroundColor}`,
   },
 }))<{ $isDragged: boolean}>`
@@ -1109,8 +1110,8 @@ const WarningContainerDiv = styled.div`
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 450px;
-    flex: 0 1 500px;
+    width: 420px;
+    flex: 0 1 600px;
     transform: translate(-50%, -50%);
     background: white;
     border-radius: 1rem;
@@ -1126,12 +1127,11 @@ const WarningMain = styled.main`
 
 const WarningFooter = styled.footer`
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
+  flex-direction: column;
   border-top: 1px solid lightgrey;
-  padding: 10px;
+  padding: 10px 30px;
   margin-top: 15px;
-  gap: 20px;
+  gap: 15px;
 `;
 
 const WarningHeader = styled.header`
@@ -1141,7 +1141,8 @@ const WarningHeader = styled.header`
 `;
 
 const WarningP = styled.p`
-
+  padding: 10px 30px;
+  text-align: justify; 
 `;
 
 const Warningh1 = styled.h1`
@@ -1156,31 +1157,42 @@ const WarrningEventWrapperDiv = styled.div`
 `
 
 const WarrningEventh2 = styled.h2`
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
   margin-bottom: 10px;
 `
-const WarningForm = styled.form`
+
+
+
+
+const WarningEventsWarningDiv = styled.div`
   display: flex;
-  flex-direction: column;
-  margin: 10px 0;
-`
-const WarningInput = styled.input.attrs({ type: "radio", name: "warning" })`
+  gap: 5px;
 `
 
-const WarningLabel = styled.label`
+const WarningIconDiv = styled(ClickableDiv)`
+border-radius: 15px;
+  &:hover{
+    background-color: lightgray;
+  }
 `
 
-const OptionWrapperDiv = styled.div`
-  margin-left: 30px;
-  margin-bottom: 10px;
-`
-
+const WarningButton = styled.input.attrs({ type: "button" })`
+  background-color: #f44336;
+  padding: 20px;
+  border-radius: 8px;
+  color: black;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
+`;
 export{
-  OptionWrapperDiv,
-  WarningInput,
-  WarningLabel,
-  WarningForm,
+  WarningButton,
+  WarningIconDiv,
+  WarningEventsWarningDiv,
   WarrningEventh2,
   WarrningEventWrapperDiv,
   Warningh1,

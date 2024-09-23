@@ -2,6 +2,22 @@ import React, { useRef, useState } from 'react';
 import * as S from '@/styles/CalendarHub.styles';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
+import { Calendar, Friend, User } from '@/utils/classes';
+const USER: User = new User(
+    "a", // Generating a unique user ID
+    "rosie@example.com", // Email address
+    "Rosie", // Username
+    "securepassword123", // Password
+    new Map([
+        ["work", new Calendar("work", "Work Calendar")],
+        ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],
+        ["yeah", new Calendar("yeah", "School Calendar")],
+    ]), // Initializes a map with two calendars
+    [
+        new Friend("yeah", "Rosie", ["yeah1", "yeah2", "yeah3"], C.FRIEND_STATUS.ACCEPTED), // Initializes friends list with one accepted friend
+        new Friend("yeah", "Juan", ["yeah4", "yeah5", "yeah6"], C.FRIEND_STATUS.PENDING), // Another friend with a pending request
+    ]
+);
 
 const FriendList: React.FC<{
     label: string;
@@ -29,7 +45,7 @@ const FriendList: React.FC<{
                 </S.FriendSearchDiv>
             </S.FindFriendSection>
             <S.FriendsContainerDiv>
-                {C.USER.friends.map((friend, i) => {
+                {USER.friends.map((friend, i) => {
                     return (
                         <S.FriendLi key={i}>
                             <S.FriendP>

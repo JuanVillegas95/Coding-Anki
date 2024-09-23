@@ -21,7 +21,7 @@ const ScheduleGridMain: React.FC<{
         clearWarning: () => void;
     }
 }> = ({ mainRef, events, mondayDate, calendarHandler, addToast, warningHandeler }) => {
-    const [currentEvent, setCurrentEvent] = useState<Event>(C.NULL_EVENT);
+    const [currentEvent, setCurrentEvent] = useState<Event>(new Event());
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isEventCreating, setIsEventCreating] = useState<boolean>(false);
