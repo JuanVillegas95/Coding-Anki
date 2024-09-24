@@ -8,8 +8,9 @@ import CalendarList from '@/components/CalendarList';
 
 const MenuAside: React.FC<{
     setCalendarName: (name: string) => void;
+    setLinkedCalendar: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
-> = ({ setCalendarName }) => {
+> = ({ setCalendarName, setLinkedCalendar }) => {
     const [isFriend, setIsFriend] = useState<boolean>(false)
     const [isChange, setIsChange] = useState<boolean>(false)
 
@@ -57,6 +58,7 @@ const MenuAside: React.FC<{
                                     label={label}
                                     icon={icon}
                                     closeFriendList={closeFriendList}
+                                    setLinkedCalendar={setLinkedCalendar}
                                 />
                             ) : (
                                 <S.MenuWrapperDiv>

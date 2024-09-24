@@ -2,7 +2,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { WARNING_STATUS, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
 import * as I  from "@/utils/icons"
 
-// USER PREMIUM CAN CHOOSE THE COLOR, UPLOUAD ICONS, HAVE 10 CALENDARS, SYNC WITH MULTIPLE USERS
 class Friend {
   id: string;
   name: string; //todo remove
@@ -74,14 +73,21 @@ class Event {
   duration: Time;
   icon: React.ComponentType;
   color: string;
+  isFriendEvent: boolean;
 
     // Attributes members for reccurring behavior
   startDate: Date;
   endDate: Date | null;
-  eventGroupID: string | null;
+  groupID: string | null;
   selectedDays: boolean[];
 
-  constructor(date: Date = new Date(), start: Time = new Time(), eventGroupID: string | null = null) {
+  constructor(
+    date: Date = new Date(), 
+    start: Time = new Time(), 
+    groupID: string | null = null, 
+    isFriendEvent: boolean = false,
+    height: number = -1, 
+    ) {
     this.id = uuidv4();
     this.date = date;
     this.start = start;
@@ -89,13 +95,14 @@ class Event {
     this.title = "";
     this.description = "";
     this.color = "purple";
-    this.height = -1;
+    this.height = height;
     this.duration = new Time(-1, -1);
     this.icon = I.star;
-    this.eventGroupID = eventGroupID;
+    this.groupID = groupID;
     this.selectedDays = Array(7).fill(false);
     this.startDate = date;
     this.endDate = null;
+    this.isFriendEvent = isFriendEvent;
   }
 }
 

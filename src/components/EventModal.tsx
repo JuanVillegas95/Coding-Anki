@@ -166,9 +166,9 @@ const EventModal: React.FC<{
 
     const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
-        const updatedEvent: Event = { ...currentEvent, eventGroupID: currentEvent.eventGroupID };
-        if (!updatedEvent.eventGroupID) updatedEvent.eventGroupID = uuidv4();
-        else updatedEvent.eventGroupID = null;
+        const updatedEvent: Event = { ...currentEvent, groupID: currentEvent.groupID };
+        if (!updatedEvent.groupID) updatedEvent.groupID = uuidv4();
+        else updatedEvent.groupID = null;
         updateCurrentEvent(updatedEvent);
     };
 
@@ -193,7 +193,7 @@ const EventModal: React.FC<{
             selectedDays: [...currentEvent.selectedDays],
         }
 
-        if (currentEvent.eventGroupID) {
+        if (currentEvent.groupID) {
             if (!currentEvent.endDate) {
                 console.log("not valid")
                 addToast(new Toast(
@@ -284,7 +284,7 @@ const EventModal: React.FC<{
                 </S.RecurringEventButton>
             </S.Row3Div>
 
-            {currentEvent.eventGroupID && (
+            {currentEvent.groupID && (
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}

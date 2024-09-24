@@ -12,23 +12,28 @@ const LongEvent: React.FC<{
     icon: React.ComponentType;
     title: string;
     description: string;
-}> = ({ color, startHours, startMinutes, endHours, endMinutes, icon, title, description }) => {
+    isLinked: boolean;
+}> = ({ color, startHours, startMinutes, endHours, endMinutes, icon, title, description, isLinked }) => {
     return (
         <S.ContainerLongEventDiv>
-            <S.LongEventHeader $color={C.COLORS[color].primary}>
-                <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
+            <S.LongEventHeader
+                $color={C.COLORS[color].primary}
+                $isLinked={isLinked}
+            >
+                {!isLinked && <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
                     {React.createElement(icon)}
-                </S.LongEventIconDiv>
-                <S.LongEventTimeDiv>
-                    <S.LongEventStartDiv>
+                </S.LongEventIconDiv>}
+                <S.LongEventTimeDiv $isLinked={isLinked}>
+                    <S.LongEventStartDiv $isLinked={isLinked}>
                         {startHours}:{startMinutes}
                     </S.LongEventStartDiv>
-                    <S.LongEventArrowDiv $color={'white'} $size={14} $svgSize={14}>
+                    {!isLinked && <S.LongEventArrowDiv $color={'white'} $size={14} $svgSize={14}>
                         <I.rightArrow />
-                    </S.LongEventArrowDiv>
-                    <S.LongEventEndDiv>
+                    </S.LongEventArrowDiv>}
+                    {isLinked && <span>-</span>}
+                    <S.LongEventStartDiv $isLinked={isLinked}>
                         {endHours}:{endMinutes}
-                    </S.LongEventEndDiv>
+                    </S.LongEventStartDiv>
                 </S.LongEventTimeDiv>
             </S.LongEventHeader>
             <S.LongEventBodyDiv>

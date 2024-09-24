@@ -71,12 +71,22 @@ const CalendarContainerDiv = styled.div`
   border-radius: 1.5%;
   background-color: white;
   display: grid;
-
   grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
   grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
   grid-template-areas: "header header" "aside subheader" "aside main";
 
   ${C.HIDE_SCROLL_BAR} 
+
+    @media print {
+      position: absolute;
+      left: -10px;
+      top: 0;
+      width: 100%;
+      visibility: visible;
+      transform: scale(0.9,1.1); 
+      transform-origin: top left;
+      width: 100%; 
+    }
 `;
 
 
@@ -144,8 +154,8 @@ const MonthP = styled.p`
   font-family: 'Poppins', sans-serif;
   font-weight: 500; 
   text-align: center; 
-  margin-right: 15px;
-  font-size: 20px;
+  font-size: 18px;
+  margin-bottom: 7px;
 `;
 
 
@@ -238,26 +248,25 @@ const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
 `;
 
 
-const LongEventTimeDiv = styled.div`
+const LongEventTimeDiv = styled.div<{  $isLinked: boolean }>`
   display: flex;
   align-items: center;
   width: 100%;
   letter-spacing: 1px;
-  margin-left: 8px;
+  margin-left: ${({ $isLinked }) =>  $isLinked? "0px" : "8px"};
+  
   margin-top: 1px;
 `;
 
-const LongEventStartDiv = styled.div`
-  margin-right: 5px;
+const LongEventStartDiv = styled.div<{$isLinked: boolean}>`
+  margin-left: ${({ $isLinked }) =>  $isLinked? "0px" : "5px"};
 `;
 
 const LongEventArrowDiv = styled(IconDiv)`
+  margin-left: 5px;
   margin-bottom: 2px;
 `
 
-const LongEventEndDiv = styled.div`
-  margin-left: 5px;
-`;
 
 
 const LongEventIconBodyDiv = styled(IconDiv)`
@@ -672,17 +681,18 @@ const ContainerLongEventDiv = styled.div`
   height: calc(100% - 12px); // -20px for EventHeader
 `
 
-const LongEventHeader = styled.header<{$color: string}>`
+const LongEventHeader = styled.header<{$color: string, $isLinked: boolean}>`
   background-color: ${({ $color}) => $color};
   height: 20px;
   width: 100%;
   display: flex;
   flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center; 
   color: white;
-  font-size: 10px;
+  font-size: ${({ $isLinked }) => $isLinked ? "9px" : "10px"};
   font-weight: 500;
-  padding: 0 0 5px 5px;
+  padding: ${({ $isLinked }) => $isLinked ? "0 0 5px 4px" : "0 0 5px 5px"};
 `;
 
 
@@ -804,12 +814,16 @@ const EventDiv = styled.div.attrs<{
     border: `1px ${$borderStyle} ${$borderColor}`,
     backgroundColor: `${$backgroundColor}`,
   },
-}))<{ $isDragged: boolean}>`
+}))<{ $isDragged: boolean,  $isFriendEvent: boolean, $isLinked: boolean}>`
+
+  ${({ $isFriendEvent }) => css`
+    margin-left: ${$isFriendEvent ? " 50%" : "0px"};
+  `}
+  width: ${({$isLinked}) => $isLinked ? "50%" : "100%"};
   display: flex;
   flex-direction: column;
   position: absolute;
   z-index: 3;
-  width: 100%;
   border-width: 2px;
   border-radius: 8px;
   box-sizing: border-box;
@@ -999,16 +1013,7 @@ const ToastDescriptionP = styled.p`
 `;
 
 const PrintableContent = styled.div`
-    @media print {
-      position: absolute;
-      left: -10px;
-      top: 0;
-      width: 100%;
-      visibility: visible;
-      transform: scale(0.9,1.1); 
-      transform-origin: top left;
-      width: 100%; 
-    }
+
 `;
 
 const FriendsWrapperDiv = styled.div`
@@ -1163,8 +1168,6 @@ const WarrningEventh2 = styled.h2`
 `
 
 
-
-
 const WarningEventsWarningDiv = styled.div`
   display: flex;
   gap: 5px;
@@ -1189,7 +1192,24 @@ const WarningButton = styled.input.attrs({ type: "button" })`
   text-align: center;
   flex: 1;
 `;
+
+const LinkIconImg = styled.img`
+  width: 40px;
+  height: 40px;
+  &:hover{
+    cursor: pointer;
+  }
+`
+
+const HeaderRigthestWrapperDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-right: 120px;
+`
+
 export{
+  HeaderRigthestWrapperDiv,
+  LinkIconImg,
   WarningButton,
   WarningIconDiv,
   WarningEventsWarningDiv,
@@ -1282,7 +1302,6 @@ export{
   LongEventTimeDiv,
   LongEventStartDiv,
   LongEventArrowDiv,
-  LongEventEndDiv,
   LongEventDescriptionP,
   LongEventHeader,
 

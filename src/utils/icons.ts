@@ -49,8 +49,12 @@ import info from "@/svg/info.svg"
 
 import calendar from "@/svg/calendar.svg"
 import group from "@/svg/group.svg"
+import linkIn from "@/gif/link-in.gif"
+import linkOut from "@/gif/link-out.gif"
+
 
 export {
+  linkIn, linkOut,
   calendar, group,
   add, disk, download, print, upload, confetti, trash, replace,
   success, error, info,

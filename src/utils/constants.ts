@@ -6,7 +6,7 @@ const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hou
 
 const CALENDAR_WIDTH: number = 1150;
 const CALENDAR_HEIGHT: number = 750;
-const HEADER_HEIGHT: number = 85;
+const HEADER_HEIGHT: number = 90;
 const HEADER_FONT_SIZE: number = 18;
 const SUBHEADER_HEIGHT: number = 50;
 const SUBHEADER_FONT_SIZE: number = 15;
@@ -51,16 +51,10 @@ const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
 // Warning Type Enum
 enum WARNING_STATUS {
   NONE = "NONE", // No warning should be shown.
-  EVENT_CONFLICT = "EVENT_CONFLICT", // 
-  CONVERT_TO_SINGLE = "CONVERT_TO_SINGLE", // Convert a recurring event (part of a groupID) to a standalone single event
-  DELETE_RECURRING_SERIES = "DELETE_RECURRING_SERIES", // Delete all events belonging to the same groupID
-  DELETE_SERIES_ON_DAY = "DELETE_SERIES_ON_DAY", // Delete all events on the selected day that belong to the groupID
+  EVENT_CONFLICT = "Event Conflict", 
+  EVENT_MODIFY = "Recurring Event Modify", 
 }
 
-enum WARNING_ACTION {
-  CANCEL = "CANCEL", //  User chose to no perform any action
-  DELETE = "DELETE", //  User chose to delete a event(s)
-}
 
 // Friend Status Enum
 enum FRIEND_STATUS {
@@ -171,5 +165,4 @@ export {
   COLORS,
   FRIEND_STATUS,
   TOAST_ICON,
-  WARNING_ACTION,
 };

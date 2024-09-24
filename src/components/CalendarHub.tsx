@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from 'uuid';
 import { Event, Calendar, Toast, Warning, User, Friend } from "@/utils/classes";
+import { v4 as uuidv4 } from 'uuid';
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
 import DaySection from "@/components/DaySection"
@@ -13,6 +13,7 @@ import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 import * as S from '@/utils/styles';
 import * as T from '@/utils/types';
+import * as I from '@/utils/icons';
 
 const USER: User = new User(
   "a", // Generating a unique user ID
@@ -30,15 +31,21 @@ const USER: User = new User(
   ]
 );
 
-
 const CalendarHub: React.FC = () => {
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
   const [warning, setWarning] = useState<Warning>(new Warning());
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(USER.calendars);
+  const [linkedCalendar, setLinkedCalendar] = useState<string>("")
+  const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
   const calendar = useRef<Calendar>(USER.calendars.get("work")!);
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
+
+  const toggleLink = (): void => {
+    const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;
+    setLinkIcon(icon);
+  }
 
 
   // Initialization logic and scroll synchronization effects
@@ -125,6 +132,7 @@ const CalendarHub: React.FC = () => {
         return updatedCalendars;
       });
     },
+
     deleteEvent: (event: Event) => {
       calendar.current.events.delete(event.id);
       setCalendars((prevCalendars) => {
@@ -160,7 +168,7 @@ const CalendarHub: React.FC = () => {
         return;
       }
       newRecurringEvents.forEach((event: Event) => calendarHandler.setEvent(event));
-    }
+    },
   };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,7 +186,6 @@ const CalendarHub: React.FC = () => {
   };
 
   const setCalendarName = (name: string) => {
-    console.log(name)
     calendar.current.name = name;
     setCalendars((prevCalendars) => {
       const updatedCalendars = new Map(prevCalendars);
@@ -187,30 +194,35 @@ const CalendarHub: React.FC = () => {
     });
   };
 
+
+  const setLinkedCalendarFriend = (event: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(event.target.value)
+
   return <React.Fragment>
     <S.CalendarWrapperDiv>
-      <S.PrintableContent>
-        <S.CalendarContainerDiv>
-          <CalendarHeader
-            mondayDate={mondayDate}
-            name={calendar.current.name}
-            changeCalendarName={changeCalendarName}
-            weekHandler={weekHandler}
-          />
-          <TimeColumnAside asideRef={asideRef} />
-          <DaySection mondayDate={mondayDate} />
-          <ScheduleGridMain
-            mondayDate={mondayDate}
-            events={calendarHandler.getEvents()}
-            calendarHandler={calendarHandler}
-            addToast={toastHandeler.push}
-            mainRef={mainRef}
-            warningHandeler={warningHandler}
-          />
-        </S.CalendarContainerDiv>
-      </S.PrintableContent>
+      <S.CalendarContainerDiv>
+        <CalendarHeader
+          mondayDate={mondayDate}
+          name={calendar.current.name}
+          changeCalendarName={changeCalendarName}
+          weekHandler={weekHandler}
+          linkIcon={linkIcon}
+          toggleLink={toggleLink}
+        />
+        <TimeColumnAside asideRef={asideRef} />
+        <DaySection mondayDate={mondayDate} />
+        <ScheduleGridMain
+          mondayDate={mondayDate}
+          events={calendarHandler.getEvents()}
+          calendarHandler={calendarHandler}
+          addToast={toastHandeler.push}
+          mainRef={mainRef}
+          warningHandeler={warningHandler}
+          isLinked={(linkIcon === I.linkIn.src)}
+        />
+      </S.CalendarContainerDiv>
       <MenuAside
         setCalendarName={setCalendarName}
+        setLinkedCalendar={setLinkedCalendarFriend}
       />
     </S.CalendarWrapperDiv>
     {(toasts.size > 0) && <ToastMessage

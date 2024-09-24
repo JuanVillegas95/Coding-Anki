@@ -1,28 +1,25 @@
 import React from 'react';
-import * as S from '@/utils/styles';
 import { Event } from '@/utils/classes';
-import * as F from '@/utils/functions';
-import * as C from '@/utils/constants';
 import ShortEvent from './ShortEvent';
 import LongEvent from './LongEvent';
+import * as S from '@/utils/styles';
+import * as F from '@/utils/functions';
+import * as C from '@/utils/constants';
+import * as T from '@/utils/types';
 
 const EventCard: React.FC<{
     event: Event;
     isEventDragging: boolean;
-    eventOnMouseDown: {
-        create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
-        drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
-        bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
-        top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
-    };
+    eventOnMouseDown: T.EventOnMouseDownType;
+    isLinked: boolean
     eventOnClick: (e: React.MouseEvent<HTMLDivElement>, event: Event) => void;
-}> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick }) => {
-    const { id, height, start, end, duration, color, icon, title, description, eventGroupID } = event;
+}> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick, isLinked }) => {
+    const { id, height, start, end, duration, color, icon, title, description, groupID, isFriendEvent } = event;
 
     const totalMinutes = F.timeToMinutes(duration);
     const topOffset = F.calculateTopOffset(start);
     const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
-    const borderStyle: string = eventGroupID ? "solid" : "dotted";
+    const borderStyle: string = groupID ? "solid" : "dotted";
     return <S.EventDiv
         key={id}
         $fromTop={topOffset}
@@ -32,6 +29,8 @@ const EventCard: React.FC<{
         $isDragged={isEventDragging}
         $borderStyle={borderStyle}
         onClick={(e) => eventOnClick(e, event)}
+        $isFriendEvent={isFriendEvent}
+        $isLinked={isLinked}
     >
         <S.EventTopDiv
             $color={isShortEvent ? "transparent" : C.COLORS[color].primary}
@@ -52,6 +51,7 @@ const EventCard: React.FC<{
                     icon={icon}
                     title={title}
                     description={description}
+                    isLinked={isLinked}
                 />
             )}
         </S.EventBodyDiv>

@@ -6,15 +6,15 @@ import * as S from "@/utils/styles";
 import * as C from "@/utils/constants";
 import * as F from "@/utils/functions";
 
-const WarningEvent: React.FC<{
+const ConflictEvent: React.FC<{
     event: Event;
     label: string;
     areConflicts?: boolean;
     moveRight?: () => void;
     moveLeft?: () => void;
 }> = ({ event, label, areConflicts, moveRight, moveLeft }) => {
-    const { id, height, start, end, duration, color, icon, title, description, eventGroupID } = event;
-    const borderStyle: string = eventGroupID ? "solid" : "dotted";
+    const { id, height, start, end, duration, color, icon, title, description, groupID, isFriendEvent } = event;
+    const borderStyle: string = groupID ? "solid" : "dotted";
 
     // Style to override the existing style from EventDiv
     const warningStyle: React.CSSProperties = {
@@ -34,7 +34,6 @@ const WarningEvent: React.FC<{
                     {React.createElement(I.right)}
                 </S.WarningIconDiv>}
             </S.WarningEventsWarningDiv>
-
             <S.EventDiv
                 key={id}
                 $fromTop={0}
@@ -44,6 +43,8 @@ const WarningEvent: React.FC<{
                 $isDragged={false}
                 style={warningStyle}
                 $borderStyle={borderStyle}
+                $isFriendEvent={false}
+                $isLinked={false}
             >
                 <S.EventTopDiv $color={C.COLORS[color].primary} />
                 <S.EventBodyDiv>
@@ -56,6 +57,7 @@ const WarningEvent: React.FC<{
                         icon={icon}
                         title={title}
                         description={description}
+                        isLinked={false}
                     />
                 </S.EventBodyDiv>
                 <S.EventBottomDiv />
@@ -64,4 +66,4 @@ const WarningEvent: React.FC<{
     );
 };
 
-export default WarningEvent;
+export default ConflictEvent;

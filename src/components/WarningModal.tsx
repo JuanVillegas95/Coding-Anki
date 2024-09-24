@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Event, Warning } from '@/utils/classes';
-import EventConflict from "@/components/EventConflict"
+import WarningConflict from "@/components/WarningConflict"
+import WarningModify from "@/components/WarningModify"
 import * as S from '@/utils/styles';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
@@ -28,17 +29,35 @@ const WarningModal: React.FC<{
 
     const cancelAction = () => warningHandler.close();
 
-    switch (status) {
-        case C.WARNING_STATUS.EVENT_CONFLICT: return <EventConflict
+    return <WarningLayout label={warning.status}>
+        {status === C.WARNING_STATUS.EVENT_CONFLICT && <WarningConflict
             currentEvent={currentEvent!}
             conflictEvents={conflictEvents!}
             deleteEvents={deleteEvents}
             deleteEvent={deleteEvent}
             cancelAction={cancelAction}
-        />
-        case C.WARNING_STATUS.NONE: return null;
-    }
+        />}
+        {status == C.WARNING_STATUS.EVENT_MODIFY && <WarningModify
+            currentEvent={currentEvent!}
+            cancelAction={cancelAction}
+        />}
+    </WarningLayout>
+
+
 
 };
+
+const WarningLayout: React.FC<{ children: React.ReactNode; label: string }> = ({ children, label }) => <S.WarningWrapperDiv>
+    <S.WarningContainerDiv>
+        <S.WarningHeader>
+            <S.Warningh1>
+                {label}
+            </S.Warningh1>
+        </S.WarningHeader>
+        {children}
+    </S.WarningContainerDiv>
+</S.WarningWrapperDiv>
+
+
 
 export default WarningModal;
