@@ -335,13 +335,16 @@ const ScheduleGridMain: React.FC<{
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isEventCreating, setIsEventCreating] = useState<boolean>(false);
-    const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
     const [isEventResizingTop, setIsEventResizingTop] = useState<boolean>(false);
     const [isEventResizingBottom, setIsEventResizingBottom] = useState<boolean>(false);
+    const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
+    const dragStartTime = useRef<Date>(new Date());
+    const dragThreshold = useRef<boolean>(false);
     const columnDivRefs: React.RefObject<HTMLDivElement>[] = Array.from(
         { length: 7 },
         () => useRef<HTMLDivElement>(null)
     );
+
 
     // Effect to update the 'HourLineDiv' every minute
     useEffect(() => {
@@ -356,6 +359,11 @@ const ScheduleGridMain: React.FC<{
 
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
+
+    useEffect(() => {
+        console.log(dragThreshold.current)
+
+    }, [dragThreshold.current])
 
     // Handlers for mouse events
     const eventOnMouseDown = {
@@ -377,7 +385,8 @@ const ScheduleGridMain: React.FC<{
             e.preventDefault();
             e.stopPropagation();
             if (e.button !== C.LEFT_MOUSE_CLICK) return;
-
+            dragStartTime.current = new Date();
+            dragThreshold.current = false;
             setIsEventDragging(true);
             setCurrentEvent(event);
         },
@@ -422,8 +431,10 @@ const ScheduleGridMain: React.FC<{
         drag: (e: React.MouseEvent<HTMLDivElement>, colRef: React.RefObject<HTMLDivElement>) => {
             e.preventDefault();
             e.stopPropagation();
-            if (e.button !== C.LEFT_MOUSE_CLICK || !isEventDragging) return;
+            if (!isEventDragging || e.button !== C.LEFT_MOUSE_CLICK) return;
 
+            dragThreshold.current = (new Date().getTime() - dragStartTime.current.getTime()) >= 200;
+            if (!dragThreshold.current) return;
             const [start, end] = F.calculateTimeOnDrag(e, colRef, currentEvent);
             const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
@@ -494,7 +505,6 @@ const ScheduleGridMain: React.FC<{
     };
 
     const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, event: Event): void => {
-        console.log(isEventDragging)
         e.preventDefault();
         e.stopPropagation();
         setCurrentEvent(event);
@@ -502,18 +512,14 @@ const ScheduleGridMain: React.FC<{
     };
 
 
+
+
+    // !THIS IS JUST FOR TESTING LINKING
     let userEvents: Map<string, Event> = USER.calendars.get("work")!.events;
     const friendEvents: Map<string, Event> = FRIEND.calendars.get("personal")!.events;
     const normalEvnets: Map<string, Event> = events;
     if (isLinked) friendEvents.forEach((event: Event) => userEvents.set(event.id, event));
     else friendEvents.forEach((event: Event) => userEvents.delete(event.id));
-
-
-
-    useEffect(() => {
-        console.log(events)
-    }, [events])
-
 
     return <S.ContainerMain
         ref={mainRef}
@@ -522,7 +528,7 @@ const ScheduleGridMain: React.FC<{
     >
         {columnDivRefs.map((colRef, index) => {
             const day: Date = F.addDateBy(mondayDate, index);
-            const filteredEvents: Event[] = F.getSameDateEvents(userEvents, day);
+            const filteredEvents: Event[] = F.getSameDateEvents(events, day);
 
             return <S.CellColumnDiv
                 ref={colRef}
@@ -543,7 +549,7 @@ const ScheduleGridMain: React.FC<{
                         event={event}
                         isEventDragging={isEventDragging}
                         eventOnMouseDown={eventOnMouseDown}
-                        eventOnClick={eventOnClick}
+                        eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
                         isLinked={isLinked}
                     />
                 ))}
