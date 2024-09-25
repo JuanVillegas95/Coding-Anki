@@ -15,7 +15,7 @@ const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
 const DAYS: string[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
 const SHORT_DURATION_THRESHOLD: number = 60; // Less than 60 minutes is a "SHORT" event.
 const MAX_DURATION_MINUTES: number = 20;
-
+const DRAG_THRESHOLD: number = 200
 // Peripheral events
 const LEFT_MOUSE_CLICK: number = 0;
 const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
@@ -75,6 +75,8 @@ const MENU: Record<string, React.ComponentType> = {
   Print: I.print,
   Help: I.interrogation,
 };
+
+
 
 // Color Scheme
 const COLORS: Record<string, {
@@ -165,4 +167,5 @@ export {
   COLORS,
   FRIEND_STATUS,
   TOAST_ICON,
+  DRAG_THRESHOLD,
 };

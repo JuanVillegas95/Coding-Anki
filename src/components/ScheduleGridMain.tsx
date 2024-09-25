@@ -432,8 +432,8 @@ const ScheduleGridMain: React.FC<{
             e.preventDefault();
             e.stopPropagation();
             if (!isEventDragging || e.button !== C.LEFT_MOUSE_CLICK) return;
+            dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= C.DRAG_THRESHOLD);
 
-            dragThreshold.current = (new Date().getTime() - dragStartTime.current.getTime()) >= 200;
             if (!dragThreshold.current) return;
             const [start, end] = F.calculateTimeOnDrag(e, colRef, currentEvent);
             const currentEventDayWeek = F.getDay(currentEvent.date);
@@ -497,10 +497,10 @@ const ScheduleGridMain: React.FC<{
         setIsEventDragging(false);
         setIsEventResizingBottom(false);
         setIsEventResizingTop(false);
-        // if ((isEventDragging || isEventResizingBottom || isEventResizingTop) && currentEvent.groupID) {
-        //     warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent));
-        //     return;
-        // }
+        if (dragThreshold.current && currentEvent.groupID) {
+            warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent));
+            return;
+        }
         if (isEventCreating && F.isNewEventValid(currentEvent, events)) openModal();
     };
 
@@ -528,7 +528,7 @@ const ScheduleGridMain: React.FC<{
     >
         {columnDivRefs.map((colRef, index) => {
             const day: Date = F.addDateBy(mondayDate, index);
-            const filteredEvents: Event[] = F.getSameDateEvents(events, day);
+            const filteredEvents: Event[] = F.getSameDateEvents(userEvents, day);
 
             return <S.CellColumnDiv
                 ref={colRef}

@@ -158,6 +158,7 @@ const CalendarHub: React.FC = () => {
           if (newConflictEvents.length > 0) newConflictEvents.forEach((newConflictEvent: Event) => conflictEvents.push(newConflictEvent));
         }
       }
+      // Because here I have a return the handaling of events is delegated to Warning Handeler
       if (conflictEvents.length > 0) {
         warningHandler.set(new Warning(
           C.WARNING_STATUS.EVENT_CONFLICT,
@@ -167,8 +168,69 @@ const CalendarHub: React.FC = () => {
         ))
         return;
       }
-      newRecurringEvents.forEach((event: Event) => calendarHandler.setEvent(event));
+      newRecurringEvents.forEach((event: Event) => {
+        calendarHandler.setEvent(event);
+        calendarHandler.setReccurringEventIDs(event);
+      });
     },
+
+    setReccurringEventIDs: (event: Event): void => {
+      const { id, groupID, date } = event;
+      const day = F.getDay(date);
+
+      // Get the current day's Map for recurring events
+      let dayGroupId: Map<string, Set<string>> = calendar.current.recurringEventIDs[day];
+
+      // Get the set of event IDs for the group, or create a new set if it doesn't exist
+      let dayEventIDs: Set<string> | undefined = dayGroupId.get(groupID!);
+      if (!dayEventIDs) {
+        dayEventIDs = new Set();
+        dayGroupId.set(groupID!, dayEventIDs); // Ensure to set the groupID with the new Set
+      }
+
+      // Add the event ID to the set of IDs (Set ensures no duplicates)
+      dayEventIDs.add(id);
+
+      // Update the state for the calendars
+      setCalendars((prevCalendars) => {
+        const updatedCalendars = new Map(prevCalendars);
+        updatedCalendars.set(calendar.current.id, { ...calendar.current });
+        return updatedCalendars;
+      });
+    },
+
+    deleteRecurringEventID: (event: Event): void => {
+      const { groupID, id } = event
+
+      // Get the day's Map of group IDs
+      const dayGroupId: Map<string, Set<string>> | undefined = calendar.current.recurringEventIDs[F.getDay(event.date)];
+
+      // If there are no groups for the given day, exit early
+      if (!dayGroupId) return;
+
+      // Get the set of event IDs for the specified group
+      const dayEventIDs: Set<string> | undefined = dayGroupId.get(groupID!);
+
+      // If no event IDs exist for the given group, exit early
+      if (!dayEventIDs) return;
+
+      // Remove the event ID from the set
+      dayEventIDs.delete(id);
+
+      // If the set becomes empty after deletion, remove the groupID from the day's Map
+      if (dayEventIDs.size === 0) {
+        dayGroupId.delete(groupID!);
+      }
+
+      // Update the state for the calendars
+      setCalendars((prevCalendars) => {
+        const updatedCalendars = new Map(prevCalendars);
+        updatedCalendars.set(calendar.current.id, { ...calendar.current });
+        return updatedCalendars;
+      });
+    }
+
+
   };
 
   const changeCalendarName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,7 +291,7 @@ const CalendarHub: React.FC = () => {
       toast={toastHandeler.getTail()}
       popToast={toastHandeler.pop}
     />}
-    {warning.status !== C.WARNING_STATUS.NONE && <WarningModal
+    {(warning.status !== C.WARNING_STATUS.NONE) && <WarningModal
       warning={warning}
       warningHandler={warningHandler}
       calendarHandler={calendarHandler}

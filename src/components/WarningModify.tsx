@@ -20,7 +20,7 @@ const WarningModify: React.FC<{
                 value={"Only This Event"}
             />
             <S.WarningButton
-                value={"All The Event"}
+                value={"All The Events"}
             />
             <S.WarningButton
                 value={"Cancel"} style={{ backgroundColor: 'lightgray' }}

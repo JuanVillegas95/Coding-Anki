@@ -6,7 +6,7 @@ const TimeColumnAside: React.FC<{ asideRef: React.RefObject<HTMLDivElement> }> =
     return (
         <S.ContainerAside ref={asideRef}>
             {F.generate24HourIntervals().map((hour, i) => (
-                <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 === 0}>
+                <S.HourDiv key={i} $marginBottom={i === 0 ? 2 : 0} $isEven={i % 2 !== 0}>
                     {hour}
                 </S.HourDiv>
             ))}

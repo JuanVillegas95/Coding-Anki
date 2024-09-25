@@ -16,12 +16,37 @@ const WarningModal: React.FC<{
     const { status, currentEvent, conflictEvents, recurringEvents } = warning;
 
     const deleteEvents = () => {
+        conflictEvents!.forEach((conflictEvent) => {
+            calendarHandler.deleteEvent(conflictEvent);
+            if (conflictEvent.groupID) calendarHandler.deleteRecurringEventID(conflictEvent);
+        });
+
+        recurringEvents!.forEach((recurringEvent) => {
+            calendarHandler.setEvent(recurringEvent);
+            calendarHandler.setReccurringEventIDs(recurringEvent);
+        });
+
+        warningHandler.close();
+    };
+
+    const deleteEvent = () => {
+        const conflictEvent: Event = conflictEvents![0];
+        calendarHandler.deleteEvent(conflictEvent);
+        if (conflictEvent.groupID) calendarHandler.deleteRecurringEventID(conflictEvent);
+
+        calendarHandler.setEvent(currentEvent!);
+        if (currentEvent!.groupID) calendarHandler.setReccurringEventIDs(currentEvent!);
+
+        warningHandler.close();
+    };
+
+    const modifyEvents = () => {
         conflictEvents!.forEach((event) => calendarHandler.deleteEvent(event));
         recurringEvents!.forEach((event) => calendarHandler.setEvent(event));
         warningHandler.close();
     };
 
-    const deleteEvent = () => {
+    const modifyEvent = () => {
         calendarHandler.deleteEvent(conflictEvents![0]);
         calendarHandler.setEvent(currentEvent!);
         warningHandler.close();

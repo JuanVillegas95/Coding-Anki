@@ -45,22 +45,39 @@ class Calendar {
   id: string;
   name: string;
   events: Map<string, Event>;
-  
-  recurringEventIDs: Map<string, string[][]>; 
-  // The key is the eventGroupID that all the events in the same group shares.
-  // The value is a string of 7 positions representing the day of the week and in every position the keys of the events are stored BUCKET TRICK!!
+  recurringEventIDs: Record<number, Map<string, Set<string>>>;
+
   constructor(
     id: string = uuidv4(), 
     name: string = "Something is wrong", 
     events: Map<string, Event> = new Map(),
-    recurringEventIDs: Map<string, string[][]> = new Map()
-  ){
+    recurringEventIDs: Record<number, Map<string, Set<string>>> = {
+      0: new Map(), // Monday
+      1: new Map(), // Tuesday
+      2: new Map(), // Wednesday
+      3: new Map(), // Thursday
+      4: new Map(), // Friday
+      5: new Map(), // Saturday
+      6: new Map(), // Sunday
+    }
+  ) {
     this.id = id;
     this.name = name;
     this.events = events;
     this.recurringEventIDs = recurringEventIDs;
   }
 }
+
+
+// Explanation:
+// `recurringEventIDs`: Record<number, Map<string, Set<string>>>
+// - The `Record` has fixed keys from 0 to 6 representing days of the week (Monday to Sunday).
+// - Each key in the `Record` points to a `Map<string, Set<string>>`:
+//     - The `Map`'s keys are `groupIDs`, representing groups of recurring events.
+//     - The `Map`'s values are `Set<string>`, which contains event IDs that belong to the `groupID` for that particular day.
+// - Using `Record<number, Map<string, Set<string>>>` allows efficient operations with **O(1)** time complexity for adding 
+
+
 
 class Event {
   id: string;

@@ -22,4 +22,13 @@ export type CalendarHandler = {
     deleteEvent: (event: Event) => void;
     getEvents: () => Map<string,Event>;
     setRecurringEvents: (recurringEvent: Event) => void;
+    setReccurringEventIDs: (event: Event) => void;
+    deleteRecurringEventID: (event: Event) => void;
+};
+
+export type EventOnMouseDownType = {
+    create: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, date: Date) => void;
+    drag: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    bottom: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
+    top: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, event: Event) => void;
 };
