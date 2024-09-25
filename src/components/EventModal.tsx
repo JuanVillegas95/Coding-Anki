@@ -174,7 +174,8 @@ const EventModal: React.FC<{
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        calendarHandler.deleteEvent(currentEvent);
+        if (!currentEvent.groupID) calendarHandler.deleteEvent(currentEvent);
+        else warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_DELETE, currentEvent))
         closeModal();
     };
 

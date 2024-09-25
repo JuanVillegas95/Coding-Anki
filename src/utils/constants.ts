@@ -53,6 +53,7 @@ enum WARNING_STATUS {
   NONE = "NONE", // No warning should be shown.
   EVENT_CONFLICT = "Event Conflict", 
   EVENT_MODIFY = "Recurring Event Modify", 
+  EVENT_DELETE = "Recurring Event Delete", 
 }
 
 
@@ -142,8 +143,7 @@ scrollbar-width: none;
 `;
 
 
-const NULL_GROUP_ID = "NULL_GROUP_ID"
-// Exporting Constants and Enums
+
 export {
   HOUR_HEIGHT,
   HOUR_WIDTH,
@@ -170,5 +170,4 @@ export {
   FRIEND_STATUS,
   TOAST_ICON,
   DRAG_THRESHOLD,
-  NULL_GROUP_ID,
 };

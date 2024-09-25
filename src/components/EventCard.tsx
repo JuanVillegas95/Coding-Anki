@@ -39,9 +39,9 @@ const EventCard: React.FC<{
         />
         <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)}
         >
-            {isShortEvent ? (
+            {isShortEvent ?
                 <ShortEvent title={title} />
-            ) : (
+                :
                 <LongEvent
                     color={color}
                     startHours={F.formatTime(start.hours)}
@@ -53,7 +53,7 @@ const EventCard: React.FC<{
                     description={description}
                     isLinked={isLinked}
                 />
-            )}
+            }
         </S.EventBodyDiv>
         <S.EventBottomDiv
             onClick={(e) => { e.stopPropagation() }}

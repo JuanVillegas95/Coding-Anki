@@ -437,8 +437,9 @@ const ScheduleGridMain: React.FC<{
             const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
 
+            // Edge case if it belongs to a groupID
             const date = currentEvent.groupID ? currentEvent.date : F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
-            const newSelectedDays: boolean[] = new Array(7).fill(false);
+            const newSelectedDays: boolean[] = currentEvent.groupID ? currentEvent.selectedDays : new Array(7).fill(false);
             newSelectedDays[F.getDay(date)] = true;
             const updatedEvent: Event = {
                 ...currentEvent,

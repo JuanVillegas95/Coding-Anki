@@ -134,8 +134,6 @@ const CalendarHub: React.FC = () => {
       });
     },
 
-
-
     deleteEvent: (event: Event) => {
       calendar.current.events.delete(event.id);
       setCalendars((prevCalendars) => {
@@ -152,6 +150,7 @@ const CalendarHub: React.FC = () => {
       const conflictEvents: Event[] = [];
       const newRecurringEvents: Event[] = [];
 
+      // optimize this if
       for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
         if (selectedDays[F.getDay(date)]) {
           const newEvent: Event = { ...recurringEvent, id: recurringEvent.id, date: recurringEvent.date };
@@ -173,6 +172,7 @@ const CalendarHub: React.FC = () => {
         ))
         return;
       }
+      // Adding Events if not conflict
       newRecurringEvents.forEach((event: Event) => {
         calendarHandler.setEvent(event);
         calendarHandler.setReccurringEventIDs(event);

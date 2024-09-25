@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Event, Warning } from '@/utils/classes';
 import WarningConflict from "@/components/WarningConflict"
 import WarningModify from "@/components/WarningModify"
+import WarningDelete from "@/components/WarningDelete"
 import * as S from '@/utils/styles';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
@@ -15,7 +16,7 @@ const WarningModal: React.FC<{
 }> = ({ warningHandler, warning, calendarHandler, }) => {
     const { status, currentEvent, conflictEvents, recurringEvents, beforeDragEvent } = warning;
 
-    const deleteEvents = () => {
+    const handleConflict = () => {
         conflictEvents!.forEach((conflictEvent) => {
             calendarHandler.deleteEvent(conflictEvent);
             if (conflictEvent.groupID) calendarHandler.deleteRecurringEventID(conflictEvent);
@@ -24,7 +25,6 @@ const WarningModal: React.FC<{
             calendarHandler.setEvent(recurringEvent);
             calendarHandler.setReccurringEventIDs(recurringEvent);
         });
-
         warningHandler.close();
     };
 
@@ -68,11 +68,26 @@ const WarningModal: React.FC<{
         calendarHandler.setEvent(beforeDragEvent!);
     };
 
+    const deleteGroupEvents = () => {
+        const groupEvents: Event[] = calendarHandler.getReccurringEventIDs(currentEvent!)
+        groupEvents.forEach((event) => {
+            calendarHandler.deleteEvent(event);
+            if (event.groupID) calendarHandler.deleteRecurringEventID(event);
+        })
+        warningHandler.close();
+    }
+
+    const deleteEvent = () => {
+        calendarHandler.deleteEvent(currentEvent!);
+        if (currentEvent!.groupID) calendarHandler.deleteRecurringEventID(currentEvent!);
+        warningHandler.close();
+    }
+
     return <WarningLayout label={warning.status}>
         {status === C.WARNING_STATUS.EVENT_CONFLICT && <WarningConflict
             currentEvent={currentEvent!}
             conflictEvents={conflictEvents!}
-            deleteEvents={deleteEvents}
+            deleteEvents={handleConflict}
             cancelAction={cancelAction}
         />}
         {status == C.WARNING_STATUS.EVENT_MODIFY && <WarningModify
@@ -80,6 +95,12 @@ const WarningModal: React.FC<{
             cancelAction={cancelActionModify}
             modifyEvent={modifyEvent}
             modifyEvents={modifyEvents}
+        />}
+        {status == C.WARNING_STATUS.EVENT_DELETE && <WarningDelete
+            currentEvent={currentEvent!}
+            cancelAction={cancelAction}
+            deleteGroupEvents={deleteGroupEvents}
+            deleteEvent={deleteEvent}
         />}
     </WarningLayout>
 
