@@ -13,14 +13,13 @@ const WarningModal: React.FC<{
     warningHandler: T.WarningHandler;
     calendarHandler: T.CalendarHandler;
 }> = ({ warningHandler, warning, calendarHandler, }) => {
-    const { status, currentEvent, conflictEvents, recurringEvents } = warning;
+    const { status, currentEvent, conflictEvents, recurringEvents, beforeDragEvent } = warning;
 
     const deleteEvents = () => {
         conflictEvents!.forEach((conflictEvent) => {
             calendarHandler.deleteEvent(conflictEvent);
             if (conflictEvent.groupID) calendarHandler.deleteRecurringEventID(conflictEvent);
         });
-
         recurringEvents!.forEach((recurringEvent) => {
             calendarHandler.setEvent(recurringEvent);
             calendarHandler.setReccurringEventIDs(recurringEvent);
@@ -29,42 +28,58 @@ const WarningModal: React.FC<{
         warningHandler.close();
     };
 
-    const deleteEvent = () => {
-        const conflictEvent: Event = conflictEvents![0];
-        calendarHandler.deleteEvent(conflictEvent);
-        if (conflictEvent.groupID) calendarHandler.deleteRecurringEventID(conflictEvent);
-
-        calendarHandler.setEvent(currentEvent!);
-        if (currentEvent!.groupID) calendarHandler.setReccurringEventIDs(currentEvent!);
-
+    const modifyEvents = (): void => {
+        const groupEvents: Event[] = calendarHandler.getReccurringEventIDs(currentEvent!)
+        const conflictEvents: Event[] = [];
+        const modifiedEvents: Event[] = [];
+        groupEvents.forEach((event) => {
+            const modifiedEvent: Event = { ...currentEvent!, id: currentEvent!.id, date: currentEvent!.date }
+            modifiedEvent.id = event.id;
+            modifiedEvent.date = event.date;
+            modifiedEvents.push(modifiedEvent)
+            const newConflictEvents: Event[] = F.getConflictingEvents(modifiedEvent, calendarHandler.getEvents());
+            if (newConflictEvents.length > 0) newConflictEvents.forEach((newConflictEvent: Event) => conflictEvents.push(newConflictEvent));
+        });
+        if (conflictEvents.length > 0) {
+            warningHandler.set(new Warning(
+                C.WARNING_STATUS.EVENT_CONFLICT,
+                currentEvent,
+                conflictEvents,
+                modifiedEvents,
+            ))
+            return;
+        }
+        modifiedEvents.forEach((event) => calendarHandler.setEvent(event))
         warningHandler.close();
     };
 
-    const modifyEvents = () => {
-        conflictEvents!.forEach((event) => calendarHandler.deleteEvent(event));
-        recurringEvents!.forEach((event) => calendarHandler.setEvent(event));
-        warningHandler.close();
-    };
-
-    const modifyEvent = () => {
-        calendarHandler.deleteEvent(conflictEvents![0]);
-        calendarHandler.setEvent(currentEvent!);
+    const modifyEvent = (): void => {
+        const singleEvent: Event = { ...currentEvent!, groupID: currentEvent!.groupID };
+        calendarHandler.deleteRecurringEventID(singleEvent);
+        singleEvent.groupID = null;
+        calendarHandler.setEvent(singleEvent!);
         warningHandler.close();
     };
 
     const cancelAction = () => warningHandler.close();
+
+    const cancelActionModify = () => {
+        warningHandler.close()
+        calendarHandler.setEvent(beforeDragEvent!);
+    };
 
     return <WarningLayout label={warning.status}>
         {status === C.WARNING_STATUS.EVENT_CONFLICT && <WarningConflict
             currentEvent={currentEvent!}
             conflictEvents={conflictEvents!}
             deleteEvents={deleteEvents}
-            deleteEvent={deleteEvent}
             cancelAction={cancelAction}
         />}
         {status == C.WARNING_STATUS.EVENT_MODIFY && <WarningModify
             currentEvent={currentEvent!}
-            cancelAction={cancelAction}
+            cancelAction={cancelActionModify}
+            modifyEvent={modifyEvent}
+            modifyEvents={modifyEvents}
         />}
     </WarningLayout>
 

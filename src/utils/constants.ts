@@ -141,6 +141,8 @@ const HIDE_SCROLL_BAR: string = `
 scrollbar-width: none;
 `;
 
+
+const NULL_GROUP_ID = "NULL_GROUP_ID"
 // Exporting Constants and Enums
 export {
   HOUR_HEIGHT,
@@ -168,4 +170,5 @@ export {
   FRIEND_STATUS,
   TOAST_ICON,
   DRAG_THRESHOLD,
+  NULL_GROUP_ID,
 };

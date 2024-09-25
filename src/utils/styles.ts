@@ -1122,11 +1122,11 @@ const WarningContainerDiv = styled.div`
     border-radius: 1rem;
 `;
 
-const WarningMain = styled.main`
+const WarningMain = styled.main<{ $center: boolean }>`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: space-between;
+  justify-content: ${({$center}) => $center ? "center" : "space-between"};
   padding: 15px 30px;
 `;
 

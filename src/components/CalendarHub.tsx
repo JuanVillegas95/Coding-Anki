@@ -84,6 +84,7 @@ const CalendarHub: React.FC = () => {
       conflictEvents: null,
       currentEvent: null,
       recurringEvents: null,
+      beforeDragEvent: null,
       status: C.WARNING_STATUS.NONE,
     }),
   };
@@ -133,6 +134,8 @@ const CalendarHub: React.FC = () => {
       });
     },
 
+
+
     deleteEvent: (event: Event) => {
       calendar.current.events.delete(event.id);
       setCalendars((prevCalendars) => {
@@ -151,7 +154,9 @@ const CalendarHub: React.FC = () => {
 
       for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
         if (selectedDays[F.getDay(date)]) {
-          const newEvent: Event = { ...recurringEvent, id: uuidv4(), date: new Date(date) };
+          const newEvent: Event = { ...recurringEvent, id: recurringEvent.id, date: recurringEvent.date };
+          newEvent.id = uuidv4();
+          newEvent.date = new Date(date);
           newRecurringEvents.push(newEvent);
 
           const newConflictEvents: Event[] = F.getConflictingEvents(newEvent, calendars.get(calendar.current.id)!.events);
@@ -172,6 +177,7 @@ const CalendarHub: React.FC = () => {
         calendarHandler.setEvent(event);
         calendarHandler.setReccurringEventIDs(event);
       });
+      calendarHandler.setReccurringEventIDs(recurringEvent);
     },
 
     setReccurringEventIDs: (event: Event): void => {
@@ -190,13 +196,32 @@ const CalendarHub: React.FC = () => {
 
       // Add the event ID to the set of IDs (Set ensures no duplicates)
       dayEventIDs.add(id);
-
       // Update the state for the calendars
       setCalendars((prevCalendars) => {
         const updatedCalendars = new Map(prevCalendars);
         updatedCalendars.set(calendar.current.id, { ...calendar.current });
         return updatedCalendars;
       });
+    },
+
+
+    getReccurringEventIDs: (event: Event): Event[] => {
+      const { id, groupID } = event;
+
+      const recurringEventsIDs: string[] = [];
+      Object.values(calendar.current.recurringEventIDs).forEach((map) => {
+        const gorupEventsIDs: Set<string> | undefined = map.get(groupID!);
+        if (gorupEventsIDs) {
+          gorupEventsIDs.forEach((id: string) => {
+            recurringEventsIDs.push(id)
+          })
+        }
+
+      })
+
+      const groupEvents: Event[] = []
+      recurringEventsIDs.forEach((id: string) => groupEvents.push(calendar.current.events!.get(id)!))
+      return groupEvents;
     },
 
     deleteRecurringEventID: (event: Event): void => {

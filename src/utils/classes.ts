@@ -149,6 +149,7 @@ class Warning {
   currentEvent: Event | null;
   conflictEvents: Event[] | null;
   recurringEvents: Event[] | null;
+  beforeDragEvent: Event | null;
   status: WARNING_STATUS;
 
   constructor(
@@ -156,11 +157,13 @@ class Warning {
     currentEvent: Event | null = null,
     conflictEvents: Event[] | null = null,
     recurringEvents:  Event[] | null = null,
+    beforeDragEvent: Event | null = null,
   ) {
     this.currentEvent = currentEvent;
     this.conflictEvents = conflictEvents;
     this.recurringEvents = recurringEvents;
     this.status = status;
+    this.beforeDragEvent = beforeDragEvent;
   }
 }
 

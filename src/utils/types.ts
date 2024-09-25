@@ -18,12 +18,14 @@ export type WeekHandler = {
 };
 
 export type CalendarHandler = {
-    setEvent: (event: Event) => void;
     deleteEvent: (event: Event) => void;
     getEvents: () => Map<string,Event>;
+    setEvent: (event: Event) => void;
     setRecurringEvents: (recurringEvent: Event) => void;
+
     setReccurringEventIDs: (event: Event) => void;
     deleteRecurringEventID: (event: Event) => void;
+    getReccurringEventIDs: (event: Event) => Event[];
 };
 
 export type EventOnMouseDownType = {

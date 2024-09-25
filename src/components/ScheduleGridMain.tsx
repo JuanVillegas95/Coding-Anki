@@ -338,6 +338,7 @@ const ScheduleGridMain: React.FC<{
     const [isEventResizingTop, setIsEventResizingTop] = useState<boolean>(false);
     const [isEventResizingBottom, setIsEventResizingBottom] = useState<boolean>(false);
     const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
+    const beforeDragEvent = useRef<Event | null>(null);
     const dragStartTime = useRef<Date>(new Date());
     const dragThreshold = useRef<boolean>(false);
     const columnDivRefs: React.RefObject<HTMLDivElement>[] = Array.from(
@@ -359,11 +360,6 @@ const ScheduleGridMain: React.FC<{
 
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
-
-    useEffect(() => {
-        console.log(dragThreshold.current)
-
-    }, [dragThreshold.current])
 
     // Handlers for mouse events
     const eventOnMouseDown = {
@@ -435,10 +431,13 @@ const ScheduleGridMain: React.FC<{
             dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= C.DRAG_THRESHOLD);
 
             if (!dragThreshold.current) return;
+            if (currentEvent.groupID && beforeDragEvent.current === null) beforeDragEvent.current = currentEvent;
+
             const [start, end] = F.calculateTimeOnDrag(e, colRef, currentEvent);
             const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
-            const date = F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
+
+            const date = currentEvent.groupID ? currentEvent.date : F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
             const newSelectedDays: boolean[] = new Array(7).fill(false);
             newSelectedDays[F.getDay(date)] = true;
             const updatedEvent: Event = {
@@ -497,10 +496,11 @@ const ScheduleGridMain: React.FC<{
         setIsEventDragging(false);
         setIsEventResizingBottom(false);
         setIsEventResizingTop(false);
-        if (dragThreshold.current && currentEvent.groupID) {
-            warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent));
+        if (dragThreshold.current && currentEvent.groupID && isEventDragging) {
+            warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent, null, null, beforeDragEvent.current));
             return;
         }
+        beforeDragEvent.current = null;
         if (isEventCreating && F.isNewEventValid(currentEvent, events)) openModal();
     };
 
@@ -528,8 +528,7 @@ const ScheduleGridMain: React.FC<{
     >
         {columnDivRefs.map((colRef, index) => {
             const day: Date = F.addDateBy(mondayDate, index);
-            const filteredEvents: Event[] = F.getSameDateEvents(userEvents, day);
-
+            const filteredEvents: Event[] = F.getSameDateEvents(normalEvnets, day);
             return <S.CellColumnDiv
                 ref={colRef}
                 data-key={index}

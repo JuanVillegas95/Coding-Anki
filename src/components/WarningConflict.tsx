@@ -8,8 +8,7 @@ const WarningConflict: React.FC<{
     conflictEvents: Event[];
     cancelAction: () => void;
     deleteEvents: () => void;
-    deleteEvent: () => void;
-}> = ({ currentEvent, conflictEvents, cancelAction, deleteEvents, deleteEvent }) => {
+}> = ({ currentEvent, conflictEvents, cancelAction, deleteEvents }) => {
     const [conflictEventIndex, setConflictEventIndex] = useState<number>(0)
     const conflictCount: number = conflictEvents.length;
     const areConflicts: boolean = conflictCount > 1;
@@ -28,7 +27,7 @@ const WarningConflict: React.FC<{
         })
     }
     return <React.Fragment>
-        <S.WarningMain>
+        <S.WarningMain $center={false}>
             <ConflictEvent event={currentEvent} label={"Current Event"} />
             <ConflictEvent
                 event={conflictEvents[conflictEventIndex]}
@@ -49,7 +48,7 @@ const WarningConflict: React.FC<{
             {!areConflicts
                 ? <S.WarningButton
                     value={"Delete Conflicting Event"}
-                    onClick={deleteEvent}
+                    onClick={deleteEvents}
                 />
                 : <S.WarningButton
                     value={`Delete All ${conflictCount} Conflicting Events`}
