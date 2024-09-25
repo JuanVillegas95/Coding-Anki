@@ -212,7 +212,12 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-            calendarHandler.setRecurringEvents(updatedEvent);
+            // If events exist just modify them if not create them
+            const recurringEvents: Event[] = calendarHandler.getReccurringEventIDs(currentEvent);
+            if (recurringEvents.length > 0) {
+                warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent, null, null));
+                return;
+            } else calendarHandler.setRecurringEvents(updatedEvent);
         } else {  // Reset all values that belong to recurring aspects
             updatedEvent.startDate = currentEvent.date;
             updatedEvent.endDate = null;

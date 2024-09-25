@@ -145,6 +145,7 @@ const CalendarHub: React.FC = () => {
 
     getEvents: () => calendars.get(calendar.current.id)!.events,
 
+
     setRecurringEvents: (recurringEvent: Event) => {
       const { startDate, endDate, selectedDays } = recurringEvent;
       const conflictEvents: Event[] = [];
