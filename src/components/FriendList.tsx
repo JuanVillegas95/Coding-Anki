@@ -2,21 +2,16 @@ import React, { useRef, useState } from 'react';
 import * as S from '@/app/styles/dashboard';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
-import { Calendar, Friend, User } from '@/utils/classes';
+import { Calendar, User } from '@/utils/classes';
 const USER: User = new User(
     "a", // Generating a unique user ID
-    "rosie@example.com", // Email address
     "Rosie", // Username
-    "securepassword123", // Password
     new Map([
         ["work", new Calendar("work", "Work Calendar")],
         ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],
         ["yeah", new Calendar("yeah", "School Calendar")],
     ]), // Initializes a map with two calendars
-    [
-        new Friend("yeah", "Rosie", ["yeah1", "yeah2", "yeah3"], C.FRIEND_STATUS.ACCEPTED), // Initializes friends list with one accepted friend
-        new Friend("yeah", "Juan", ["yeah4", "yeah5", "yeah6"], C.FRIEND_STATUS.PENDING), // Another friend with a pending request
-    ]
+
 );
 
 const FriendList: React.FC<{
@@ -39,11 +34,11 @@ const FriendList: React.FC<{
             </S.FriendSearchDiv>
         </S.FindFriendSection>
         <S.FriendsContainerDiv>
-            {USER.friends.map((friend, i) => {
+            {/* {USER.friendIds.map((friend, i) => {
                 return (
                     <S.FriendLi key={i}>
                         <S.FriendP>
-                            {friend.name}
+                            {friend.id}
                         </S.FriendP>
                         <S.FriendCalendarButton
                             $color={"black"}
@@ -62,7 +57,7 @@ const FriendList: React.FC<{
 
                     </S.FriendLi>
                 )
-            })}
+            })} */}
         </S.FriendsContainerDiv>
     </S.FriendsWrapperDiv>
 }

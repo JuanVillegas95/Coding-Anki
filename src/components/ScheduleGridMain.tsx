@@ -4,7 +4,7 @@ import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as T from "@/utils/types"
 import * as I from "@/utils/icons"
-import { Event, Time, Toast, Warning, User, Calendar, Friend } from '@/utils/classes';
+import { Event, Time, Toast, Warning, User, Calendar } from '@/utils/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
 import { v4 as uuidv4 } from 'uuid';
@@ -303,9 +303,6 @@ const USER = new User(
     new Map([
         ["work", new Calendar("work", "Work Calendar", eventsDataUser)]
     ]),
-    [
-        new Friend("friend1", "", [], C.FRIEND_STATUS.ACCEPTED)
-    ]
 );
 
 const FRIEND = new User(
@@ -314,7 +311,6 @@ const FRIEND = new User(
     new Map([
         ["personal", new Calendar("personal", "Personal Calendar", eventsDataFriend)]
     ]),
-    []
 );
 
 

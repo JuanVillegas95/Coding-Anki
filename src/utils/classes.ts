@@ -2,36 +2,22 @@ import { v4 as uuidv4 } from 'uuid';
 import { WARNING_STATUS, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
 import * as I  from "@/utils/icons"
 
-class Friend {
-  id: string;
-  name: string; //todo remove
-  calendars: string[]  //todo remove
-  status: FRIEND_STATUS;
-  
-  constructor(id: string, name: string, calendars: string[], status: FRIEND_STATUS = FRIEND_STATUS.PENDING) {
-    this.id = id;
-    this.name = name; // todo remove friend
-    this.calendars = calendars; // todo remove calendars
-    this.status = status;
-  }
-}
-
 class User {
   id: string;  
-  oauth_id: string;  
+  oauthId: string;  
   calendars: Map<string, Calendar>;  
-  friends: Friend[];  
+  friendIds: Set<string>;  
 
   constructor(
     id: string = uuidv4(),
-    oauth_id: string,  
+    oauthId: string,  
     calendars: Map<string, Calendar> = new Map(),
-    friends: Friend[] = []
+    friendIds: Set<string> = new Set()
   ) {
     this.id = id;
-    this.oauth_id = oauth_id;
+    this.oauthId = oauthId;
     this.calendars = calendars;
-    this.friends = friends;
+    this.friendIds = friendIds;
   }
 }
 
@@ -163,4 +149,4 @@ class Warning {
 }
 
 
-export { Event, Time, Calendar, User, Friend, Toast, Warning};
+export { Event, Time, Calendar, User, Toast, Warning};

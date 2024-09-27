@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import * as S from '@/app/styles/dashboard';
 import * as C from '@/utils/constants';
-import { Calendar, User, Friend } from '@/utils/classes';
+import { Calendar, User } from '@/utils/classes';
 
 const USER: User = new User(
     "a", // Generating a unique user ID
@@ -11,10 +11,7 @@ const USER: User = new User(
         ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],
         ["yeah", new Calendar("yeah", "School Calendar")],
     ]), // Initializes a map with two calendars
-    [
-        new Friend("yeah", "Rosie", ["yeah1", "yeah2", "yeah3"], C.FRIEND_STATUS.ACCEPTED), // Initializes friends list with one accepted friend
-        new Friend("yeah", "Juan", ["yeah4", "yeah5", "yeah6"], C.FRIEND_STATUS.PENDING), // Another friend with a pending request
-    ]
+
 );
 
 const CalendarList: React.FC<{

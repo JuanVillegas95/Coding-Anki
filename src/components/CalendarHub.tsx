@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from "react";
-import { Event, Calendar, Toast, Warning, User, Friend } from "@/utils/classes";
+import { Event, Calendar, Toast, Warning, User } from "@/utils/classes";
 import { v4 as uuidv4 } from 'uuid';
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
@@ -23,10 +23,6 @@ const USER: User = new User(
     ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],
     ["yeah", new Calendar("yeah", "School Calendar")],
   ]), // Initializes a map with two calendars
-  [
-    new Friend("yeah", "Rosie", ["yeah1", "yeah2", "yeah3"], C.FRIEND_STATUS.ACCEPTED), // Initializes friends list with one accepted friend
-    new Friend("yeah", "Juan", ["yeah4", "yeah5", "yeah6"], C.FRIEND_STATUS.PENDING), // Another friend with a pending request
-  ]
 );
 
 const CalendarHub: React.FC = () => {
