@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as T from "@/utils/types"
@@ -300,8 +300,6 @@ const eventsDataFriend = new Map([
 const USER = new User(
     uuidv4(), // Generating a unique user ID
     "user@example.com", // Email address
-    "UserName", // Username
-    "securepassword", // Password
     new Map([
         ["work", new Calendar("work", "Work Calendar", eventsDataUser)]
     ]),
@@ -313,8 +311,6 @@ const USER = new User(
 const FRIEND = new User(
     uuidv4(), // Generating a unique friend user ID
     "friend@example.com", // Email address
-    "FriendName", // Username
-    "securepassword", // Password
     new Map([
         ["personal", new Calendar("personal", "Personal Calendar", eventsDataFriend)]
     ]),
@@ -437,7 +433,7 @@ const ScheduleGridMain: React.FC<{
             const currentEventDayWeek = F.getDay(currentEvent.date);
             const enteredEventDayWeek = parseInt(colRef.current!.dataset.key as string);
 
-            // Edge case if it belongs to a groupID
+            // Edge case if it belongs to a groupID\
             const date = currentEvent.groupID ? currentEvent.date : F.addDateBy(currentEvent.date, Math.sign(enteredEventDayWeek - currentEventDayWeek));
             const newSelectedDays: boolean[] = currentEvent.groupID ? currentEvent.selectedDays : new Array(7).fill(false);
             newSelectedDays[F.getDay(date)] = true;

@@ -3,6 +3,7 @@
 
 ## Understanding the Roles of `Container` and `Wrapper` in Styled Components
 
+
 1. **`Container`:**
    - **Role:** A `Container` is a parent element meant to hold a sequence of child elements and create a structured layout. It is generally responsible for the overall layout constraints, such as width, padding, and alignment of content within a defined space.
    - **Purpose:** The purpose of a `Container` is to provide a consistent framework or area where multiple components or elements can live together. It often dictates the layout flow (e.g., flexbox or grid) and how child elements are arranged within it.
@@ -40,19 +41,4 @@
 - Use **`Container`** when you are building the main layout structure of your application or components that involve a sequence of elements with defined positioning rules.
 - Use **`Wrapper`** when you need to control the positioning of a specific element or a small group of elements relative to their surroundings.
 
-
-So
-x is true y show meanu
-x is from true to false first (animation of Menu leaving) then set x to false [Here animation 0, x timeout]
-if x false use effect on y set y true
-
-
-
-MeanuAnimationIn MenuAnimationOut
-Me
-
-Render   Anim
-0         0       
-0         1       animaiton in -> change Render to 1 1.-
-1         0 
-1         1       animation out
+In the icons you contian svg png gif files

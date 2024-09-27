@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import { Toast } from '@/utils/classes';
 import { TOAST_ICON } from '@/utils/constants';
 

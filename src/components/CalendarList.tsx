@@ -1,13 +1,11 @@
 import React, { useRef, useState } from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import * as C from '@/utils/constants';
 import { Calendar, User, Friend } from '@/utils/classes';
 
 const USER: User = new User(
     "a", // Generating a unique user ID
-    "rosie@example.com", // Email address
     "Rosie", // Username
-    "securepassword123", // Password
     new Map([
         ["work", new Calendar("work", "Work Calendar")],
         ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],

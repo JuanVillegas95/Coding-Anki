@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 

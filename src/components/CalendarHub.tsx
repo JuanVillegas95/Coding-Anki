@@ -11,15 +11,13 @@ import ToastMessage from "@/components/ToastMessage";
 import WarningModal from "@/components/WarningModal";
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 import * as T from '@/utils/types';
 import * as I from '@/utils/icons';
 
 const USER: User = new User(
   "a", // Generating a unique user ID
-  "rosie@example.com", // Email address
   "Rosie", // Username
-  "securepassword123", // Password
   new Map([
     ["work", new Calendar("work", "Work Calendar")],
     ["personal", new Calendar("personal", "Personal Calendar asdkjhbasjhdajshdjhasgd")],

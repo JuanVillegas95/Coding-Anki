@@ -24,7 +24,7 @@
       "@/images/*": ["./public/images/*"],
       "@/svg/*": ["./public/svg/*"],
       "@/gif/*": ["./public/gif/*"],
-      "@/styles/*": ["./src/styles/*"],
+      "@/styles/*": ["./src/app/styles/*"],
       "@/utils/*": ["./src/utils/*"],
     }
   },

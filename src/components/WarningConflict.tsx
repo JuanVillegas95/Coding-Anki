@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Event } from "@/utils/classes";
 import ConflictEvent from "@/components/ConflictEvent";
-import * as S from "@/utils/styles";
+import * as S from "@/app/styles/dashboard";
 
 const WarningConflict: React.FC<{
     currentEvent: Event;

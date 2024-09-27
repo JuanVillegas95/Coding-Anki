@@ -4,12 +4,7 @@ import "./globals.css";
 import StyledComponentsRegistry from "../../lib/registry";
 import React from "react";
 
-const poppins = Poppins({
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-  subsets: ["latin"],
-  display: "swap",
-});
+
 
 export const metadata: Metadata = {
   title: "Purrfect timing",
@@ -23,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning={true} className={poppins.className}>
+      <body suppressHydrationWarning={true} >
         <StyledComponentsRegistry>
           {children}
         </StyledComponentsRegistry>

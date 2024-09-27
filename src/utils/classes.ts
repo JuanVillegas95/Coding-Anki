@@ -17,29 +17,24 @@ class Friend {
 }
 
 class User {
-  id: string;
-  email: string;
-  username: string;
-  password: string;
-  calendars: Map<string, Calendar>;
-  friends: Friend[];
+  id: string;  
+  oauth_id: string;  
+  calendars: Map<string, Calendar>;  
+  friends: Friend[];  
 
   constructor(
     id: string = uuidv4(),
-    email: string,
-    username: string,
-    password: string,
+    oauth_id: string,  
     calendars: Map<string, Calendar> = new Map(),
-    friends: Friend[],
-    ){
-      this.id = id;
-      this.calendars = calendars;
-      this.email = email;
-      this.username = username;
-      this.password = password;
-      this.friends = friends;
-    }
+    friends: Friend[] = []
+  ) {
+    this.id = id;
+    this.oauth_id = oauth_id;
+    this.calendars = calendars;
+    this.friends = friends;
+  }
 }
+
 
 class Calendar {
   id: string;

@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/utils/styles';
+import * as S from '@/app/styles/dashboard';
 
 const IconMenu: React.FC<{
     isIconMenu: boolean;

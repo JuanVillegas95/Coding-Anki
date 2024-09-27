@@ -46,14 +46,18 @@ import yellow from "@/svg/yellow.svg"
 import error from "@/svg/bad.svg"
 import success from "@/svg/good.svg"
 import info from "@/svg/info.svg"
+import removeUser from "@/svg/remove-user.svg"
+import addUser from "@/svg/user-add.svg"
 
 import calendar from "@/svg/calendar.svg"
 import group from "@/svg/group.svg"
 import linkIn from "@/gif/link-in.gif"
 import linkOut from "@/gif/link-out.gif"
 
-
+import oracle from "@/images/oracle.png"
 export {
+  oracle,
+  removeUser, addUser,
   linkIn, linkOut,
   calendar, group,
   add, disk, download, print, upload, confetti, trash, replace,
