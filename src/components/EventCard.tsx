@@ -2,7 +2,7 @@ import React from 'react';
 import { Event } from '@/utils/classes';
 import ShortEvent from './ShortEvent';
 import LongEvent from './LongEvent';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as T from '@/utils/types';

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as C from '@/utils/constants';
 import { Calendar, User } from '@/utils/classes';
 

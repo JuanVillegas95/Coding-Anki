@@ -1,5 +1,5 @@
-import * as S from "@/app/styles/base"
-import { LoginContainerDiv } from "./login";
+import * as S from "@/utils/style.base"
+import { LoginContainerDiv } from "./style.login";
 import styled, { keyframes, css } from 'styled-components';
 
 export const CreateWrapperDiv = styled(S.CenterDiv)``;

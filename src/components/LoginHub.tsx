@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { oracle, cross } from "@/utils/icons";
 import Image from "next/image";
-import * as S from "@/app/styles/login";
+import * as S from "@/utils/style.login";
 
 const LoginHub: React.FC = () => {
     const [isWhyModal, setIsWhyModal] = useState<boolean>(false);

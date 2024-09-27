@@ -1,4 +1,3 @@
-'use client';
 import React, { useState, useEffect, useRef } from "react";
 import { Event, Calendar, Toast, Warning, User } from "@/utils/classes";
 import { v4 as uuidv4 } from 'uuid';
@@ -11,9 +10,9 @@ import ToastMessage from "@/components/ToastMessage";
 import WarningModal from "@/components/WarningModal";
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
-import * as S from '@/app/styles/dashboard';
 import * as T from '@/utils/types';
 import * as I from '@/utils/icons';
+import * as S from '@/utils/style.calendar';
 
 const USER: User = new User(
   "a", // Generating a unique user ID
@@ -167,9 +166,10 @@ const CalendarHub: React.FC = () => {
         ))
         return;
       }
+
       // Adding Events if not conflict
       newRecurringEvents.forEach((event: Event) => {
-        calendarHandler.setEvent(event);
+        calendarHandler.setEvent(event); //  Add new events to the calendar
         calendarHandler.setReccurringEventIDs(event);
       });
       calendarHandler.setReccurringEventIDs(recurringEvent);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
@@ -194,6 +194,9 @@ const EventModal: React.FC<{
             selectedDays: [...currentEvent.selectedDays],
         }
 
+        // If event has an groupID means either the user is:
+        // - setting for the first time recurringEvents
+        // - modifying recurring events
         if (currentEvent.groupID) {
             if (!currentEvent.endDate) {
                 console.log("not valid")
@@ -214,10 +217,15 @@ const EventModal: React.FC<{
             }
             // If events exist just modify them if not create them
             const recurringEvents: Event[] = calendarHandler.getReccurringEventIDs(currentEvent);
-            if (recurringEvents.length > 0) {
+            const isRecurringEventsEmpty: boolean = (recurringEvents.length === 0)
+
+            if (isRecurringEventsEmpty) {
                 warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent, null, null));
                 return;
-            } else calendarHandler.setRecurringEvents(updatedEvent);
+            } else {
+                calendarHandler.setRecurringEvents(updatedEvent);
+            }
+
         } else {  // Reset all values that belong to recurring aspects
             updatedEvent.startDate = currentEvent.date;
             updatedEvent.endDate = null;

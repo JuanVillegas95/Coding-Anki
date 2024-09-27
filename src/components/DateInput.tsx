@@ -1,5 +1,5 @@
 import React from 'react';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as F from '@/utils/functions';
 
 const DateInput: React.FC<{
@@ -9,10 +9,11 @@ const DateInput: React.FC<{
 }> = ({ text, date, handleDate }) => {
     const dateTag = `${text}Date`;
     const formatedDate: string = date ? F.formatDate(date) : "";
+    const isDisabled: boolean = (text === "Start");
 
     return <S.TimeContainerDiv>
         <S.TimeP>{text}</S.TimeP>
-        <S.DayInputDate value={formatedDate} onChange={(e) => handleDate(e, dateTag)} />
+        <S.DayInputDate value={formatedDate} onChange={isDisabled ? undefined : (e) => handleDate(e, dateTag)} $isDisabled={isDisabled} />
     </S.TimeContainerDiv>
 };
 

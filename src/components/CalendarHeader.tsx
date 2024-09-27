@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as I from '@/utils/icons';
 import * as F from '@/utils/functions';
 import * as T from '@/utils/types';

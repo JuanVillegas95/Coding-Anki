@@ -3,7 +3,7 @@ import { Event, Warning } from '@/utils/classes';
 import WarningConflict from "@/components/WarningConflict"
 import WarningModify from "@/components/WarningModify"
 import WarningDelete from "@/components/WarningDelete"
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as I from '@/utils/icons';

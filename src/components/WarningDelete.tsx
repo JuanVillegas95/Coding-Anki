@@ -1,7 +1,7 @@
 import React from "react";
 import { Event } from "@/utils/classes";
 import ConflictEvent from "@/components/ConflictEvent";
-import * as S from "@/app/styles/dashboard";
+import * as S from "@/utils/style.calendar";
 import * as C from "@/utils/constants";
 
 const WarningDelete: React.FC<{

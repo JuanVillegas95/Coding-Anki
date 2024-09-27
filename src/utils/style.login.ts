@@ -1,4 +1,4 @@
-import * as S from "@/app/styles/base"
+import * as S from "@/utils/style.base"
 import styled, { keyframes, css } from 'styled-components';
 
 

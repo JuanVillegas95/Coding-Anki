@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import * as S from "@/app/styles/create";
+import * as S from "@/utils/style.create";
 
 const CreateHub: React.FC = () => {
     const [username, setUsername] = useState<string>("");

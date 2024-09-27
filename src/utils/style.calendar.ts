@@ -1,5 +1,39 @@
 import * as C from "@/utils/constants"
 import styled, { keyframes, css } from 'styled-components';
+import * as S from "@/utils/style.base"
+
+
+const CalendarWrapperDiv = styled(S.CenterDiv)`
+  flex-direction: row;
+  gap: 5px;
+`;
+
+
+const CalendarContainerDiv = styled.div`
+  width: ${C.CALENDAR_WIDTH}px;
+  height: ${C.CALENDAR_HEIGHT}px;
+  margin-left: 30px;
+  padding-bottom: 5px;
+  border-radius: 12px;
+  background-color: white;
+  display: grid;
+  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
+  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
+  grid-template-areas: "header header" "aside subheader" "aside main";
+
+  ${C.HIDE_SCROLL_BAR} 
+  @media print {
+    position: absolute;
+    left: -10px;
+    top: 0;
+    width: 100%;
+    visibility: visible;
+    transform: scale(0.9,1.1); 
+    transform-origin: top left;
+    width: 100%; 
+  }
+`;
+
 
 const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size: number, $svgSize: number}>`
   background-color: transparent;
@@ -50,45 +84,6 @@ const IconMenuButton = styled(IconButton)`
     cursor: pointer;
   }
 `
-const CalendarWrapperDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  gap: 5px;
-`;
-
-
-const CalendarContainerDiv = styled.div`
-  width: ${C.CALENDAR_WIDTH}px;
-  height: ${C.CALENDAR_HEIGHT}px;
-  min-width: ${C.CALENDAR_WIDTH - 200}px;
-  margin-left: 30px;
-  padding-bottom: 5px;
-  border-radius: 1.5%;
-  background-color: white;
-  display: grid;
-  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
-  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
-  grid-template-areas: "header header" "aside subheader" "aside main";
-
-  ${C.HIDE_SCROLL_BAR} 
-
-    @media print {
-      position: absolute;
-      left: -10px;
-      top: 0;
-      width: 100%;
-      visibility: visible;
-      transform: scale(0.9,1.1); 
-      transform-origin: top left;
-      width: 100%; 
-    }
-`;
-
 
 const ContainerHeader = styled.header`
   grid-area: header;
@@ -426,7 +421,11 @@ const TimeSelect = styled.select`
   }
 `;
 
-const DayInputDate = styled.input.attrs({type: 'date',})`
+const DayInputDate = styled.input.attrs<{ $isDisabled: boolean}>(
+  ({$isDisabled}) => ({
+  type: 'date',
+  disabled: $isDisabled,  
+}))`
   position: relative;
   padding: 8px;
   border: 1px solid #ccc;
@@ -448,7 +447,16 @@ const DayInputDate = styled.input.attrs({type: 'date',})`
     opacity: 0;
     pointer-events: auto;
   }
+
+  /* Optional: Style the input when disabled */
+  &:disabled {
+    background-color: #f0f0f0;
+    color: #999;
+    cursor: not-allowed;
+  }
 `;
+
+
 
 const RecurringEventButton = styled.button.attrs({type: "button"})`
   width: 180px;

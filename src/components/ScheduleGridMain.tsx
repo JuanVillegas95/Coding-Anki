@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as S from '@/app/styles/dashboard';
+import * as S from '@/utils/style.calendar';
 import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as T from "@/utils/types"
@@ -349,7 +349,6 @@ const ScheduleGridMain: React.FC<{
     }, []);
 
     const updateCurrentEvent = (newEvent: Event): void => setCurrentEvent((prevEvent) => ({ ...prevEvent, ...newEvent }));
-
     const closeModal = (): void => setIsModalOpen(false);
     const openModal = (): void => setIsModalOpen(true);
 
@@ -404,7 +403,7 @@ const ScheduleGridMain: React.FC<{
             e.stopPropagation();
             if (e.button !== C.LEFT_MOUSE_CLICK || !isEventCreating) return;
 
-            const newEvent: Event = { ...currentEvent }
+            const newEvent: Event = { ...currentEvent };
             newEvent.end = F.calculateEventTime(e, columnDivRefs[0]);
             newEvent.height = F.calculateEventHeight(newEvent);
             newEvent.duration = F.calculateEventDuration(newEvent);

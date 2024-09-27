@@ -4,44 +4,44 @@ import React from "react";
 
 // Utility functions
 // Converts hours to minutes
-const hoursToMinutes = (hours: number): number => hours * 60; 
+export const hoursToMinutes = (hours: number): number => hours * 60; 
 
 // Converts minutes to hours
-const minutesToHours = (minutes: number): number => minutes / 60; 
+export const minutesToHours = (minutes: number): number => minutes / 60; 
 
 // Converts hours (including fractional hours from minutes) to height in pixels
-const hoursToPixels = (hours: number): number => hours * C.HOUR_HEIGHT; 
+export const hoursToPixels = (hours: number): number => hours * C.HOUR_HEIGHT; 
 
 // Convert pixels to hours (including fractional hours from minutes)
-const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
+export const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
 
 // Convert time in minutes;
-const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
+export const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
 
 
 // Converts the map into an array returning only the events with the same date
-const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
+export const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
 
 
 // Creates an array of n size;
-const range = (size: number): number[] => [...Array(size).keys()]
+export const range = (size: number): number[] => [...Array(size).keys()]
 
 // Validates if two dates are in the same day
-const areDatesTheSame = (first: Date, second: Date): boolean =>
+export const areDatesTheSame = (first: Date, second: Date): boolean =>
   first.getFullYear() === second.getFullYear() &&
   first.getMonth() === second.getMonth() &&
   first.getDate() === second.getDate();
 
 // Adds a specified number of days to the given date.
-const addDateBy = (date: Date, count: number): Date => {
+export const addDateBy = (date: Date, count: number): Date => {
   const newDate = new Date(date.getTime());
   newDate.setDate(newDate.getDate() + count);
   return newDate;
 };
 
 // Returns the most recent Monday
-const getMostRecentMonday = (): Date => {
+export const getMostRecentMonday = (): Date => {
   const today = new Date();
   const dayOfWeek = today.getDay();
   const daysSinceMonday = (dayOfWeek + 6) % 7;
@@ -51,17 +51,17 @@ const getMostRecentMonday = (): Date => {
 
 
 // Calculates the top offset in pixels units given the time.
-const calculateTopOffset = (time: Time): number => {
+export const calculateTopOffset = (time: Time): number => {
   const totalTimeMinutes = timeToMinutes(time);
   const totalTimeHours = minutesToHours(totalTimeMinutes);
   return hoursToPixels(totalTimeHours);
 }
 
 // Formats the unit into decimal format
-const formatTime = (unit: number): string => (( unit < 10 ) ? `0${unit}` : `${unit}`)
+export const formatTime = (unit: number): string => (( unit < 10 ) ? `0${unit}` : `${unit}`)
 
 //  Generates an array of 24-hour formatted time intervals
-const generate24HourIntervals = (): string[] => {
+export const generate24HourIntervals = (): string[] => {
   const timeArray: string[] = [];
   for(let i = 0; i<24; i++) {
     const formattedTime: string = formatTime(i);
@@ -72,7 +72,7 @@ const generate24HourIntervals = (): string[] => {
 } 
 
 // Calculates the start time of an event based on a mouse click position.
-const calculateEventTime = (
+export const calculateEventTime = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>, 
   columnDivRef: React.RefObject<HTMLDivElement>,
   ): Time => {
@@ -86,7 +86,7 @@ const calculateEventTime = (
   return new Time(timeHour, timeMinutes);
 }
 
-const calculateTimeOnDrag = (
+export const calculateTimeOnDrag = (
   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
   columnDivRef: React.RefObject<HTMLDivElement>,
   event: Event
@@ -129,7 +129,7 @@ const calculateTimeOnDrag = (
 
 
 // Checks if a new event overlaps with any existing events on the same date.
-const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, minutes }: Time) => {
+export const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, minutes }: Time) => {
   const sameDateEvents: Event[] = getSameDateEvents(events,newDate);
   const newEventTotalMinutes: number = hoursToMinutes(hours) + minutes;
 
@@ -143,7 +143,7 @@ const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, 
 }
 
 // Calculate the eventHeight based on the mouse position and the Start Time
-const calculateEventHeight = ({ start, end }: Event): number =>{
+export const calculateEventHeight = ({ start, end }: Event): number =>{
   const totalHourStart: number= start.hours + minutesToHours(start.minutes);
   const distanceFromStart: number = hoursToPixels(totalHourStart);
 
@@ -154,7 +154,7 @@ const calculateEventHeight = ({ start, end }: Event): number =>{
 }
 
 // Calculates the  end time of an event based the height and start time
-const calculateEventEnd = ({ start, height }: Event): Time => {
+export const calculateEventEnd = ({ start, height }: Event): Time => {
   const totalMinutesStart: number = timeToMinutes(start);
   const totalMinutesHeight: number = Math.floor(hoursToMinutes(pixelsToHours(height)));
   const totalMinutes: number = totalMinutesStart + totalMinutesHeight;
@@ -166,7 +166,7 @@ const calculateEventEnd = ({ start, height }: Event): Time => {
 }
 
 // Calculates the event duration
-const calculateEventDuration = ({ start, end }: Event): Time => {
+export const calculateEventDuration = ({ start, end }: Event): Time => {
   const totalStartMinutes: number = timeToMinutes(start);
   const totalEndMinutes: number = timeToMinutes(end);
 
@@ -178,14 +178,14 @@ const calculateEventDuration = ({ start, end }: Event): Time => {
   return new Time(eventHours,eventMinutes);
 }
 
-const isEndBeforeStart = ({ start, end }: Event): boolean => { 
+export const isEndBeforeStart = ({ start, end }: Event): boolean => { 
   const startTotalMinutes: number = timeToMinutes(start);
   const endTotalMinutes: number = timeToMinutes(end);
 
   return endTotalMinutes < startTotalMinutes;
 };
 
-const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
+export const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
   const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
@@ -201,7 +201,7 @@ const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean 
   return false; 
 };
 
-const getConflictingEvents = (newEvent: Event, events: Map<string, Event>): Event[] => {
+export const getConflictingEvents = (newEvent: Event, events: Map<string, Event>): Event[] => {
   const conflictingEvents: Event[] = [];
   const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
@@ -225,7 +225,7 @@ const getConflictingEvents = (newEvent: Event, events: Map<string, Event>): Even
 
 
 
-const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
+export const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
 
   const totalMinutes: number = timeToMinutes(newEvent.duration);
 
@@ -243,11 +243,11 @@ const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean =
   return true;
 }
 
-const formatMonth = (month: Date): string =>{
+export const formatMonth = (month: Date): string =>{
   return month.toLocaleString('en-US', { month: 'short' })
 }
 
-const getMonth = (mondayDate: Date): string => {
+export const getMonth = (mondayDate: Date): string => {
 
   const month: string = formatMonth(mondayDate);
   for(let i = 0; i<7; i++){
@@ -260,19 +260,19 @@ const getMonth = (mondayDate: Date): string => {
   return mondayDate.toLocaleDateString('en-US', { month: 'long' });
 }
 
-const generate24Hours = (): string[] => {
+export const generate24Hours = (): string[] => {
   const hourArray: string[] = [];
   for(let i = 0; i<24; i++)   hourArray.push(formatTime(i));
   return hourArray;
 }
 
-const generate60Minutes = (): string[] => {
+export const generate60Minutes = (): string[] => {
   const minutesArray: string[] = [];
   for(let i = 0; i<60; i++)   minutesArray.push(formatTime(i));
   return minutesArray;
 }
 
-const formatDate = (date: Date): string => {
+export const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
@@ -280,47 +280,14 @@ const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 }
 
-const getDay = (date: Date): number => {
+export const getDay = (date: Date): number => {
   let dayOfTheWeek: number = date.getDay() - 1;
   if(dayOfTheWeek < 0) dayOfTheWeek = 6;
   return dayOfTheWeek;
 }
 
-const shouldBeLocked = (date: Date, index: number): boolean => {
+export const shouldBeLocked = (date: Date, index: number): boolean => {
   let dayOfTheWeek: number = date.getDay() - 1;
   if(dayOfTheWeek < 0) dayOfTheWeek = 6;
   return dayOfTheWeek === index;
 }
-
-
-
-
-
-export {
-  getConflictingEvents,
-  range,
-  areDatesTheSame,
-  addDateBy,
-  getMostRecentMonday,
-  calculateTopOffset,
-  generate24HourIntervals,
-  calculateEventTime,
-  isEventOverlapping,
-  calculateEventHeight,
-  calculateEventEnd,
-  isNewEventValid,
-  calculateEventDuration,
-  formatTime,
-  timeToMinutes,
-  getMonth,
-  generate24Hours,
-  generate60Minutes,
-  isEventColliding,
-  formatDate,
-  getDay,
-  shouldBeLocked,
-  formatMonth,
-  getSameDateEvents,
-  calculateTimeOnDrag,
-  isEndBeforeStart,
-};
