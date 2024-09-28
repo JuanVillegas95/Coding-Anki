@@ -70,6 +70,10 @@ const CalendarHub: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    console.log(calendar.current)
+
+  }, [calendars])
 
   const warningHandler: T.WarningHandler = {
     set: (newWarning: Warning): void => setWarning((prev) => ({ ...prev, ...newWarning })),
@@ -139,40 +143,91 @@ const CalendarHub: React.FC = () => {
     getEvents: () => calendars.get(calendar.current.id)!.events,
 
 
-    setRecurringEvents: (recurringEvent: Event) => {
-      const { startDate, endDate, selectedDays } = recurringEvent;
-      const conflictEvents: Event[] = [];
-      const newRecurringEvents: Event[] = [];
 
-      // optimize this if
-      for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
-        if (selectedDays[F.getDay(date)]) {
+    // Remember here you are dealing either with modifying or creating and potential conflicts
+    setRecurringEvents: (recurringEvent: Event) => {
+      const { startDate, endDate, selectedDays, groupID } = recurringEvent;
+      const existingEvents: Event[] = calendarHandler.getEventsByGroupID(groupID!);
+
+      // Filter Events
+      const eventsToModify: Event[] = [];
+      const eventsToDelete: Event[] = [];
+      const eventsToCreate: Event[] = [];
+      const eventsToSet: Event[] = [];
+      const conflictEvents: Event[] = [];
+
+      if (existingEvents.length > 0) {
+        const existingEventSample = existingEvents[0]; // All recurring events maintain the same selected days
+        for (let day = 0; day < 7; day++) {
+
+          // Modify existing events if the day remains selected (was true, stays true).
+          if (existingEventSample.selectedDays[day] === true && recurringEvent.selectedDays[day] === true) {
+            // From that day in the groupID I want the unique IDs of those events to modify them.
+            const idsToModify: Set<string> = calendar.current.recurringEventIDs[day].get(groupID!)!;
+            idsToModify.forEach((id: string) => {
+              const eventToModify = calendar.current.events.get(id)!; // eventToModify has the reference of the event to avoid mutation
+              const modifiedEvent: Event = { ...recurringEvent, id: recurringEvent.id, date: recurringEvent.date };
+              modifiedEvent.id = eventToModify.id;
+              modifiedEvent.date = eventToModify.date;
+              eventsToModify.push(modifiedEvent);
+            });
+          }
+          // Delete existing events for the unselected day (was true, now false)
+          else if (existingEventSample.selectedDays[day] === true && recurringEvent.selectedDays[day] === false) {
+            // From that day in the groupID I want the unique IDs of those events to delete them.
+            const idsToDelete: Set<string> = calendar.current.recurringEventIDs[day].get(groupID!)!;
+            idsToDelete.forEach((id: string) => eventsToDelete.push(calendar.current.events.get(id)!));
+          }
+        }
+
+        for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
+          const day: number = F.getDay(date);
+          // Create new events for the newly selected day (was false, now true)
+          if (existingEventSample.selectedDays[day] === false && recurringEvent.selectedDays[day] === true) {
+            const newEvent: Event = { ...recurringEvent, id: recurringEvent.id, date: recurringEvent.date };
+            newEvent.id = uuidv4(); // new unique Id
+            newEvent.date = new Date(date); // its date
+            eventsToCreate.push(newEvent); // everything remains the same just add it
+          }
+        }
+        // Concatenate both arrays.
+        eventsToModify.forEach((event: Event) => eventsToSet.push(event));
+        eventsToCreate.forEach((event: Event) => eventsToSet.push(event));
+        // Dont forget to update both data structres
+        eventsToDelete.forEach((event: Event) => {
+          calendarHandler.deleteEvent(event)
+          calendarHandler.deleteRecurringEventID(event)
+        })
+      } else {
+        eventsToSet.push(recurringEvent);
+        for (let date = F.addDateBy(startDate, 1); date <= endDate!; date = F.addDateBy(date, 1)) {
+          const day: number = F.getDay(date);
+          // Create new events for the newly selected day (was false, now true)
+          if (recurringEvent.selectedDays[day] === false) continue;
           const newEvent: Event = { ...recurringEvent, id: recurringEvent.id, date: recurringEvent.date };
           newEvent.id = uuidv4();
-          newEvent.date = new Date(date);
-          newRecurringEvents.push(newEvent);
-
-          const newConflictEvents: Event[] = F.getConflictingEvents(newEvent, calendars.get(calendar.current.id)!.events);
-          if (newConflictEvents.length > 0) newConflictEvents.forEach((newConflictEvent: Event) => conflictEvents.push(newConflictEvent));
+          newEvent.date = new Date(date); // its date
+          eventsToSet.push(newEvent); // everything remains the same just add it
         }
       }
+
+      eventsToSet.forEach((event: Event) => {
+        conflictEvents.concat(F.getConflictingEvents(event, calendarHandler.getEvents()))
+      });
+
       // Because here I have a return the handaling of events is delegated to Warning Handeler
       if (conflictEvents.length > 0) {
         warningHandler.set(new Warning(
           C.WARNING_STATUS.EVENT_CONFLICT,
-          recurringEvent,
-          conflictEvents,
-          newRecurringEvents,
         ))
         return;
       }
 
-      // Adding Events if not conflict
-      newRecurringEvents.forEach((event: Event) => {
-        calendarHandler.setEvent(event); //  Add new events to the calendar
+      // Dont forget to update both data structres
+      eventsToSet.forEach((event: Event) => {
+        calendarHandler.setEvent(event);
         calendarHandler.setReccurringEventIDs(event);
       });
-      calendarHandler.setReccurringEventIDs(recurringEvent);
     },
 
     setReccurringEventIDs: (event: Event): void => {
@@ -200,24 +255,25 @@ const CalendarHub: React.FC = () => {
     },
 
 
-    getReccurringEventIDs: (event: Event): Event[] => {
-      const { id, groupID } = event;
-
+    getEventsByGroupID: (groupID: string): Event[] => {
       const recurringEventsIDs: string[] = [];
+
       Object.values(calendar.current.recurringEventIDs).forEach((map) => {
-        const gorupEventsIDs: Set<string> | undefined = map.get(groupID!);
-        if (gorupEventsIDs) {
-          gorupEventsIDs.forEach((id: string) => {
-            recurringEventsIDs.push(id)
-          })
+        const groupEventIDs: Set<string> | undefined = map.get(groupID!);
+        if (groupEventIDs) {
+          groupEventIDs.forEach((id: string) => recurringEventsIDs.push(id));
         }
+      });
 
-      })
+      const groupEvents: Event[] = [];
+      recurringEventsIDs.forEach((id: string) => {
+        const event = calendar.current.events!.get(id);
+        if (event) groupEvents.push(event);
+      });
 
-      const groupEvents: Event[] = []
-      recurringEventsIDs.forEach((id: string) => groupEvents.push(calendar.current.events!.get(id)!))
       return groupEvents;
     },
+
 
     deleteRecurringEventID: (event: Event): void => {
       const { groupID, id } = event
@@ -279,7 +335,7 @@ const CalendarHub: React.FC = () => {
 
   const setLinkedCalendarFriend = (event: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(event.target.value)
 
-  return <React.Fragment>
+  return <React.Fragment >
     <S.CalendarWrapperDiv>
       <S.CalendarContainerDiv>
         <CalendarHeader
@@ -307,16 +363,20 @@ const CalendarHub: React.FC = () => {
         setLinkedCalendar={setLinkedCalendarFriend}
       />
     </S.CalendarWrapperDiv>
-    {(toasts.size > 0) && <ToastMessage
-      toast={toastHandeler.getTail()}
-      popToast={toastHandeler.pop}
-    />}
-    {(warning.status !== C.WARNING_STATUS.NONE) && <WarningModal
-      warning={warning}
-      warningHandler={warningHandler}
-      calendarHandler={calendarHandler}
-    />}
-  </React.Fragment>
+    {
+      (toasts.size > 0) && <ToastMessage
+        toast={toastHandeler.getTail()}
+        popToast={toastHandeler.pop}
+      />
+    }
+    {
+      (warning.status !== C.WARNING_STATUS.NONE) && <WarningModal
+        warning={warning}
+        warningHandler={warningHandler}
+        calendarHandler={calendarHandler}
+      />
+    }
+  </React.Fragment >
 };
 
 export default CalendarHub;

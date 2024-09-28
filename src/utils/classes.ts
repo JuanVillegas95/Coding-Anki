@@ -77,8 +77,9 @@ class Event {
   startDate: Date;
   endDate: Date | null;
   groupID: string | null;
-  selectedDays: boolean[];
+  storedGroupId: string | null; // In order to handle then toggleing
 
+  selectedDays: boolean[];
   constructor(
     date: Date = new Date(), 
     start: Time = new Time(), 
@@ -95,6 +96,7 @@ class Event {
     this.color = "purple";
     this.height = height;
     this.duration = new Time(-1, -1);
+    this.storedGroupId = null;
     this.icon = I.star;
     this.groupID = groupID;
     this.selectedDays = Array(7).fill(false);

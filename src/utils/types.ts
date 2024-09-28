@@ -25,7 +25,7 @@ export type CalendarHandler = {
 
     setReccurringEventIDs: (event: Event) => void;
     deleteRecurringEventID: (event: Event) => void;
-    getReccurringEventIDs: (event: Event) => Event[];
+    getEventsByGroupID: (groupID: string) => Event[];
 };
 
 export type EventOnMouseDownType = {

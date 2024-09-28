@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as S from '@/utils/style.calendar';
 import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
@@ -166,9 +166,12 @@ const EventModal: React.FC<{
 
     const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
-        const updatedEvent: Event = { ...currentEvent, groupID: currentEvent.groupID };
-        if (!updatedEvent.groupID) updatedEvent.groupID = uuidv4();
-        else updatedEvent.groupID = null;
+        const updatedEvent: Event = { ...currentEvent, groupID: currentEvent.groupID, storedGroupId: currentEvent.storedGroupId };
+
+        if (!updatedEvent.storedGroupId) updatedEvent.storedGroupId = uuidv4();
+        if (updatedEvent.groupID) updatedEvent.groupID = null;
+        else updatedEvent.groupID = updatedEvent.storedGroupId;
+
         updateCurrentEvent(updatedEvent);
     };
 
@@ -192,14 +195,18 @@ const EventModal: React.FC<{
             startDate: new Date(currentEvent.startDate),
             endDate: currentEvent.endDate ? new Date(currentEvent.endDate) : null,
             selectedDays: [...currentEvent.selectedDays],
+            storedGroupId: currentEvent.storedGroupId,
         }
 
-        // If event has an groupID means either the user is:
-        // - setting for the first time recurringEvents
-        // - modifying recurring events
-        if (currentEvent.groupID) {
+        if (!currentEvent.groupID) { // Reset all values that belong to recurring aspects
+            updatedEvent.startDate = currentEvent.date;
+            updatedEvent.endDate = null;
+            updatedEvent.selectedDays.fill(false);
+            updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
+            updatedEvent.storedGroupId = null;
+            calendarHandler.setEvent(updatedEvent);
+        } else { // It has gorupID
             if (!currentEvent.endDate) {
-                console.log("not valid")
                 addToast(new Toast(
                     "Handle end time",
                     "End time must be valid",
@@ -215,24 +222,8 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-            // If events exist just modify them if not create them
-            const recurringEvents: Event[] = calendarHandler.getReccurringEventIDs(currentEvent);
-            const isRecurringEventsEmpty: boolean = (recurringEvents.length === 0)
-
-            if (isRecurringEventsEmpty) {
-                warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY, currentEvent, null, null));
-                return;
-            } else {
-                calendarHandler.setRecurringEvents(updatedEvent);
-            }
-
-        } else {  // Reset all values that belong to recurring aspects
-            updatedEvent.startDate = currentEvent.date;
-            updatedEvent.endDate = null;
-            updatedEvent.selectedDays.fill(false);
-            updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
+            calendarHandler.setRecurringEvents(updatedEvent);
         }
-        calendarHandler.setEvent(updatedEvent);
         closeModal();
     };
 

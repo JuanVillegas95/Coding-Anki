@@ -14,6 +14,7 @@ const eventsDataUser = new Map([
     [
         "1",
         {
+            storedGroupId: null,
             id: "b868bc61-de97-45cd-ba11-ccd3aeca76c4",
             date: new Date("2024-09-23T13:23:07.864Z"),
             start: { hours: 0, minutes: 44 },
@@ -34,6 +35,7 @@ const eventsDataUser = new Map([
     [
         "2",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "7d3d6cec-fa95-4c95-9922-6137852b3930",
             date: new Date("2024-09-24T13:23:07.864Z"),
@@ -54,6 +56,7 @@ const eventsDataUser = new Map([
     [
         "3",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "8d644ef7-0d7c-482e-89cf-ee8402a6b353",
             date: new Date("2024-09-25T13:23:07.864Z"),
@@ -74,6 +77,7 @@ const eventsDataUser = new Map([
     [
         "4",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "acbbc846-265b-4535-9053-d787450b3a70",
             date: new Date("2024-09-26T13:23:07.864Z"),
@@ -94,6 +98,7 @@ const eventsDataUser = new Map([
     [
         "5",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "932e788f-cd3e-4014-92c5-94071368af67",
             date: new Date("2024-09-27T13:23:07.864Z"),
@@ -114,6 +119,7 @@ const eventsDataUser = new Map([
     [
         "6",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "4e35c113-770f-4e42-8a6c-544847d62836",
             date: new Date("2024-09-28T13:23:07.864Z"),
@@ -134,6 +140,7 @@ const eventsDataUser = new Map([
     [
         "7",
         {
+            storedGroupId: null,
             isFriendEvent: false,
             id: "818b0ded-0a98-4f87-bb07-cb6eb6a3d69f",
             date: new Date("2024-09-29T13:23:07.864Z"),
@@ -157,6 +164,7 @@ const eventsDataFriend = new Map([
     [
         "8",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "b868bc61-de97-45cd-ba11-ccd3aeca76c4",
             date: new Date("2024-09-23T13:23:07.864Z"),
@@ -177,6 +185,7 @@ const eventsDataFriend = new Map([
     [
         "9",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "7d3d6cec-fa95-4c95-9922-6137852b3930",
             date: new Date("2024-09-24T13:23:07.864Z"),
@@ -197,6 +206,7 @@ const eventsDataFriend = new Map([
     [
         "10",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "8d644ef7-0d7c-482e-89cf-ee8402a6b353",
             date: new Date("2024-09-25T13:23:07.864Z"),
@@ -217,6 +227,7 @@ const eventsDataFriend = new Map([
     [
         "11",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "acbbc846-265b-4535-9053-d787450b3a70",
             date: new Date("2024-09-26T13:23:07.864Z"),
@@ -237,6 +248,7 @@ const eventsDataFriend = new Map([
     [
         "12",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "932e788f-cd3e-4014-92c5-94071368af67",
             date: new Date("2024-09-27T13:23:07.864Z"),
@@ -257,6 +269,7 @@ const eventsDataFriend = new Map([
     [
         "13",
         {
+            storedGroupId: null,
             isFriendEvent: true,
             id: "4e35c113-770f-4e42-8a6c-544847d62836",
             date: new Date("2024-09-28T13:23:07.864Z"),
@@ -291,7 +304,8 @@ const eventsDataFriend = new Map([
             selectedDays: [false, false, false, false, false, false, true],
             startDate: new Date("2024-09-29T13:23:07.864Z"),
             endDate: null,
-            icon: I.star // Add the required icon property here
+            icon: I.star,// Add the required icon property here
+            storedGroupId: null,
         }
     ]
 ]);
