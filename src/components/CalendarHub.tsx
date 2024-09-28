@@ -70,10 +70,10 @@ const CalendarHub: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log(calendar.current)
+  // useEffect(() => {
+  //   console.log(calendar.current)
 
-  }, [calendars])
+  // }, [calendars])
 
   const warningHandler: T.WarningHandler = {
     set: (newWarning: Warning): void => setWarning((prev) => ({ ...prev, ...newWarning })),
@@ -363,11 +363,10 @@ const CalendarHub: React.FC = () => {
         setLinkedCalendar={setLinkedCalendarFriend}
       />
     </S.CalendarWrapperDiv>
-    {
-      (toasts.size > 0) && <ToastMessage
-        toast={toastHandeler.getTail()}
-        popToast={toastHandeler.pop}
-      />
+    {(toasts.size > 0) && <ToastMessage
+      toast={toastHandeler.getTail()}
+      popToast={toastHandeler.pop}
+    />
     }
     {
       (warning.status !== C.WARNING_STATUS.NONE) && <WarningModal

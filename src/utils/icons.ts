@@ -55,8 +55,11 @@ import linkIn from "@/gif/link-in.gif"
 import linkOut from "@/gif/link-out.gif"
 
 import oracle from "@/images/oracle.png"
+import logo from "@/images/logo.png"
+import acctually from "@/images/actually.png"
+import welcome from "@/images/welcome.png"
 export {
-  oracle,
+  oracle, logo, acctually, welcome,
   removeUser, addUser,
   linkIn, linkOut,
   calendar, group,

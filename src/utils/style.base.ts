@@ -1,6 +1,7 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { Fredoka } from "next/font/google";
+import { Fredoka, Varela_Round } from "next/font/google";
+
 
 const fredoka = Fredoka({
     weight: ["300", "400", "500", "600", "700"],
@@ -9,6 +10,30 @@ const fredoka = Fredoka({
     display: "swap",
   });
 
+const varela = Varela_Round({
+    weight: ["400"],
+    style: ["normal",],
+    subsets: ["latin"],
+    display: "swap",
+});
+
+export const LogoWrapperDiv = styled.div`
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 90deg, white 90deg);
+  position: relative;
+`
+export const LogoTextT = styled.p`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: ${fredoka.style.fontFamily};
+  font-weight: 700;
+  color: black;
+  font-size: 30px;
+`
 
 export const TitleP = styled.p`
   font-family: ${fredoka.style.fontFamily};
@@ -97,13 +122,13 @@ export const ButtonInput = styled.input.attrs({ type: "button" })`
   color: white;
   padding: 10px;
   font-size: 20px;
+  border: none;
+  outline: none;
   &:hover{
     cursor: pointer;
   }
 `
-//   width: 600px;
-// height: 400px;
-// gap: 20px;
+
 
 export const ContainerColDiv = styled.div<{ $width: string, $height: string, $gap?: string}>`
   display: flex;

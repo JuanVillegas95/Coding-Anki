@@ -60,3 +60,10 @@ export const LoginWhyP = styled(S.TextP)`
   }
 `
 
+export const LoginLogoWrapperDiv = styled.div`
+  Image{
+
+  }
+
+`
+

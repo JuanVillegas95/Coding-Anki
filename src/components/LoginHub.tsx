@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { oracle, cross } from "@/utils/icons";
+import { oracle, cross, acctually } from "@/utils/icons";
+import Logo from "@/components/Logo"
 import Image from "next/image";
 import * as S from "@/utils/style.login";
 
@@ -11,6 +12,7 @@ const LoginHub: React.FC = () => {
     return <React.Fragment>
         <S.LoginWrapperDiv>
             <S.LoginContainerDiv $height={"400px"} $width={"600px"} $gap={"20px"}>
+                <Logo />
                 <S.LoginTitleWrapperDiv>
                     <S.LoginTitleP>Login with Oracle</S.LoginTitleP>
                     <Image
@@ -28,6 +30,14 @@ const LoginHub: React.FC = () => {
         </S.LoginWrapperDiv>
         {isWhyModal && <S.LoginModalWrapperDiv $zIndex={1} >
             <S.LoginModalContainerDiv $width={"600px"} $height={"auto"}>
+                <Image
+                    src={acctually.src}
+                    height={200}
+                    width={200}
+                    alt={"Oracle Logo"}
+                    objectFit={"cover"}
+                    style={{ marginLeft: "10px" }}
+                />
                 <S.LoginCloseDiv
                     $isBackgroundGrey={true}
                     $size={"40px"}
