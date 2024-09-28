@@ -15,7 +15,14 @@ export const LoginModalContainerDiv = styled(S.ModalContainerDiv)`
 `;
 
 export const LoginTitleP = styled(S.TitleP)`
+  font-size: 50px;
+  font-weight: 600;
 `;
+
+export const LoginWrapperHeader = styled.header`
+  display: flex;
+  gap: 0;
+`
 
 export const LoginTextP = styled(S.TextP)`
 `;
@@ -45,10 +52,11 @@ export const LoginContainerDiv = styled(S.ContainerColDiv)``
 
 export const LoginTitleWrapperDiv = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-around;
   align-items: center;
+  gap: 15px;
 `
 
 export const LoginButtonInput = styled(S.ButtonInput).attrs({ value: "Next" })``
@@ -60,10 +68,4 @@ export const LoginWhyP = styled(S.TextP)`
   }
 `
 
-export const LoginLogoWrapperDiv = styled.div`
-  Image{
-
-  }
-
-`
 

@@ -143,7 +143,7 @@ const CalendarHub: React.FC = () => {
     getEvents: () => calendars.get(calendar.current.id)!.events,
 
 
-
+    // !ABOUT TO ABSTRACT THE LOGIC OF THIS
     // Remember here you are dealing either with modifying or creating and potential conflicts
     setRecurringEvents: (recurringEvent: Event) => {
       const { startDate, endDate, selectedDays, groupID } = recurringEvent;
@@ -157,9 +157,9 @@ const CalendarHub: React.FC = () => {
       const conflictEvents: Event[] = [];
 
       if (existingEvents.length > 0) {
+        // warningHandler.set(new Warning(C.WARNING_STATUS.EVENT_MODIFY,))
         const existingEventSample = existingEvents[0]; // All recurring events maintain the same selected days
         for (let day = 0; day < 7; day++) {
-
           // Modify existing events if the day remains selected (was true, stays true).
           if (existingEventSample.selectedDays[day] === true && recurringEvent.selectedDays[day] === true) {
             // From that day in the groupID I want the unique IDs of those events to modify them.

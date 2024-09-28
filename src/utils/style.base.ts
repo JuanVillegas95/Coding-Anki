@@ -18,11 +18,7 @@ const varela = Varela_Round({
 });
 
 export const LogoWrapperDiv = styled.div`
-  width: 300px;
-  height: 300px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 90deg, white 90deg);
-  position: relative;
 `
 export const LogoTextT = styled.p`
   position: absolute;

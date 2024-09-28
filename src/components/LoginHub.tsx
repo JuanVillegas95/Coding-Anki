@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { oracle, cross, acctually } from "@/utils/icons";
+import { oracle, cross, acctually, oracle_text, logo } from "@/utils/icons";
 import Logo from "@/components/Logo"
 import Image from "next/image";
 import * as S from "@/utils/style.login";
@@ -11,17 +11,26 @@ const LoginHub: React.FC = () => {
 
     return <React.Fragment>
         <S.LoginWrapperDiv>
-            <S.LoginContainerDiv $height={"400px"} $width={"600px"} $gap={"20px"}>
-                <Logo />
+            <S.LoginContainerDiv $height={"500px"} $width={"600px"} $gap={"20px"}>
+                <Image
+                    src={logo.src}
+                    alt="Purrfect Timing Logo"
+                    width={200}
+                    height={200}
+                    style={{
+                        border: "5px solid black",
+                        borderRadius: "50%"
+                    }}
+                />
                 <S.LoginTitleWrapperDiv>
-                    <S.LoginTitleP>Login with Oracle</S.LoginTitleP>
+                    <S.LoginTitleP>Login with</S.LoginTitleP>
                     <Image
-                        src={oracle.src}
-                        height={50}
-                        width={80}
+                        src={oracle_text.src}
+                        height={40}
+                        width={300}
                         alt={"Oracle Logo"}
                         objectFit={"cover"}
-                        style={{ marginLeft: "10px" }}
+                        style={{ marginLeft: "5px" }}
                     />
                 </S.LoginTitleWrapperDiv>
                 <S.LoginButtonInput />
@@ -30,14 +39,6 @@ const LoginHub: React.FC = () => {
         </S.LoginWrapperDiv>
         {isWhyModal && <S.LoginModalWrapperDiv $zIndex={1} >
             <S.LoginModalContainerDiv $width={"600px"} $height={"auto"}>
-                <Image
-                    src={acctually.src}
-                    height={200}
-                    width={200}
-                    alt={"Oracle Logo"}
-                    objectFit={"cover"}
-                    style={{ marginLeft: "10px" }}
-                />
                 <S.LoginCloseDiv
                     $isBackgroundGrey={true}
                     $size={"40px"}
@@ -47,7 +48,17 @@ const LoginHub: React.FC = () => {
                 >
                     {React.createElement(cross)}
                 </S.LoginCloseDiv>
-                <S.LoginTitleP>Why Are We Using Oracle for Login?</S.LoginTitleP>
+                <S.LoginWrapperHeader>
+                    <S.LoginTitleP>Why Are We Using Oracle for Login?</S.LoginTitleP>
+                    <Image
+                        src={acctually.src}
+                        height={200}
+                        width={200}
+                        alt={"Oracle Logo"}
+                        objectFit={"cover"}
+                        style={{ marginLeft: "10px" }}
+                    />
+                </S.LoginWrapperHeader>
                 <S.LoginTextP>
                     At PurrfectTiming, we take your privacy and security seriously. That’s why we’ve chosen Oracle OAuth 2.0 for managing user authentication. By using Oracle, we ensure that:
                 </S.LoginTextP>

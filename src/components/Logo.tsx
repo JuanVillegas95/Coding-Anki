@@ -15,7 +15,6 @@ const Logo: React.FC = () => (
                 borderRadius: "50%"
             }}
         />
-        <LogoTextT>Purrfect Timing</LogoTextT>
     </LogoWrapperDiv>
 );
 
