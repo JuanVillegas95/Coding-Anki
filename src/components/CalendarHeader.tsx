@@ -7,16 +7,14 @@ import * as T from '@/utils/types';
 
 const CalendarHeader: React.FC<{
     mondayDate: Date,
-    name: string,
-    changeCalendarName: (e: React.ChangeEvent<HTMLInputElement>) => void,
     weekHandler: T.WeekHandler
     linkIcon: string;
     toggleLink: () => void;
-}> = ({ name, changeCalendarName, weekHandler, mondayDate, linkIcon, toggleLink }) => {
+}> = ({ weekHandler, mondayDate, linkIcon, toggleLink }) => {
 
     return <S.ContainerHeader>
         <S.CalendarNameDiv>
-            <S.CalendarNameInput value={name} onChange={changeCalendarName} />
+            <S.CalendarNameInput value={undefined} onChange={undefined} />
         </S.CalendarNameDiv>
         <S.HeaderRigthestWrapperDiv>
             <S.MonthP>{F.getMonth(mondayDate)}</S.MonthP>

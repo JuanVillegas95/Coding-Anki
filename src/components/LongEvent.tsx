@@ -9,11 +9,11 @@ const LongEvent: React.FC<{
     startMinutes: string;
     endHours: string;
     endMinutes: string;
-    icon: React.ComponentType;
+    // icon: React.ComponentType;
     title: string;
     description: string;
     isLinked: boolean;
-}> = ({ color, startHours, startMinutes, endHours, endMinutes, icon, title, description, isLinked }) => {
+}> = ({ color, startHours, startMinutes, endHours, endMinutes, title, description, isLinked }) => {
     return (
         <S.ContainerLongEventDiv>
             <S.LongEventHeader
@@ -21,7 +21,7 @@ const LongEvent: React.FC<{
                 $isLinked={isLinked}
             >
                 {!isLinked && <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
-                    {React.createElement(icon)}
+                    {/* {React.createElement(icon)} */}
                 </S.LongEventIconDiv>}
                 <S.LongEventTimeDiv $isLinked={isLinked}>
                     <S.LongEventStartDiv $isLinked={isLinked}>
@@ -40,7 +40,7 @@ const LongEvent: React.FC<{
                 <S.LongEventTitleP>{title}</S.LongEventTitleP>
                 <S.LongEventDescriptionP>{description}</S.LongEventDescriptionP>
                 <S.LongEventIconBodyDiv $color={C.COLORS[color].tertiary} $size={40} $svgSize={40}>
-                    {React.createElement(icon)}
+                    {/* {React.createElement(icon)} */}
                 </S.LongEventIconBodyDiv>
             </S.LongEventBodyDiv>
         </S.ContainerLongEventDiv>

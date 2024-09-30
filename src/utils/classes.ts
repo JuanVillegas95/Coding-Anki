@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { WARNING_STATUS, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
+import { strigifyDate } from "@/utils/functions";
 import * as I  from "@/utils/icons"
 
 class User {
@@ -25,70 +26,127 @@ class User {
 class Calendar {
   id: string;
   name: string;
-  events: Map<string, Event>;
-  recurringEventIDs: Record<number, Map<string, Set<string>>>;
-
-  constructor(
-    id: string = uuidv4(), 
-    name: string = "Something is wrong", 
-    events: Map<string, Event> = new Map(),
-    recurringEventIDs: Record<number, Map<string, Set<string>>> = {
-      0: new Map(), // Monday
-      1: new Map(), // Tuesday
-      2: new Map(), // Wednesday
-      3: new Map(), // Thursday
-      4: new Map(), // Friday
-      5: new Map(), // Saturday
-      6: new Map(), // Sunday
+  private eventsById: Map<string, Event>;  // Stores all event objects by their unique ID
+  private eventIdsByDay: Map<string, Set<string>>;  // Maps specific dates as strings to Set<string> of event IDs for events on those days
+  private eventIdsByGroupId: Map<string, Set<string>>; // Maps specific groupId as strings to Set<string> of event IDs for those events Ids
+  
+    constructor(id: string = uuidv4(), name: string = "Something is wrong") {
+      this.id = id;
+      this.name = name;
+      this.eventsById = new Map<string, Event>();
+      this.eventIdsByDay = new Map<string, Set<string>>();
+      this.eventIdsByGroupId = new Map<string, Set<string>>();
     }
-  ) {
-    this.id = id;
-    this.name = name;
-    this.events = events;
-    this.recurringEventIDs = recurringEventIDs;
-  }
+
+    public consoleLogDate(event: Event): void {
+      if(this.eventsById.get(event.id)){
+        if(this.eventsById.get(event.id)?.date) console.log(this.eventsById.get(event.id)?.date)
+      }
+      
+    }
+
+    public setEvent(event: Event): void {
+      const existingEvent = this.eventsById.get(event.id);
+
+
+      if (existingEvent) { // If the event exists, modify it
+        // Handle date change in eventIdsByDay
+        const updatedEvent = { ...event };
+        const oldDateKey: string = existingEvent.date;
+        const newDateKey: string = updatedEvent.date;
+        // Remove event ID from the old date's Set
+        if (oldDateKey !== newDateKey) {
+          const oldDateEvents = this.eventIdsByDay.get(oldDateKey);
+          if (oldDateEvents) {
+            oldDateEvents.delete(updatedEvent.id);
+            if (oldDateEvents.size === 0) this.eventIdsByDay.delete(oldDateKey); 
+          }
+    
+          // Add event ID to the new date's Set
+          if (this.eventIdsByDay.has(newDateKey)) this.eventIdsByDay.get(newDateKey)!.add(updatedEvent.id);
+          else this.eventIdsByDay.set(newDateKey, new Set([updatedEvent.id]));
+        }
+        this.eventsById.set(updatedEvent.id, updatedEvent);
+
+        //!BANANAS 
+        // if (event.groupId) {
+        //   if (this.eventIdsByGroupId.has(event.groupId)) this.eventIdsByGroupId.get(event.groupId)!.add(event.id);
+        //   else this.eventIdsByGroupId.set(event.groupId, new Set([event.id]));
+        // }
+        //!
+
+      } else { // If the event doesn't exist, treat it as a new event
+        // Add the event to the eventsById map
+        this.eventsById.set(event.id, event);
+    
+        // Step 2: Add the event ID to the eventIdsByDay map for that date
+        const dateKey: string = event.date;
+        if (this.eventIdsByDay.has(dateKey)) this.eventIdsByDay.get(dateKey)!.add(event.id);
+        else this.eventIdsByDay.set(dateKey, new Set([event.id]));
+      }
+    
+      // Step 3: If the event has a groupId, add the event ID to the eventIdsByGroupId map
+      // Handle groupId for both add and modify cases
+      if (event.groupId) {
+        if (existingEvent && existingEvent.groupId !== event.groupId) {
+          // If groupId has changed, remove from the old groupId
+          const oldGroupEvents = this.eventIdsByGroupId.get(existingEvent.groupId!);
+          if (oldGroupEvents) {
+            oldGroupEvents.delete(event.id);
+            if (oldGroupEvents.size === 0) this.eventIdsByGroupId.delete(existingEvent.groupId!);
+          }
+        }
+    
+        // Add event ID to the new groupId's Set
+        if (this.eventIdsByGroupId.has(event.groupId)) this.eventIdsByGroupId.get(event.groupId)!.add(event.id);
+        else this.eventIdsByGroupId.set(event.groupId, new Set([event.id]));
+      }
+    }
+    
+    public getEventsByDate(date: string): Event[] {
+      const eventIds: Set<string> | undefined = this.eventIdsByDay.get(date);
+    
+      if (!eventIds) return [];
+    
+      const events: Event[] = Array.from(eventIds).map(eventId => this.eventsById.get(eventId)!);
+
+      return events;
+    }
+    
 }
 
-
-// Explanation:
-// `recurringEventIDs`: Record<number, Map<string, Set<string>>>
-// - The `Record` has fixed keys from 0 to 6 representing days of the week (Monday to Sunday).
-// - Each key in the `Record` points to a `Map<string, Set<string>>`:
-//     - The `Map`'s keys are `groupIDs`, representing groups of recurring events.
-//     - The `Map`'s values are `Set<string>`, which contains event IDs that belong to the `groupID` for that particular day.
-// - Using `Record<number, Map<string, Set<string>>>` allows efficient operations with **O(1)** time complexity for adding 
 
 
 
 class Event {
   id: string;
-  date: Date;
+  date: string; //YYYY-MM-DD 
   title: string;
   description: string;
   start: Time;
   end: Time;
   height: number;
   duration: Time;
-  icon: React.ComponentType;
+  icon: string;
   color: string;
   isFriendEvent: boolean;
 
-    // Attributes members for reccurring behavior
+  // Attributes members for reccurring behavior
   startDate: Date;
   endDate: Date | null;
-  groupID: string | null;
+  groupId: string | null;
   storedGroupId: string | null; // In order to handle then toggleing
 
   selectedDays: boolean[];
   constructor(
-    date: Date = new Date(), 
+    date: Date, 
     start: Time = new Time(), 
-    groupID: string | null = null, 
+    groupId: string | null = null, 
     isFriendEvent: boolean = false,
     height: number = -1, 
-    ) {// hi
+    ) {
     this.id = uuidv4();
-    this.date = date;
+    this.date = strigifyDate(date);
     this.start = start;
     this.end = new Time(-1, -1);
     this.title = "";
@@ -97,8 +155,8 @@ class Event {
     this.height = height;
     this.duration = new Time(-1, -1);
     this.storedGroupId = null;
-    this.icon = I.star;
-    this.groupID = groupID;
+    this.icon = "";
+    this.groupId = groupId;
     this.selectedDays = Array(7).fill(false);
     this.startDate = date;
     this.endDate = null;

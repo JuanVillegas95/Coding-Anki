@@ -18,13 +18,13 @@ const CalendarList: React.FC<{
     label: string;
     icon: React.ComponentType;
     closeCalendarList: () => void;
-    setCalendarName: (name: string) => void;
+    // setCalendarName: (name: string) => void;
 
 }>
-    = ({ closeCalendarList, label, icon, setCalendarName }) => {
+    = ({ closeCalendarList, label, icon }) => {
         const [selectedCalendar, setSelectedCalendar] = useState<string>("")
 
-        const handleOnClick = (name: string) => setCalendarName(name)
+        // const handleOnClick = (name: string) => setCalendarName(name)
 
         return <S.FriendsWrapperDiv>
             <S.FriendHeader onClick={closeCalendarList}>
@@ -34,7 +34,7 @@ const CalendarList: React.FC<{
             <S.CalendarListContainerDiv>
                 {Array.from(USER.calendars.values()).map((calendar: Calendar, index: number) => {
                     return (
-                        <S.CalerndarLi key={index} onClick={() => handleOnClick(calendar.name)}>
+                        <S.CalerndarLi key={index} onClick={undefined}>
                             <S.FriendP >
                                 {calendar.name}
                             </S.FriendP>

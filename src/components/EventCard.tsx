@@ -14,12 +14,11 @@ const EventCard: React.FC<{
     isLinked: boolean
     eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
 }> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick, isLinked }) => {
-    const { id, height, start, end, duration, color, icon, title, description, groupID, isFriendEvent } = event;
-    // console.log(eventOnClick)
+    const { id, height, start, end, duration, color, title, description, groupId, isFriendEvent } = event;
     const totalMinutes = F.timeToMinutes(duration);
     const topOffset = F.calculateTopOffset(start);
     const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
-    const borderStyle: string = groupID ? "solid" : "dotted";
+    const borderStyle: string = groupId ? "solid" : "dotted";
     return <S.EventDiv
         key={id}
         $fromTop={topOffset}
@@ -48,7 +47,7 @@ const EventCard: React.FC<{
                     startMinutes={F.formatTime(start.minutes)}
                     endHours={F.formatTime(end.hours)}
                     endMinutes={F.formatTime(end.minutes)}
-                    icon={icon}
+                    // icon={icon}
                     title={title}
                     description={description}
                     isLinked={isLinked}

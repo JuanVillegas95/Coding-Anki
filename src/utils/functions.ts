@@ -19,8 +19,6 @@ export const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
 export const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
 
 
-// Converts the map into an array returning only the events with the same date
-export const getSameDateEvents = (events: Map<any, Event>, date: Date): Event[] => Array.from(events.values()).filter(( event ) => areDatesTheSame(event.date, date));
 
 
 
@@ -36,9 +34,10 @@ export const areDatesTheSame = (first: Date, second: Date): boolean =>
 // Adds a specified number of days to the given date.
 export const addDateBy = (date: Date, count: number): Date => {
   const newDate = new Date(date.getTime());
-  newDate.setDate(newDate.getDate() + count);
+  newDate.setUTCDate(newDate.getUTCDate() + count); 
   return newDate;
 };
+
 
 // Returns the most recent Monday
 export const getMostRecentMonday = (): Date => {
@@ -129,16 +128,16 @@ export const calculateTimeOnDrag = (
 
 
 // Checks if a new event overlaps with any existing events on the same date.
-export const isEventOverlapping = (events: Map<string, Event>, newDate: Date, { hours, minutes }: Time) => {
-  const sameDateEvents: Event[] = getSameDateEvents(events,newDate);
+export const isEventOverlapping = (events: Event[], { hours, minutes }: Time) => {
   const newEventTotalMinutes: number = hoursToMinutes(hours) + minutes;
 
-  for(const { start, end } of sameDateEvents){
+  for(const { start, end } of events){
     const eventStartTotalMinutes: number = hoursToMinutes(start.hours) + start.minutes;
     const eventEndTotalMinutes: number = hoursToMinutes(end.hours) + end.minutes;
     
     if(newEventTotalMinutes >= eventStartTotalMinutes && newEventTotalMinutes < eventEndTotalMinutes) return true;
   }
+  
   return false;
 }
 
@@ -185,12 +184,11 @@ export const isEndBeforeStart = ({ start, end }: Event): boolean => {
   return endTotalMinutes < startTotalMinutes;
 };
 
-export const isEventColliding = (newEvent: Event, events: Map<string, Event>): boolean => {
-  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
+export const isEventColliding = (newEvent: Event, events: Event[]): boolean => {
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
 
-  for (const { start, end, id } of sameDateEvents) {
+  for (const { start, end, id } of events) {
     if (newEvent.id === id) continue;
     const eventStartMinutes = timeToMinutes(start);
     const eventEndMinutes = timeToMinutes(end);
@@ -203,29 +201,29 @@ export const isEventColliding = (newEvent: Event, events: Map<string, Event>): b
 
 export const getConflictingEvents = (newEvent: Event, events: Map<string, Event>): Event[] => {
   const conflictingEvents: Event[] = [];
-  const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
+  // const sameDateEvents: Event[] = getSameDateEvents(events, newEvent.date);
   const newEventStartMinutes = timeToMinutes(newEvent.start);
   const newEventEndMinutes = timeToMinutes(newEvent.end);
 
-  for (const event of sameDateEvents) {
-    const { start, end, id } = event;
-    if (newEvent.id === id) continue; // Skip the new event itself if it’s already in the list
+  // for (const event of sameDateEvents) {
+  //   const { start, end, id } = event;
+  //   if (newEvent.id === id) continue; // Skip the new event itself if it’s already in the list
 
-    const eventStartMinutes = timeToMinutes(start);
-    const eventEndMinutes = timeToMinutes(end);
+  //   const eventStartMinutes = timeToMinutes(start);
+  //   const eventEndMinutes = timeToMinutes(end);
 
-    // Check for time overlap
-    if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) {
-      conflictingEvents.push(event); // Add the conflicting event to the list
-    }
-  }
+  //   // Check for time overlap
+  //   if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) {
+  //     conflictingEvents.push(event); // Add the conflicting event to the list
+  //   }
+  // }
 
   return conflictingEvents; // Return all conflicting events
 };
 
 
 
-export const isNewEventValid = (newEvent: Event, events: Map<string, Event>): boolean => {
+export const isNewEventValid = (newEvent: Event, events: Event[]): boolean => {
 
   const totalMinutes: number = timeToMinutes(newEvent.duration);
 
@@ -280,14 +278,31 @@ export const formatDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 }
 
-export const getDay = (date: Date): number => {
-  let dayOfTheWeek: number = date.getDay() - 1;
-  if(dayOfTheWeek < 0) dayOfTheWeek = 6;
+export const getDay = (date: string): number => {
+  const utcDate = parseDateStringToUTC(date);  
+  let dayOfTheWeek: number = utcDate.getUTCDay();  
+  // Adjust so that Monday becomes 0, Tuesday becomes 1, ..., Sunday becomes 6
+  dayOfTheWeek = (dayOfTheWeek === 0) ? 6 : dayOfTheWeek - 1;
   return dayOfTheWeek;
-}
+};
+
 
 export const shouldBeLocked = (date: Date, index: number): boolean => {
   let dayOfTheWeek: number = date.getDay() - 1;
   if(dayOfTheWeek < 0) dayOfTheWeek = 6;
   return dayOfTheWeek === index;
 }
+
+export const strigifyDate = (date: Date): string => {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+    .toISOString()
+    .split('T')[0];
+};
+
+export const parseDateStringToUTC = (dateString: string): Date => {
+  // Split the string "YYYY-MM-DD" into an array
+  const [year, month, day] = dateString.split('-').map(Number); // Convert each part to a number
+
+  // Use Date.UTC to create a UTC date
+  return new Date(Date.UTC(year, month - 1, day)); // Month is 0-indexed
+};
