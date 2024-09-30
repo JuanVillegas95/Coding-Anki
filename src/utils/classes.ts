@@ -86,7 +86,7 @@ class Event {
     groupID: string | null = null, 
     isFriendEvent: boolean = false,
     height: number = -1, 
-    ) {
+    ) {// hi
     this.id = uuidv4();
     this.date = date;
     this.start = start;
