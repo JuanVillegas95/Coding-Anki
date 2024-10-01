@@ -45,6 +45,45 @@ class Calendar {
       
     }
 
+    private removeEventIdFromDate(dateKey: string, eventId: string): void {
+      const eventsSet = this.eventIdsByDay.get(dateKey);
+      if (eventsSet) {
+        eventsSet.delete(eventId);
+        if (eventsSet.size === 0) {
+          this.eventIdsByDay.delete(dateKey);
+        }
+      }
+    }
+
+    private addEventToDate(dateKey: string, eventId: string): void {
+      if (this.eventIdsByDay.has(dateKey)) {
+        this.eventIdsByDay.get(dateKey)!.add(eventId);
+      } else {
+        this.eventIdsByDay.set(dateKey, new Set([eventId]));
+      }
+    }
+    
+
+    private removeEventIdFromGroup(groupId: string, eventId: string): void {
+      const eventsSet = this.eventIdsByGroupId.get(groupId);
+      if (eventsSet) {
+        eventsSet.delete(eventId);
+        if (eventsSet.size === 0) {
+          this.eventIdsByGroupId.delete(groupId);
+        }
+      }
+    }
+
+    private addEventIdToGroup(groupId: string, eventId: string): void {
+      if (this.eventIdsByGroupId.has(groupId)) {
+        this.eventIdsByGroupId.get(groupId)!.add(eventId);
+      } else {
+        this.eventIdsByGroupId.set(groupId, new Set([eventId]));
+      }
+    }
+    
+    
+    
     public deleteEvent(event: Event): void {
       const existingEvent = this.eventsById.get(event.id);
       if (!existingEvent) {
@@ -78,62 +117,72 @@ class Calendar {
     
       console.log(`Event with ID ${event.id} successfully deleted.`);
     }
-    
 
-    public setEvent(event: Event): void {
-      const existingEvent = this.eventsById.get(event.id);
+    // const events: Event[] = []
+    // const startDate: Date = F.parseDateStringToUTC(updatedEvent.date);
+    // const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate);
+    // for (let date = startDate; date <= endDate!; date = F.addDateBy(date, 1)) {
+    //     const day: number = F.getDay(F.strigifyDate(date));
+    //     if (!updatedEvent.selectedDays[day]) continue;
+    //     const newEvent: Event = { ...updatedEvent, id: updatedEvent.id, date: updatedEvent.date };
+    //     newEvent.id = uuidv4();
+    //     newEvent.date = F.strigifyDate(date);
+    //     events.push(newEvent);
+    // }
+    // events.forEach((event: Event) => setEvent(event));
 
-      if (existingEvent) { // If the event exists, modify it
-        // Handle date change in eventIdsByDay
-        const updatedEvent = { ...event };
-        const oldDateKey: string = existingEvent.date;
-        const newDateKey: string = updatedEvent.date;
-        // Remove event ID from the old date's Set
-        if (oldDateKey !== newDateKey) {
-          const oldDateEvents = this.eventIdsByDay.get(oldDateKey);
-          if (oldDateEvents) {
-            oldDateEvents.delete(updatedEvent.id);
-            if (oldDateEvents.size === 0) this.eventIdsByDay.delete(oldDateKey); 
-          }
-    
-          // Add event ID to the new date's Set
-          if (this.eventIdsByDay.has(newDateKey)) this.eventIdsByDay.get(newDateKey)!.add(updatedEvent.id);
-          else this.eventIdsByDay.set(newDateKey, new Set([updatedEvent.id]));
+
+    public setEvent(eventToSet: Event): void {
+      const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
+
+      // This module has 2 main branches and inside of them other 2 main branches.
+      if(existingEvent){
+        // Deep copying nested objects
+        // From now and on we are going to use 'updatedEvent' to avid direct mutation.
+        // We will handle the  updates in contrast to 'eventToSet'
+        const updatedEvent: Event = {   
+          ...eventToSet,
+          start: { ...eventToSet.start },
+          end: { ...eventToSet.end },
+          selectedDays: [...eventToSet.selectedDays]
         }
-        this.eventsById.set(updatedEvent.id, updatedEvent);
 
-        //!BANANAS 
-        // if (event.groupId) {
-        //   if (this.eventIdsByGroupId.has(event.groupId)) this.eventIdsByGroupId.get(event.groupId)!.add(event.id);
-        //   else this.eventIdsByGroupId.set(event.groupId, new Set([event.id]));
-        // }
-        //!
+        if(updatedEvent.groupId){
 
-      } else { // If the event doesn't exist, treat it as a new event
-        // Add the event to the eventsById map
-        this.eventsById.set(event.id, event);
-    
-        // Step 2: Add the event ID to the eventIdsByDay map for that date
-        const dateKey: string = event.date;
-        if (this.eventIdsByDay.has(dateKey)) this.eventIdsByDay.get(dateKey)!.add(event.id);
-        else this.eventIdsByDay.set(dateKey, new Set([event.id]));
-      }
-    
-      // Step 3: If the event has a groupId, add the event ID to the eventIdsByGroupId map
-      // Handle groupId for both add and modify cases
-      if (event.groupId) {
-        if (existingEvent && existingEvent.groupId !== event.groupId) {
-          // If groupId has changed, remove from the old groupId
-          const oldGroupEvents = this.eventIdsByGroupId.get(existingEvent.groupId!);
-          if (oldGroupEvents) {
-            oldGroupEvents.delete(event.id);
-            if (oldGroupEvents.size === 0) this.eventIdsByGroupId.delete(existingEvent.groupId!);
+        }else{ 
+          // Updating Existing Standalone Events
+          if(eventToSet.groupId){
+            // Updating an event that comes from standalone to belong to a group
+          }else{
+            console.log("modifying standalone")
+            // Updating an event that didnt have a gorupID and still dosent
+            // An event can only be moved across multiple days if it is a standalone event and not associated with any groupId
+            const oldDateKey: string = existingEvent.date;
+            const newDateKey: string = updatedEvent.date;
+            
+            // Remove event ID from the old date's Set and add the event ID to the new date's Set
+            if (oldDateKey !== newDateKey) {
+              this.removeEventIdFromDate(oldDateKey, updatedEvent.id);
+              this.addEventToDate(newDateKey, updatedEvent.id);
+            }
+            this.eventsById.set(updatedEvent.id, updatedEvent);
           }
         }
-    
-        // Add event ID to the new groupId's Set
-        if (this.eventIdsByGroupId.has(event.groupId)) this.eventIdsByGroupId.get(event.groupId)!.add(event.id);
-        else this.eventIdsByGroupId.set(event.groupId, new Set([event.id]));
+      }else{
+        if(eventToSet.groupId){
+
+        }else{
+          console.log("Creating standalone")
+          // Handling New Standalone Event Creation:
+          // Add the event to the eventsById map
+          this.eventsById.set(eventToSet.id, eventToSet);
+
+          // Add the event ID to the eventIdsByDay map for that date
+          const dateKey: string = eventToSet.date;
+          this.addEventToDate(dateKey,eventToSet.id);
+
+          // Since no groupId nothing left to do
+        }
       }
     }
     

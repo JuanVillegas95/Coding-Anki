@@ -191,16 +191,13 @@ const EventModal: React.FC<{
             selectedDays: [...currentEvent.selectedDays],
             storedGroupId: currentEvent.storedGroupId,
         }
-
-
-        if (!currentEvent.groupId) { // Reset all values that belong to recurring aspects
+        if (!updatedEvent.groupId) { // Reset all values that belong to recurring aspects
             updatedEvent.endDate = "";
             updatedEvent.selectedDays.fill(false);
-            updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
+            updatedEvent.selectedDays[F.getDay(updatedEvent.date)] = true;
             updatedEvent.storedGroupId = null;
-            setEvent(updatedEvent);
-        } else { // It has gorupID
-            if (!currentEvent.endDate) {
+        } else {
+            if (!updatedEvent.endDate) {
                 addToast(new Toast(
                     "Handle end time",
                     "End time must be valid",
@@ -208,7 +205,7 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-            if (F.isEndBeforeStart(currentEvent)) {
+            if (F.isEndBeforeStart(updatedEvent)) {
                 addToast(new Toast(
                     "Handle time",
                     "The end time cannot be before the start time",
@@ -216,21 +213,9 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-            const events: Event[] = []
-            const startDate: Date = F.parseDateStringToUTC(updatedEvent.date);
-            const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate);
-            for (let date = startDate; date <= endDate!; date = F.addDateBy(date, 1)) {
-                const day: number = F.getDay(F.strigifyDate(date));
-                if (!updatedEvent.selectedDays[day]) continue;
-                const newEvent: Event = { ...updatedEvent, id: updatedEvent.id, date: updatedEvent.date };
-                newEvent.id = uuidv4();
-                newEvent.date = F.strigifyDate(date);
-                events.push(newEvent);
-            }
-            events.forEach((event: Event) => setEvent(event));
         };
+        setEvent(updatedEvent);
         closeModal();
-
     }
 
 
