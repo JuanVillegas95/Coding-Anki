@@ -14,14 +14,13 @@ const EventModal: React.FC<{
     event: React.MutableRefObject<Event | null>;
     getEvents: (date: string) => Event[];
     setEvent: (event: Event) => void;
-    deleteEvent: (event: Event) => void;
 
     addToast: (newToast: Toast) => void;
     isModalOpen: boolean;
     closeModal: () => void;
     warningHandeler: T.WarningHandler;
 
-}> = ({ isModalOpen, closeModal, getEvents, addToast, warningHandeler, event, setEvent, deleteEvent }) => {
+}> = ({ isModalOpen, closeModal, getEvents, addToast, warningHandeler, event, setEvent }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
         ...event.current!,
         start: { ...event.current!.start },
@@ -170,8 +169,9 @@ const EventModal: React.FC<{
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        if (!currentEvent.groupId) deleteEvent(currentEvent);
         //! bananas
+        // if (!currentEvent.groupId) deleteEvent(currentEvent);
+
         //else warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_DELETE, event.current))
         //!
         closeModal();
@@ -185,19 +185,8 @@ const EventModal: React.FC<{
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const updatedEvent: Event = {
-            ...currentEvent,
-            endDate: currentEvent.endDate,
-            selectedDays: [...currentEvent.selectedDays],
-            storedGroupId: currentEvent.storedGroupId,
-        }
-        if (!updatedEvent.groupId) { // Reset all values that belong to recurring aspects
-            updatedEvent.endDate = "";
-            updatedEvent.selectedDays.fill(false);
-            updatedEvent.selectedDays[F.getDay(updatedEvent.date)] = true;
-            updatedEvent.storedGroupId = null;
-        } else {
-            if (!updatedEvent.endDate) {
+        if (currentEvent.groupId) {
+            if (!currentEvent.endDate) {
                 addToast(new Toast(
                     "Handle end time",
                     "End time must be valid",
@@ -205,7 +194,7 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-            if (F.isEndBeforeStart(updatedEvent)) {
+            if (F.isEndBeforeStart(currentEvent)) {
                 addToast(new Toast(
                     "Handle time",
                     "The end time cannot be before the start time",
@@ -213,8 +202,9 @@ const EventModal: React.FC<{
                 ));
                 return;
             }
-        };
-        setEvent(updatedEvent);
+        }
+
+        setEvent(currentEvent);
         closeModal();
     }
 
@@ -286,7 +276,7 @@ const EventModal: React.FC<{
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}
-                        date={currentEvent.date}
+                        date={currentEvent.startDate}
                         handleDate={handleDate}
                     />
                     <DateInput
@@ -299,6 +289,7 @@ const EventModal: React.FC<{
                             selectedDays={currentEvent.selectedDays}
                             startDate={currentEvent.date}
                             handleSelectedDays={handleSelectedDays}
+                            groupId={currentEvent.groupId}
                         />
                     </S.ContainerDaySelectorDiv>
                 </S.Row4Div>

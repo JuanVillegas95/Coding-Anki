@@ -12,14 +12,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 const ScheduleGridMain: React.FC<{
     setEvent: (event: Event) => void;
-    deleteEvent: (event: Event) => void;
     getEvents: (date: string) => Event[];
     addToast: (newToast: Toast) => void;
     mondayDate: Date;
     mainRef: React.RefObject<HTMLDivElement>;
     isLinked: boolean;
     warningHandeler: T.WarningHandler;
-}> = ({ mainRef, mondayDate, addToast, warningHandeler, isLinked, setEvent, getEvents, deleteEvent }) => {
+}> = ({ mainRef, mondayDate, addToast, warningHandeler, isLinked, setEvent, getEvents }) => {
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isEventCreating, setIsEventCreating] = useState<boolean>(false);
@@ -248,7 +247,6 @@ const ScheduleGridMain: React.FC<{
             closeModal={closeModal}
             getEvents={getEvents}
             event={event}
-            deleteEvent={deleteEvent}
             addToast={addToast}
             warningHandeler={warningHandeler}
             setEvent={setEvent}

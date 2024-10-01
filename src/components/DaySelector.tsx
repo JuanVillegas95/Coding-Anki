@@ -7,19 +7,20 @@ const DaySelector: React.FC<{
     selectedDays: boolean[];
     startDate: string;
     handleSelectedDays: (e: React.ChangeEvent<HTMLInputElement>, index: number) => void;
-}> = ({ startDate, handleSelectedDays, selectedDays }) => {
-    return <>
+    groupId: string | null;
+}> = ({ startDate, handleSelectedDays, selectedDays, groupId }) => {
+    return <React.Fragment>
         {C.DAYS.map((day, index) => (
             <S.DayLabel key={index}>
                 <S.DaySpan>{day.charAt(0)}</S.DaySpan>
                 <S.EventInputCheckBox
                     checked={selectedDays[index]}
                     onChange={(e) => handleSelectedDays(e, index)}
-                    disabled={F.shouldBeLocked(startDate, index)}
+                    disabled={groupId ? undefined : F.shouldBeLocked(startDate, index)}
                 />
             </S.DayLabel>
         ))}
-    </>
+    </React.Fragment>
 };
 
 export default DaySelector;
