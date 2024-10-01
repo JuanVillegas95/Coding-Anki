@@ -35,7 +35,7 @@ const CalendarContainerDiv = styled.div`
 `;
 
 
-const IconButton = styled.button.attrs({type: "button"})<{$color: string, $size: number, $svgSize: number}>`
+const IconButton = styled.button.attrs({type: "button"})<{$color?: string, $size?: number, $svgSize?: number}>`
   background-color: transparent;
   border-style: none;
   width: ${({ $size }) => $size}px;

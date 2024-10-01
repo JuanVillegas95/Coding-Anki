@@ -270,25 +270,18 @@ export const generate60Minutes = (): string[] => {
   return minutesArray;
 }
 
-export const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
-}
 
 export const getDay = (date: string): number => {
   const utcDate = parseDateStringToUTC(date);  
   let dayOfTheWeek: number = utcDate.getUTCDay();  
-  // Adjust so that Monday becomes 0, Tuesday becomes 1, ..., Sunday becomes 6
   dayOfTheWeek = (dayOfTheWeek === 0) ? 6 : dayOfTheWeek - 1;
   return dayOfTheWeek;
 };
 
 
-export const shouldBeLocked = (date: Date, index: number): boolean => {
-  let dayOfTheWeek: number = date.getDay() - 1;
+export const shouldBeLocked = (date: string, index: number): boolean => {
+  const utcDate = parseDateStringToUTC(date);  
+  let dayOfTheWeek: number = utcDate.getDay();
   if(dayOfTheWeek < 0) dayOfTheWeek = 6;
   return dayOfTheWeek === index;
 }

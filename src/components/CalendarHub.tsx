@@ -115,9 +115,17 @@ const CalendarHub: React.FC = () => {
     });
   };
 
-  const getCurrentCalendar = (): Calendar => calendars!.get(currentCalendar.id) as Calendar;
+  const deleteEvent = (event: Event): void => {
+    const currentCalendar: Calendar = getCurrentCalendar();
+    currentCalendar.deleteEvent(event);
+    setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+      const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+      updatedCalendars.set(currentCalendar.id, currentCalendar);
+      return updatedCalendars;
+    });
+  };
 
-  const consoleLogDate = (event: Event): void => currentCalendar.consoleLogDate(event);
+  const getCurrentCalendar = (): Calendar => calendars!.get(currentCalendar.id) as Calendar;
 
   const getEvents = (date: string): Event[] => {
     const currentCalendar: Calendar = getCurrentCalendar();
@@ -139,6 +147,7 @@ const CalendarHub: React.FC = () => {
         <ScheduleGridMain
           setEvent={setEvent}
           getEvents={getEvents}
+          deleteEvent={deleteEvent}
           mondayDate={mondayDate}
           addToast={toastHandeler.push}
           mainRef={mainRef}
@@ -151,12 +160,11 @@ const CalendarHub: React.FC = () => {
         setLinkedCalendar={setLinkedCalendarFriend}
       />
     </S.CalendarWrapperDiv>
-    {/* {(toasts.size > 0) && <ToastMessage
+    {(toasts.size > 0) && <ToastMessage
       toast={toastHandeler.getTail()}
       popToast={toastHandeler.pop}
-    />
-    }
-    {
+    />}
+    {/* {
       (warning.status !== C.WARNING_STATUS.NONE) && <WarningModal
         warning={warning}
         warningHandler={warningHandler}

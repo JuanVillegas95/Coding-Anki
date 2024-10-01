@@ -45,9 +45,43 @@ class Calendar {
       
     }
 
+    public deleteEvent(event: Event): void {
+      const existingEvent = this.eventsById.get(event.id);
+      if (!existingEvent) {
+        console.error(`Event with ID ${event.id} does not exist.`);
+        return;
+      }
+    
+      // Step 1: Remove the event from the eventsById map
+      this.eventsById.delete(event.id);
+    
+      // Step 2: Remove the event ID from the eventIdsByDay map for its date
+      const dateKey: string = existingEvent.date;
+      const eventsOnDate = this.eventIdsByDay.get(dateKey);
+      if (eventsOnDate) {
+        eventsOnDate.delete(event.id);
+        if (eventsOnDate.size === 0) {
+          this.eventIdsByDay.delete(dateKey);  // Remove the date entry if no more events on that date
+        }
+      }
+
+      // Step 3: Remove the event ID from the eventIdsByGroupId map if it belongs to a group
+      if (existingEvent.groupId) {
+        const groupEvents = this.eventIdsByGroupId.get(existingEvent.groupId);
+        if (groupEvents) {
+          groupEvents.delete(event.id);
+          if (groupEvents.size === 0) {
+            this.eventIdsByGroupId.delete(existingEvent.groupId);  // Remove the group entry if no more events in the group
+          }
+        }
+      }
+    
+      console.log(`Event with ID ${event.id} successfully deleted.`);
+    }
+    
+
     public setEvent(event: Event): void {
       const existingEvent = this.eventsById.get(event.id);
-
 
       if (existingEvent) { // If the event exists, modify it
         // Handle date change in eventIdsByDay
@@ -123,17 +157,16 @@ class Event {
   date: string; //YYYY-MM-DD 
   title: string;
   description: string;
-  start: Time;
-  end: Time;
   height: number;
-  duration: Time;
   icon: string;
   color: string;
   isFriendEvent: boolean;
 
+  duration: Time;
+  start: Time;
+  end: Time;
   // Attributes members for reccurring behavior
-  startDate: Date;
-  endDate: Date | null;
+  endDate: string;
   groupId: string | null;
   storedGroupId: string | null; // In order to handle then toggleing
 
@@ -155,11 +188,10 @@ class Event {
     this.height = height;
     this.duration = new Time(-1, -1);
     this.storedGroupId = null;
-    this.icon = "";
+    this.icon = "star";
     this.groupId = groupId;
-    this.selectedDays = Array(7).fill(false);
-    this.startDate = date;
-    this.endDate = null;
+    this.selectedDays = new Array(7).fill(false);
+    this.endDate = "";
     this.isFriendEvent = isFriendEvent;
   }
 }

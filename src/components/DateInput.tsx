@@ -4,16 +4,14 @@ import * as F from '@/utils/functions';
 
 const DateInput: React.FC<{
     text: string;
-    date: Date | null;
-    handleDate: (e: React.ChangeEvent<HTMLInputElement>, tag: string) => void;
+    date: string;
+    handleDate: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }> = ({ text, date, handleDate }) => {
-    const dateTag = `${text}Date`;
-    const formatedDate: string = date ? F.formatDate(date) : "";
     const isDisabled: boolean = (text === "Start");
 
     return <S.TimeContainerDiv>
         <S.TimeP>{text}</S.TimeP>
-        <S.DayInputDate value={formatedDate} onChange={isDisabled ? undefined : (e) => handleDate(e, dateTag)} $isDisabled={isDisabled} />
+        <S.DayInputDate value={date} onChange={isDisabled ? undefined : (e) => handleDate(e)} $isDisabled={isDisabled} />
     </S.TimeContainerDiv>
 };
 

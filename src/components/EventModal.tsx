@@ -8,18 +8,26 @@ import { Event, Toast, Warning } from '@/utils/classes';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
-import IconMenu from './IconMenu';
 import DaySelector from './DaySelector';
 
 const EventModal: React.FC<{
+    event: React.MutableRefObject<Event | null>;
+    getEvents: (date: string) => Event[];
+    setEvent: (event: Event) => void;
+    deleteEvent: (event: Event) => void;
+
     addToast: (newToast: Toast) => void;
     isModalOpen: boolean;
     closeModal: () => void;
     warningHandeler: T.WarningHandler;
-    getEvents: (date: string) => Event[];
-    event: React.MutableRefObject<Event | null>;
-}> = ({ isModalOpen, closeModal, getEvents, addToast, warningHandeler, event }) => {
-    const [currentEvent, setCurrentEvent] = useState<Event>({ ...event.current! })
+
+}> = ({ isModalOpen, closeModal, getEvents, addToast, warningHandeler, event, setEvent, deleteEvent }) => {
+    const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
+        ...event.current!,
+        start: { ...event.current!.start },
+        end: { ...event.current!.end },
+        selectedDays: [...event.current!.selectedDays]
+    })
 
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
@@ -53,11 +61,11 @@ const EventModal: React.FC<{
             ));
             return;
         }
-        currentEvent.title = title;
+        setCurrentEvent({ ...currentEvent, title })
     };
 
-    const handleIcon = (icon: string): void => { currentEvent.icon = icon; };
-    const handleColor = (color: string): void => { currentEvent.color = color };
+    const handleIcon = (icon: string): void => { setCurrentEvent({ ...currentEvent, icon }) };
+    const handleColor = (color: string): void => { setCurrentEvent({ ...currentEvent, color }) };
 
     const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const description = e.target.value;
@@ -69,7 +77,7 @@ const EventModal: React.FC<{
             ));
             return;
         }
-        currentEvent.description = description;
+        setCurrentEvent({ ...currentEvent, description })
     };
 
     const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string): void => {
@@ -100,88 +108,72 @@ const EventModal: React.FC<{
         //     return;
         // }
 
-        // currentEvent = { ...updatedEvent }
+        setCurrentEvent(updatedEvent)
     };
 
-    const handleDate = (e: React.ChangeEvent<HTMLInputElement>, tag: string): void => {
+    const handleDate = (e: React.ChangeEvent<HTMLInputElement>): void => {
         // Extract year, month, and day from the input
-        const [year, month, day] = e.target.value.split('-').map(Number);
-        const newDate = new Date(year, month - 1, day);
+        const date: string = e.target.value;
+        const updatedEvent: Event = { ...currentEvent, endDate: currentEvent.endDate };
+        updatedEvent.endDate = date;
 
-        // Normalize the new date (set time components to zero)
-        newDate.setHours(0, 0, 0, 0);
+        const startDate: Date = F.parseDateStringToUTC(updatedEvent.date)
+        const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
 
-        // Create a copy of the current event with normalized dates
-        // const updatedEvent: Event = {
-        //     ...event.current,
-        //     startDate: new Date(event.current.startDate),
-        //     endDate: event.current.endDate ? new Date(event.current.endDate) : null,
-        // };
+        if (startDate >= endDate) {
+            addToast(new Toast(
+                "Handle date",
+                "The start date cannot be after the end date",
+                C.TOAST_TYPE.INFO
+            ));
+            return;
+        }
 
-        // Normalize the existing startDate and endDate
-        // updatedEvent.startDate.setHours(0, 0, 0, 0);
-        // if (updatedEvent.endDate) updatedEvent.endDate.setHours(0, 0, 0, 0);
+        if (updatedEvent.endDate) {
+            const dateDifference = endDate.getTime() - startDate.getTime();
+            if (dateDifference > C.ONE_YEAR_IN_MS) {
+                addToast(new Toast(
+                    "Handle date",
+                    "The event duration cannot be greater than one year.",
+                    C.TOAST_TYPE.INFO
+                ));
+                return;
+            }
+        }
 
-        // Update the startDate or endDate based on the tag
-        // if (tag === 'StartDate') updatedEvent.startDate = newDate;
-        // if (tag === 'EndDate') updatedEvent.endDate = newDate;
-
-        // Validate date ranges
-        // if (updatedEvent.endDate && updatedEvent.startDate >= updatedEvent.endDate) {
-        //     addToast(new Toast(
-        //         "Handle date",
-        //         "The start date cannot be after the end date",
-        //         C.TOAST_TYPE.INFO
-        //     ));
-        //     return;
-        // }
-
-        // Check if the event duration exceeds one year
-        const oneYearInMs = 365 * 24 * 60 * 60 * 1000; // One year in milliseconds
-        // if (updatedEvent.endDate) {
-        //     const dateDifference = updatedEvent.endDate.getTime() - updatedEvent.startDate.getTime();
-
-        //     if (dateDifference > oneYearInMs) {
-        //         addToast(new Toast(
-        //             "Handle date",
-        //             "The event duration cannot be greater than one year.",
-        //             C.TOAST_TYPE.INFO
-        //         ));
-        //         return;
-        //     }
-        // }
-
-        // Update the current event with the new dates
-
-        // event.current = { ...updatedEvent }
+        setCurrentEvent(updatedEvent)
     };
 
 
     const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
-        // const isSelected: boolean = e.target.checked;
-        // const updatedEvent: Event = { ...event.current, selectedDays: [...event.current.selectedDays] };
-        // updatedEvent.selectedDays[index] = isSelected;
-        // event.current = { ...updatedEvent }
-
+        const isSelected: boolean = e.target.checked;
+        const updatedEvent: Event = { ...currentEvent, selectedDays: [...currentEvent.selectedDays] };
+        updatedEvent.selectedDays[index] = isSelected;
+        setCurrentEvent(updatedEvent)
     };
 
 
     const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
         e.preventDefault();
-        // const updatedEvent: Event = { ...event.current, groupId: event.current?.groupId, storedGroupId: event.current.storedGroupId };
+        const updatedEvent: Event = {
+            ...currentEvent,
+            groupId: currentEvent.groupId,
+            storedGroupId: currentEvent.storedGroupId,
+        };
 
-        // if (!updatedEvent.storedGroupId) updatedEvent.storedGroupId = uuidv4();
-        // if (updatedEvent.groupId) updatedEvent.groupId = null;
-        // else updatedEvent.groupId = updatedEvent.storedGroupId;
+        if (!updatedEvent.storedGroupId) updatedEvent.storedGroupId = uuidv4();
+        if (updatedEvent.groupId) updatedEvent.groupId = null;
+        else updatedEvent.groupId = updatedEvent.storedGroupId;
 
-        // event.current = { ...updatedEvent }
-
+        setCurrentEvent(updatedEvent)
     };
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        // if (!event.current.groupId) calendarHandler.deleteEvent(event.current);
-        // else warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_DELETE, event.current))
+        if (!currentEvent.groupId) deleteEvent(currentEvent);
+        //! bananas
+        //else warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_DELETE, event.current))
+        //!
         closeModal();
     };
 
@@ -193,43 +185,53 @@ const EventModal: React.FC<{
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // const updatedEvent: Event = {
-        //     ...event.current,
-        //     startDate: new Date(event.current.startDate),
-        //     endDate: event.current.endDate ? new Date(event.current.endDate) : null,
-        //     selectedDays: [...event.current.selectedDays],
-        //     storedGroupId: event.current.storedGroupId,
-        // }
+        const updatedEvent: Event = {
+            ...currentEvent,
+            endDate: currentEvent.endDate,
+            selectedDays: [...currentEvent.selectedDays],
+            storedGroupId: currentEvent.storedGroupId,
+        }
 
-        // if (!event.current.groupID) { // Reset all values that belong to recurring aspects
-        //     updatedEvent.startDate = event.current.date;
-        //     updatedEvent.endDate = null;
-        //     updatedEvent.selectedDays.fill(false);
-        //     updatedEvent.selectedDays[F.getDay(event.current.date)] = true;
-        //     updatedEvent.storedGroupId = null;
-        //     calendarHandler.setEvent(updatedEvent);
-        // } else { // It has gorupID
-        //     if (!event.current.endDate) {
-        //         addToast(new Toast(
-        //             "Handle end time",
-        //             "End time must be valid",
-        //             C.TOAST_TYPE.INFO
-        //         ));
-        //         return;
-        //     }
-        //     if (F.isEndBeforeStart(event.current)) {
-        //         addToast(new Toast(
-        //             "Handle time",
-        //             "The end time cannot be before the start time",
-        //             C.TOAST_TYPE.INFO
-        //         ));
-        //         return;
-        //     }
-        //     calendarHandler.setRecurringEvents(updatedEvent);
-        // }
+
+        if (!currentEvent.groupId) { // Reset all values that belong to recurring aspects
+            updatedEvent.endDate = "";
+            updatedEvent.selectedDays.fill(false);
+            updatedEvent.selectedDays[F.getDay(currentEvent.date)] = true;
+            updatedEvent.storedGroupId = null;
+            setEvent(updatedEvent);
+        } else { // It has gorupID
+            if (!currentEvent.endDate) {
+                addToast(new Toast(
+                    "Handle end time",
+                    "End time must be valid",
+                    C.TOAST_TYPE.INFO
+                ));
+                return;
+            }
+            if (F.isEndBeforeStart(currentEvent)) {
+                addToast(new Toast(
+                    "Handle time",
+                    "The end time cannot be before the start time",
+                    C.TOAST_TYPE.INFO
+                ));
+                return;
+            }
+            const events: Event[] = []
+            const startDate: Date = F.parseDateStringToUTC(updatedEvent.date);
+            const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate);
+            for (let date = startDate; date <= endDate!; date = F.addDateBy(date, 1)) {
+                const day: number = F.getDay(F.strigifyDate(date));
+                if (!updatedEvent.selectedDays[day]) continue;
+                const newEvent: Event = { ...updatedEvent, id: updatedEvent.id, date: updatedEvent.date };
+                newEvent.id = uuidv4();
+                newEvent.date = F.strigifyDate(date);
+                events.push(newEvent);
+            }
+            events.forEach((event: Event) => setEvent(event));
+        };
         closeModal();
-    };
 
+    }
 
 
     return <S.ContainerModalDiv >
@@ -237,32 +239,35 @@ const EventModal: React.FC<{
             <S.ModalCloseButton $color={'black'} $size={30} $svgSize={15} onClick={handleCloseModal}>
                 {React.createElement(I.cross)}
             </S.ModalCloseButton>
-
             <S.Row1Div>
                 <S.TitleInput value={currentEvent.title} onChange={handleTitle} />
-                {/* <IconMenu
-                    toggleIconMenu={toggleIconMenu}
-                    isIconMenu={isIconMenu}
-                    handleIcon={handleIcon}
-                    event.currentIcon={event.current.icon}
-                iconArray={C.ICONS_ARRAY}
-                /> */}
-                <S.IconMenuButton $color={""} $size={50} $svgSize={25} onClick={toggleColorMenu}>
+                <S.IconMenuButton $size={50} $svgSize={25} onClick={toggleIconMenu}>
+                    {React.createElement(C.ICONS[currentEvent.icon])}
+                    {isIconMenu && (
+                        <S.ContainerMenuDiv $block={isIconMenu ? 'block' : 'none'}>
+                            <S.MenuItemDiv>
+                                {Object.entries(C.ICONS).map(([iconName, IconComponent], index: number) => (
+                                    <S.ItemButton key={index} $size={49} $svgSize={30} onClick={() => handleIcon(iconName)}>
+                                        {React.createElement(IconComponent)}
+                                    </S.ItemButton>
+                                ))}
+                            </S.MenuItemDiv>
+                        </S.ContainerMenuDiv>
+                    )}
+                </S.IconMenuButton>
+                <S.IconMenuButton $size={50} $svgSize={25} onClick={toggleColorMenu}>
                     <S.colorDivFirst $color={C.COLORS[currentEvent.color].primary} />
                     {isColorMenu && (
                         <S.ContainerMenuDiv $block={isColorMenu ? 'block' : 'none'}>
                             <S.MenuItemDiv>
-                                {
-                                    Array.from(Object.keys(C.COLORS)).map((color, index) => (
-                                        <S.ItemButton
-                                            key={index}
-                                            $color={""}
-                                            $size={49}
-                                            $svgSize={25} onClick={() => handleColor(color)} >
-                                            <S.colorDiv $color={C.COLORS[color].primary} />
-                                        </S.ItemButton>
-                                    ))
-                                }
+                                {Object.entries(C.COLORS).map(([colorName, order], index: number) => (
+                                    <S.ItemButton
+                                        key={index}
+                                        $size={49}
+                                        $svgSize={25} onClick={() => handleColor(colorName)} >
+                                        <S.colorDiv $color={order.primary} />
+                                    </S.ItemButton>
+                                ))}
                             </S.MenuItemDiv>
                         </S.ContainerMenuDiv>
                     )}
@@ -296,7 +301,7 @@ const EventModal: React.FC<{
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}
-                        date={currentEvent.startDate}
+                        date={currentEvent.date}
                         handleDate={handleDate}
                     />
                     <DateInput
@@ -307,7 +312,7 @@ const EventModal: React.FC<{
                     <S.ContainerDaySelectorDiv>
                         <DaySelector
                             selectedDays={currentEvent.selectedDays}
-                            startDate={currentEvent.startDate}
+                            startDate={currentEvent.date}
                             handleSelectedDays={handleSelectedDays}
                         />
                     </S.ContainerDaySelectorDiv>

@@ -21,18 +21,7 @@ const LEFT_MOUSE_CLICK: number = 0;
 const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
 const ENTER_KEY: string = "Enter";
 
-// Icons Array
-const ICONS_ARRAY: React.ComponentType[] = [
-  I.bell,
-  I.cart,
-  I.heart,
-  I.star,
-  I.mark,
-  I.phone,
-  I.information,
-  I.coke,
-  I.meh
-];
+
 
 // Toast Type Enum
 enum TOAST_TYPE {
@@ -76,7 +65,6 @@ const MENU: Record<string, React.ComponentType> = {
   Print: I.print,
   Help: I.interrogation,
 };
-
 
 
 // Color Scheme
@@ -132,6 +120,18 @@ const COLORS: Record<string, {
   },
 };
 
+export const ICONS: Record<string, React.ComponentType> = {
+  bell: I.bell,
+  cart: I.cart,
+  heart: I.heart,
+  star: I.star,
+  mark: I.mark,
+  phone: I.phone,
+  information: I.information,
+  coke: I.coke,
+  meh: I.meh,
+};
+
 // Scrollbar Hiding CSS
 const HIDE_SCROLL_BAR: string = `
 &::-webkit-scrollbar {
@@ -142,6 +142,7 @@ const HIDE_SCROLL_BAR: string = `
 scrollbar-width: none;
 `;
 
+export const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000; 
 
 
 export {
@@ -159,7 +160,6 @@ export {
   HOURS_FONT_SIZE,
   HEADER_FONT_SIZE,
   HIDE_SCROLL_BAR,
-  ICONS_ARRAY,
   SHORT_DURATION_THRESHOLD,
   WARNING_STATUS,
   ESCAPE_KEYS,
