@@ -38,11 +38,6 @@ class Calendar {
       this.eventIdsByGroupId = new Map<string, Set<string>>();
     }
     
-    public deleteEvent(eventToDelete: Event): void{
-      const existingEvent: Event | undefined = this.eventsById.get(eventToDelete.id);
-      if(!existingEvent) console.log("error"); return;
-      
-    }
 
     public setEvent(eventToSet: Event): void {
       const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
@@ -87,6 +82,7 @@ class Calendar {
       }
 
       // Branch 2: If (was groupId, now standalone) Delete the standalone, Update the recurring instances.
+      //! IF SOMETHING GIVE PROBLEMS COME HERE
       else if(existingEvent.groupId && !eventToSet.groupId){
         console.log("Branch 2, Delete the standalone, Update the recurring instances");
         // Step 1: remove id from the groupId
@@ -98,10 +94,8 @@ class Calendar {
           const groupIdEvent: Event = { ...event, selectedDays: [...event.selectedDays] };
 
           if(groupIdEvent.selectedDays[getDay(eventToSet.date)]) this.eventsById.delete(groupIdEvent.id);
-
           groupIdEvent.selectedDays[getDay(eventToSet.date)] = false;
           this.eventsById.set(groupIdEvent.id, groupIdEvent);
-
           this.removeEventIdFromDate(eventToSet.date, groupIdEvent.id);
         });
       }
@@ -125,13 +119,7 @@ class Calendar {
           const stringifiedDate: string = strigifyDate(date);
           const day: number = getDay(stringifiedDate);
           if(!eventToSet.selectedDays[day]) continue;
-          const newEvent: Event = { ...eventToSet, id: eventToSet.id, date: eventToSet.date };
-          newEvent.id = uuidv4();
-          newEvent.date = stringifiedDate;
-    
-          this.eventsById.set(newEvent.id, newEvent);
-          this.addEventIdToDate(newEvent.date, newEvent.id);
-          this.addEventIdToGroup(newEvent.groupId!, newEvent.id);
+          this.createEvent(eventToSet,stringifiedDate)
         }
       }
 
@@ -143,77 +131,69 @@ class Calendar {
         const startDate: Date = parseDateStringToUTC(eventToSet.startDate);
         const endDate: Date = parseDateStringToUTC(eventToSet.endDate);
 
-        // Step 2: Delete (Since the range shrunk)
+        // Step 1: Delete (Since the range shrunk)
         if(endDate < existingEventendDate){
-          for (let date = endDate; date <= existingEventendDate!; date = addDateBy(date, 1)) {
+          for (let date = addDateBy(endDate, 1); date <= existingEventendDate!; date = addDateBy(date, 1)) {
             const stringifiedDate: string = strigifyDate(date);
             const eventToRemove = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
-            if (eventToRemove) {
-              this.removeEventIdFromDate(stringifiedDate, eventToRemove.id);
-              this.removeEventIdFromGroup(eventToSet.groupId!, eventToRemove.id);
-              this.eventsById.delete(eventToRemove.id);
-            } 
+            if (eventToRemove) this.deleteEvent(eventToRemove.id, stringifiedDate, eventToSet.groupId!); 
           }
         }
+
         for (let date = startDate; date <= endDate; date = addDateBy(date, 1)) {
           const stringifiedDate: string = strigifyDate(date);
           const day: number = getDay(stringifiedDate);
           const prevSelected: boolean =  existingEvent.selectedDays[day];
           const currSelected: boolean = eventToSet.selectedDays[day];
 
-          // If (was false, stays false) No operation
+          // Step 2: If (was false, stays false) No operation
           if(!prevSelected && !currSelected) continue;
 
-          // If (was true, stays true) Update or Create
+          // Step 3: If (was true, stays true) Update or Create
           else if (prevSelected && currSelected) {
-            // Step 1: Update
-            const eventToModify = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
-            if (eventToModify) {
-              console.log("Event on %s day was updated", stringifiedDate);
-
-              const updatedEvent: Event = { ...eventToSet };
-              updatedEvent.id = eventToModify.id;
-              this.eventsById.set(eventToModify.id, updatedEvent);
-            } 
-
-            // Step 2: Create (Since the range grew)
-            else {
-              console.log("Event on %s day was created", stringifiedDate);
-              const newEvent: Event = { ...eventToSet, id: eventToSet.id, date: eventToSet.date };
-              newEvent.id = uuidv4();
-              newEvent.date = stringifiedDate;
-      
-              this.eventsById.set(newEvent.id, newEvent);
-              this.addEventIdToDate(newEvent.date, newEvent.id);
-              this.addEventIdToGroup(newEvent.groupId!, newEvent.id);
-            }
+            const eventToUpdate: Event | undefined = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
+            // Update or Create (Since the range grew)
+            if (eventToUpdate) this.updateEvent(eventToUpdate, eventToSet);
+            else this.createEvent(eventToSet, stringifiedDate);
           }
 
-          // If (was true, now false) Delete
+          // Step 4: If (was true, now false) Delete
           else if (prevSelected && !currSelected) {
-            // Step 1: Delete
-            console.log("Event on %s day was deleted", stringifiedDate);
-            const eventToRemove = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
-            if (eventToRemove) {
-              this.removeEventIdFromDate(stringifiedDate, eventToRemove.id);
-              this.removeEventIdFromGroup(eventToSet.groupId!, eventToRemove.id);
-              this.eventsById.delete(eventToRemove.id);
-            } 
+            const eventToRemove: Event | undefined = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
+            // Delete
+            if (eventToRemove) this.deleteEvent(eventToRemove.id, stringifiedDate, eventToSet.groupId!);
           }
           
-          // If (was false, now true) Create
-          else if (!prevSelected && currSelected) {
-            console.log("Event on %s day was created", stringifiedDate);
-            const newEvent: Event = { ...eventToSet, id: eventToSet.id, date: eventToSet.date };
-            newEvent.id = uuidv4();
-            newEvent.date = stringifiedDate;
-    
-            this.eventsById.set(newEvent.id, newEvent);
-            this.addEventIdToDate(newEvent.date, newEvent.id);
-            this.addEventIdToGroup(newEvent.groupId!, newEvent.id);
-          }
+          // Step 5: (was false, now true) Create
+          else if (!prevSelected && currSelected) this.createEvent(eventToSet, stringifiedDate);
+          
         }
       } 
+    }
+
+    private updateEvent(eventToUpdate: Event, eventToSet: Event){
+      const _eventToSet: Event = { ...eventToSet };
+      _eventToSet.id = eventToUpdate.id;
+      this.eventsById.set(_eventToSet.id, _eventToSet);
+      console.log("Event on %s day was updated", _eventToSet.date);
+    }
+
+    private deleteEvent(eventId: string, dateId: string, groupId?: string): void {
+      if(groupId) this.removeEventIdFromGroup(groupId, eventId);
+      this.removeEventIdFromDate(dateId, eventId);
+      this.eventsById.delete(eventId);
+      console.log("Event on %s day was deleted", dateId);
+    }
+
+    private createEvent(eventToSet: Event, dateId: string): void {
+      const newEvent: Event = { ...eventToSet, id: eventToSet.id, date: eventToSet.date };
+      newEvent.id = uuidv4();
+      newEvent.date = dateId;
+
+      if(newEvent.groupId) this.addEventIdToGroup(newEvent.groupId, newEvent.id);
+      this.addEventIdToDate(dateId, newEvent.id);
+      this.eventsById.set(newEvent.id, newEvent);
+      console.log("Event on %s day was added", dateId);
     }
     
     public consoleLogDate(event: Event): void {

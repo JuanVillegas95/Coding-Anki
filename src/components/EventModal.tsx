@@ -116,7 +116,7 @@ const EventModal: React.FC<{
         const updatedEvent: Event = { ...currentEvent, endDate: currentEvent.endDate };
         updatedEvent.endDate = date;
 
-        const startDate: Date = F.parseDateStringToUTC(updatedEvent.date)
+        const startDate: Date = F.parseDateStringToUTC(updatedEvent.startDate)
         const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
 
         if (startDate >= endDate) {
