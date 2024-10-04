@@ -421,11 +421,7 @@ const TimeSelect = styled.select`
   }
 `;
 
-const DayInputDate = styled.input.attrs<{ $isDisabled: boolean}>(
-  ({$isDisabled}) => ({
-  type: 'date',
-  disabled: $isDisabled,  
-}))`
+const DayInputDate = styled.input.attrs({ type: "date"})`
   position: relative;
   padding: 8px;
   border: 1px solid #ccc;
