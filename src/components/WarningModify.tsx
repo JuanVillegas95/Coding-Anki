@@ -11,7 +11,7 @@ const WarningModify: React.FC<{
     modifyEvents: () => void;
 }> = ({ currentEvent, cancelAction, modifyEvent, modifyEvents }) => {
     return <React.Fragment>
-        <S.WarningMain $center={true}>
+        {/* <S.WarningMain $center={true}>
             <ConflictEvent event={currentEvent} label={"Current Event"} />
         </S.WarningMain>
         <S.WarningP>
@@ -32,7 +32,7 @@ const WarningModify: React.FC<{
                 value={"Cancel"} style={{ backgroundColor: 'lightgray' }}
                 onClick={cancelAction}
             />
-        </S.WarningFooter>
+        </S.WarningFooter> */}
     </React.Fragment>
 
 };

@@ -6,6 +6,7 @@ import ToastMessage from "@/components/ToastMessage";
 import Image from "next/image";
 import { TOAST_TYPE, TOAST_ICON } from "@/utils/constants";
 import * as S from "@/utils/style.create";
+import { useRouter } from "next/navigation";
 
 
 const CreateHub: React.FC = () => {
@@ -13,6 +14,7 @@ const CreateHub: React.FC = () => {
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
     const [username, setUsername] = useState<string>("");
     const [userID, setUserID] = useState<string>("ced266c7-d7e3-4681-a343-0828ae597fc8");
+    const router = useRouter();
 
     const handleUserNameInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const username: string = e.target.value;
@@ -53,6 +55,8 @@ const CreateHub: React.FC = () => {
         },
     }
 
+    const handleButtonClick = () => router.replace("/calendar");
+
 
     return <React.Fragment>
         <S.CreateWrapperDiv>
@@ -76,7 +80,7 @@ const CreateHub: React.FC = () => {
                         </S.CreateIdWrapperDiv>
                         <S.CreateWrapperFooter>
                             <S.CreateUsernameInput onChange={(e) => handleUserNameInput(e)} />
-                            <S.CreateButtonInput />
+                            <S.CreateButtonInput onClick={handleButtonClick} />
                         </S.CreateWrapperFooter>
                     </S.CreateWrapperHeader>
                 </S.CreateWrapperMain>

@@ -16,7 +16,7 @@ const WarningDelete: React.FC<{
         </S.WarningMain>
         <S.WarningP>
             You’re deleting a recurring event.
-            Do you want to delete only this occurrence {currentEvent.date.toDateString()}, or delete for all the recurring events?
+            Do you want to delete only this occurrence {currentEvent.date}, or delete for all the recurring events?
         </S.WarningP>
         <S.WarningFooter>
             <S.WarningButton

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { usePathname } from 'next/navigation';
 import { Event, Calendar, Toast, Warning, User } from "@/utils/classes";
 import { v4 as uuidv4 } from 'uuid';
 import CalendarHeader from "@/components/CalendarHeader"
@@ -18,7 +20,6 @@ const currentCalendar = new Calendar("yes", "hi");
 
 const CalendarHub: React.FC = () => {
   const [calendars, setCalendars] = useState<Map<string, Calendar>>(new Map([[currentCalendar.id, currentCalendar]]));
-
   const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
   const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
   const [warning, setWarning] = useState<Warning>(new Warning());
@@ -26,6 +27,30 @@ const CalendarHub: React.FC = () => {
   const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
   const asideRef = useRef<HTMLDivElement>(null);
   const mainRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+
+    const fetchUserData = async (): Promise<void> => {
+      try {
+        if (!pathname) return;
+        const userId: string | undefined = pathname.split('/').pop();
+        console.log(userId)
+        const response = await fetch(`/calendar${userId}/api?userId=${userId}`);
+        // const data: UserData = await response.json();
+
+        if (response.ok) {
+          // router.replace(`/calendar?userId=${data.user.id}`);
+        }
+        else {
+          // Means i have to create the user
+        }
+      } catch (error) {
+
+      }
+    }
+    fetchUserData();
+  }, [pathname])
 
   const toggleLink = (): void => {
     const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;

@@ -17,7 +17,7 @@ const EventCard: React.FC<{
     const { id, height, start, end, duration, color, title, description, groupId, isFriendEvent, icon } = event;
     const totalMinutes = F.timeToMinutes(duration);
     const topOffset = F.calculateTopOffset(start);
-    const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
+const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
     const borderStyle: string = groupId ? "solid" : "dotted";
 
     return <S.EventDiv

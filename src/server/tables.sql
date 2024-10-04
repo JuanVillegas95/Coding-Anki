@@ -1,0 +1,34 @@
+CREATE TABLE USERS (
+    id VARCHAR2(36) PRIMARY KEY NOT NULL,  
+    username VARCHAR2(30) NOT NULL,
+    oauth_id VARCHAR2(36) NOT NULL UNIQUE
+);
+
+CREATE TABLE CALENDARS (
+    id VARCHAR2(36) PRIMARY KEY NOT NULL,
+    user_id VARCHAR2(36) NOT NULL, 
+    name VARCHAR2(30) NOT NULL,      
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
+);
+
+CREATE TABLE EVENTS (
+    id VARCHAR2(36) PRIMARY KEY NOT NULL,
+    calendar_id VARCHAR2(36) NOT NULL, 
+    group_id VARCHAR2(36) NOT NULL,    
+    title VARCHAR2(40) NOT NULL,        
+    description VARCHAR2(200) NOT NULL, 
+    event_date VARCHAR2(10) NOT NULL,   
+    icon_name VARCHAR2(20) NOT NULL,    
+    color VARCHAR2(20) NOT NULL,        
+    height NUMBER NOT NULL,              
+    top_offset NUMBER NOT NULL,           
+    FOREIGN KEY (calendar_id) REFERENCES CALENDARS(id) ON DELETE CASCADE
+);
+
+CREATE TABLE FRIENDSHIPS (
+    user_id VARCHAR2(36) NOT NULL,
+    friend_id VARCHAR2(36) NOT NULL,
+    PRIMARY KEY (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES USERS(id) ON DELETE CASCADE
+);

@@ -1,26 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { oracle, cross, acctually, oracle_text, logo } from "@/utils/icons";
 import Logo from "@/components/Logo"
 import Image from "next/image";
 import * as S from "@/utils/style.login";
+import { useRouter } from "next/navigation";
+import { UserData } from "@/utils/types";
+
 
 const LoginHub: React.FC = () => {
     const [isWhyModal, setIsWhyModal] = useState<boolean>(false);
+
+    const router = useRouter();
+    const handleButtonClick = () => router.replace("/login/create");
+
     const openWhyModal = (): void => setIsWhyModal(true);
     const closeWhyModal = (): void => setIsWhyModal(false);
+    //! DATABASE
 
+    const handleLogin = async () => {
+        try {
+            const response = await fetch("/login/api/?oauth_id=juan_oauth_id", { method: "GET" });
+            const data: UserData = await response.json();
+            if (response.ok) {
+                console.log(data)
+                console.log(data.user)
+                console.log(data.user.ID)
+
+                console.log(`/calendar/${data.user.ID}`)
+                router.push(`/calendar/${data.user.ID}`);
+            }
+            else {
+                // Means i have to create the user
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
     return <React.Fragment>
         <S.LoginWrapperDiv>
-            <S.LoginContainerDiv $height={"500px"} $width={"600px"} $gap={"20px"}>
+            <S.LoginContainerDiv $height={"600px"} $width={"700px"} $gap={"20px"}>
                 <Image
                     src={logo.src}
                     alt="Purrfect Timing Logo"
-                    width={200}
-                    height={200}
-                    style={{
-                        border: "5px solid black",
-                        borderRadius: "50%"
-                    }}
+                    width={300}
+                    height={300}
                 />
                 <S.LoginTitleWrapperDiv>
                     <S.LoginTitleP>Login with</S.LoginTitleP>
@@ -33,7 +56,7 @@ const LoginHub: React.FC = () => {
                         style={{ marginLeft: "5px" }}
                     />
                 </S.LoginTitleWrapperDiv>
-                <S.LoginButtonInput />
+                <S.LoginButtonInput onClick={handleLogin} />
                 <S.LoginWhyP onClick={openWhyModal}>Why are we using Oracle for login?</S.LoginWhyP>
             </S.LoginContainerDiv>
         </S.LoginWrapperDiv>

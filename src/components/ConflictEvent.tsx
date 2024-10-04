@@ -13,8 +13,8 @@ const ConflictEvent: React.FC<{
     moveRight?: () => void;
     moveLeft?: () => void;
 }> = ({ event, label, areConflicts, moveRight, moveLeft }) => {
-    const { id, height, start, end, duration, color, icon, title, description, groupID, isFriendEvent } = event;
-    const borderStyle: string = groupID ? "solid" : "dotted";
+    const { id, height, start, end, duration, color, icon, title, description, groupId, isFriendEvent } = event;
+    const borderStyle: string = groupId ? "solid" : "dotted";
 
     // Style to override the existing style from EventDiv
     const warningStyle: React.CSSProperties = {

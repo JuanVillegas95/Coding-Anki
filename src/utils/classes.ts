@@ -38,7 +38,51 @@ class Calendar {
       this.eventIdsByGroupId = new Map<string, Set<string>>();
     }
     
+    public deleteEventSubmit(eventToDelete: Event): void{
+      const existingEventToDelete: Event | undefined = this.eventsById.get(eventToDelete.id);
 
+      if(!existingEventToDelete) { console.log("Event to delete does not exist"); return; }
+    
+      // Event exists but no groupId
+      if(!existingEventToDelete.groupId){
+
+        return;
+      }
+
+      // Event exist and group Id
+      // this.removeEventIdFromGroup(groupId, eventId);
+      // this.removeEventIdFromDate(dateId, eventId);
+      // this.eventsById.delete(eventId);
+      // console.log("Event on %s day was deleted", dateId);
+    }
+    
+    private updateEvent(eventToUpdate: Event, eventToSet: Event){
+      const _eventToSet: Event = { ...eventToSet };
+      _eventToSet.id = eventToUpdate.id;
+      this.eventsById.set(_eventToSet.id, _eventToSet);
+      console.log("Event on %s day was updated", _eventToSet.date);
+    }
+
+    private deleteEvent(eventId: string, dateId: string, groupId?: string): void {
+      if(groupId) this.removeEventIdFromGroup(groupId, eventId);
+      this.removeEventIdFromDate(dateId, eventId);
+      this.eventsById.delete(eventId);
+      console.log("Event on %s day was deleted", dateId);
+    }
+
+    // If is Recurring completly new Event is created from eventToSet, else just set
+    private createEvent(eventToSet: Event, dateId: string, isRecurring?: boolean): void {
+      const newEvent: Event = { ...eventToSet };
+      if(isRecurring) newEvent.id = uuidv4();
+      newEvent.date = dateId;
+
+      if(newEvent.groupId) this.addEventIdToGroup(newEvent.groupId, newEvent.id);
+      this.addEventIdToDate(dateId, newEvent.id);
+      this.eventsById.set(newEvent.id, newEvent);
+      console.log("Event on %s day was added", dateId);
+    }
+
+   
     public setEvent(eventToSet: Event): void {
       const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
 
@@ -47,13 +91,7 @@ class Calendar {
         // We don't have to worry about the edge case of not existing and having a groupId
         // Since in order to convert into a groupId event needs to exist
         // So we only worry about event not existing and not having a groupId
-
-        // Add the event to the eventsById map
-        this.eventsById.set(eventToSet.id, eventToSet);    
-        // Add the event ID to the eventIdsByDay map for that date
-        const dateKey: string = eventToSet.date;
-        this.addEventIdToDate(dateKey, eventToSet.id);
-        // Since no groupId nothing left to do
+        this.createEvent(eventToSet,eventToSet.id)
         return;
       }
 
@@ -101,6 +139,7 @@ class Calendar {
       }
 
       // Branch 3: If (was standalone, now groupId) Update standalone, Create new reucrring instances.
+       //! WHAT THE DAY WAS SELECTED STAY SELECTED BUT ITS OUT OF ITS RANGE 
       else if(!existingEvent.groupId && eventToSet.groupId){
         console.log("Branch 3,  Create new reucrring instances");
         // Step 1: Update the standalone
@@ -119,7 +158,7 @@ class Calendar {
           const stringifiedDate: string = strigifyDate(date);
           const day: number = getDay(stringifiedDate);
           if(!eventToSet.selectedDays[day]) continue;
-          this.createEvent(eventToSet,stringifiedDate)
+          this.createEvent(eventToSet,stringifiedDate,true);
         }
       }
 
@@ -152,49 +191,25 @@ class Calendar {
           // Step 3: If (was true, stays true) Update or Create
           else if (prevSelected && currSelected) {
             const eventToUpdate: Event | undefined = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
-            // Update or Create (Since the range grew)
+            // Update else Create (Since the range grew)
             if (eventToUpdate) this.updateEvent(eventToUpdate, eventToSet);
-            else this.createEvent(eventToSet, stringifiedDate);
+            else this.createEvent(eventToSet, stringifiedDate,true);
           }
 
           // Step 4: If (was true, now false) Delete
           else if (prevSelected && !currSelected) {
             const eventToRemove: Event | undefined = this.findEventByGroupAndDate(existingEvent.groupId, stringifiedDate);
-            // Delete
             if (eventToRemove) this.deleteEvent(eventToRemove.id, stringifiedDate, eventToSet.groupId!);
           }
           
           // Step 5: (was false, now true) Create
-          else if (!prevSelected && currSelected) this.createEvent(eventToSet, stringifiedDate);
+          else if (!prevSelected && currSelected) this.createEvent(eventToSet, stringifiedDate,true);
           
         }
       } 
     }
 
-    private updateEvent(eventToUpdate: Event, eventToSet: Event){
-      const _eventToSet: Event = { ...eventToSet };
-      _eventToSet.id = eventToUpdate.id;
-      this.eventsById.set(_eventToSet.id, _eventToSet);
-      console.log("Event on %s day was updated", _eventToSet.date);
-    }
 
-    private deleteEvent(eventId: string, dateId: string, groupId?: string): void {
-      if(groupId) this.removeEventIdFromGroup(groupId, eventId);
-      this.removeEventIdFromDate(dateId, eventId);
-      this.eventsById.delete(eventId);
-      console.log("Event on %s day was deleted", dateId);
-    }
-
-    private createEvent(eventToSet: Event, dateId: string): void {
-      const newEvent: Event = { ...eventToSet, id: eventToSet.id, date: eventToSet.date };
-      newEvent.id = uuidv4();
-      newEvent.date = dateId;
-
-      if(newEvent.groupId) this.addEventIdToGroup(newEvent.groupId, newEvent.id);
-      this.addEventIdToDate(dateId, newEvent.id);
-      this.eventsById.set(newEvent.id, newEvent);
-      console.log("Event on %s day was added", dateId);
-    }
     
     public consoleLogDate(event: Event): void {
       if(this.eventsById.get(event.id)){

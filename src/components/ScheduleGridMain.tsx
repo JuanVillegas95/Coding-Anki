@@ -105,7 +105,7 @@ const ScheduleGridMain: React.FC<{
         drag: (e: React.MouseEvent<HTMLDivElement>, colRef: React.RefObject<HTMLDivElement>) => {
             e.preventDefault();
             e.stopPropagation();
-            if (!isEventDragging || e.button !== C.LEFT_MOUSE_CLICK || !event.current) return;
+            if (!isEventDragging || e.button !== C.LEFT_MOUSE_CLICK || !event.current || event.current.groupId) return;
             dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= C.DRAG_THRESHOLD);
 
             if (!dragThreshold.current) return;
@@ -119,15 +119,13 @@ const ScheduleGridMain: React.FC<{
 
             const currentEventDayWeek: number = F.getDay(event.current.date);
             const enteredEventDayWeek: number = parseInt(colRef.current!.dataset.key as string);
-            if (!event.current.groupId) {
-                event.current.date = F.strigifyDate(
-                    F.addDateBy(
-                        F.parseDateStringToUTC(event.current.date),
-                        Math.sign(enteredEventDayWeek - currentEventDayWeek)
-                    )
-                );
-                event.current.selectedDays = new Array(7).fill(false);
-            }
+            event.current.date = F.strigifyDate(
+                F.addDateBy(
+                    F.parseDateStringToUTC(event.current.date),
+                    Math.sign(enteredEventDayWeek - currentEventDayWeek)
+                )
+            );
+            event.current.selectedDays = new Array(7).fill(false);
             event.current.selectedDays[F.getDay(event.current.date)] = true;
 
             if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
