@@ -100,6 +100,7 @@ class Calendar {
   public deleteEventSubmit(eventToDelete: Event): void {
     if(!eventToDelete.groupId) this.deleteEvent(eventToDelete);
     else this.getEventsByGroupId(eventToDelete.groupId).forEach((event: Event) => this.deleteEvent(event));
+  
   }
   public setEvent(eventToSet: Event): void {
     const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
@@ -114,6 +115,7 @@ class Calendar {
       console.log("Branch 3, was standalone, now groupId");
       // Step 1: Update the standalone
       const eventToSetCopy: Event = { ...eventToSet, id: existingEvent.id, date: existingEvent.date };
+      this.addEventIdToGroup(eventToSetCopy.groupId!,eventToSetCopy.id);
       this.updateEvent(existingEvent,eventToSetCopy)
 
       // Step 2: Create new instances (exculding the updated one)
@@ -193,7 +195,7 @@ class Calendar {
 
         // Step 2: (was false, now true) Create
         else if (!prevSelected && currSelected) {
-          const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate };
+          const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate};
           this.addEvent(eventToSetCopy)
         }
 
@@ -204,6 +206,10 @@ class Calendar {
           if(foundEvent){
             const eventToSetCopy: Event= { ...eventToSet, id: foundEvent.id, date: foundEvent.date}
             this.updateEvent(foundEvent,eventToSetCopy);
+          }
+          else{
+            const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate};
+            this.addEvent(eventToSetCopy)
           }
         }
 
