@@ -140,6 +140,15 @@ const CalendarHub: React.FC = () => {
     });
   };
 
+  const deleteEvent = (event: Event): void => {
+    const currentCalendar: Calendar = getCurrentCalendar();
+    currentCalendar.deleteEventSubmit(event);
+    setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+      const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+      updatedCalendars.set(currentCalendar.id, currentCalendar);
+      return updatedCalendars;
+    });
+  };
 
   const getCurrentCalendar = (): Calendar => calendars!.get(currentCalendar.id) as Calendar;
 
@@ -159,11 +168,11 @@ const CalendarHub: React.FC = () => {
         <DaySection mondayDate={mondayDate} />
         <ScheduleGridMain
           setEvent={setEvent}
+          deleteEvent={deleteEvent}
           getEvents={getEvents}
           mondayDate={mondayDate}
           addToast={toastHandeler.push}
           mainRef={mainRef}
-          warningHandeler={warningHandler}
           isLinked={(linkIcon === I.linkIn.src)}
         />
       </S.CalendarContainerDiv>

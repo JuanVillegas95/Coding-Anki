@@ -12,15 +12,12 @@ import DaySelector from './DaySelector';
 
 const EventModal: React.FC<{
     event: React.MutableRefObject<Event | null>;
-    getEvents: (date: string) => Event[];
     setEvent: (event: Event) => void;
-
+    deleteEvent: (event: Event) => void;
     addToast: (newToast: Toast) => void;
     isModalOpen: boolean;
     closeModal: () => void;
-    warningHandeler: T.WarningHandler;
-
-}> = ({ isModalOpen, closeModal, getEvents, addToast, warningHandeler, event, setEvent }) => {
+}> = ({ isModalOpen, closeModal, addToast, event, setEvent, deleteEvent }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
         ...event.current!,
         start: { ...event.current!.start },
@@ -171,11 +168,7 @@ const EventModal: React.FC<{
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        //! bananas
-        // if (!currentEvent.groupId) deleteEvent(currentEvent);
-
-        //else warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_DELETE, event.current))
-        //!
+        deleteEvent(currentEvent);
         closeModal();
     };
 

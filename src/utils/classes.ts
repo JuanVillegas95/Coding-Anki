@@ -77,7 +77,6 @@ class Calendar {
     if(eventToDelete.groupId) this.deleteEventIdFromGroup(eventToDelete.groupId, eventToDelete.id);
     this.deleteEventIdFromDate(eventToDelete.date, eventToDelete.id);
     this.eventsById.delete(eventToDelete.id);
-      
     console.log("The following event was deleted", this.getEventSummary(eventToDelete));
   }
 
@@ -98,10 +97,12 @@ class Calendar {
     console.log("The following event was updated", this.getEventSummary(updatedEvent));
   }
 
-   
+  public deleteEventSubmit(eventToDelete: Event): void {
+    if(!eventToDelete.groupId) this.deleteEvent(eventToDelete);
+    else this.getEventsByGroupId(eventToDelete.groupId).forEach((event: Event) => this.deleteEvent(event));
+  }
   public setEvent(eventToSet: Event): void {
     const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
-
     
     if (!existingEvent){ this.addEvent(eventToSet); return; }
 
@@ -129,93 +130,92 @@ class Calendar {
       }
     }
 
-      // Branch 3: If (was groupId, now standalone) Update the standalone, Delete the recurring instances.
-      else if (existingEvent.groupId && !eventToSet.groupId) {
-        console.log("Branch 3: Transition from group to standalone");
+    // Branch 3: If (was groupId, now standalone) Update the standalone, Delete the recurring instances.
+    else if (existingEvent.groupId && !eventToSet.groupId) {
+      console.log("Branch 3: Transition from group to standalone");
     
-        // Step 1: Delete all recurring events from the group
-        const eventsByGroupId: Event[] = this.getEventsByGroupId(existingEvent.groupId);
-        eventsByGroupId.forEach((event: Event) => {
-            this.deleteEvent(event);
-        });
+      // Step 1: Delete all recurring events from the group
+      const eventsByGroupId: Event[] = this.getEventsByGroupId(existingEvent.groupId);
+      eventsByGroupId.forEach((event: Event) => {
+          this.deleteEvent(event);
+      });
+
+      // Step 2: Update the existing event to standalone
+      const booleanArray: boolean[] = Array(7).fill(false);
+      booleanArray[getDay(eventToSet.date)] = true;
+      const eventToSetCopy: Event = { 
+          ...eventToSet, 
+          id: existingEvent.id,     // Retain the original event's id
+          storedGroupId: null,
+          groupId: null,       // Remove groupId to make it standalone
+          selectedDays: booleanArray,  // Remove recurrence logic (if applicable)
+          startDate: eventToSet.date, // Update start and end dates if needed
+          endDate: ""
+      };
     
-        // Step 2: Update the existing event to standalone
-        const booleanArray: boolean[] = Array(7).fill(false);
-        booleanArray[getDay(eventToSet.date)] = true;
-        const eventToSetCopy: Event = { 
-            ...eventToSet, 
-            id: existingEvent.id,     // Retain the original event's id
-            storedGroupId: null,
-            groupId: null,       // Remove groupId to make it standalone
-            selectedDays: booleanArray,  // Remove recurrence logic (if applicable)
-            startDate: eventToSet.date, // Update start and end dates if needed
-            endDate: ""
-        };
-    
-        this.updateEvent(existingEvent, eventToSetCopy);
+      this.updateEvent(existingEvent, eventToSetCopy);
     }
     
-      // Branch 4: If (was groupdId, stays groupId) 
-      // Update, Create or Delete according 'selectedDays' and 'endDate' transitioning.
-      else if (existingEvent.groupId && eventToSet.groupId) { 
-        console.log("Branch 4,  Update, Create or Delete according selectedDays transitioning");
-        const existingEventEndDate: Date = parseDateStringToUTC(existingEvent.endDate);
-        const existingEventStartDate: Date = parseDateStringToUTC(existingEvent.startDate);
-        const eventToSetStartDate: Date = parseDateStringToUTC(eventToSet.startDate);
-        const eventToSetEndDate: Date = parseDateStringToUTC(eventToSet.endDate);
+    // Branch 4: If (was groupdId, stays groupId)Update, Create or Delete according 'selectedDays' and 'dates' 
+    else if (existingEvent.groupId && eventToSet.groupId) { 
+      console.log("Branch 4,  Update, Create or Delete according selectedDays transitioning");
+      const existingEventEndDate: Date = parseDateStringToUTC(existingEvent.endDate);
+      const existingEventStartDate: Date = parseDateStringToUTC(existingEvent.startDate);
+      const eventToSetStartDate: Date = parseDateStringToUTC(eventToSet.startDate);
+      const eventToSetEndDate: Date = parseDateStringToUTC(eventToSet.endDate);
 
-        if (existingEventEndDate > eventToSetEndDate) {
-          for (let date = addDateBy(eventToSetEndDate, 1); date <= existingEventEndDate; date = addDateBy(date, 1)) {
-            const stringifiedDate = strigifyDate(date);
-            const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
-            const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-            if (foundEvent) this.deleteEvent(foundEvent);
-          }
+      if (existingEventEndDate > eventToSetEndDate) {
+        for (let date = addDateBy(eventToSetEndDate, 1); date <= existingEventEndDate; date = addDateBy(date, 1)) {
+          const stringifiedDate = strigifyDate(date);
+          const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
+          const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
+          if (foundEvent) this.deleteEvent(foundEvent);
         }
+      }
         
-        if (existingEventStartDate < eventToSetStartDate) {
-          for (let date = existingEventStartDate; date < eventToSetStartDate; date = addDateBy(date, 1)) {
-            const stringifiedDate = strigifyDate(date);
-            const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
-            const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-            if (foundEvent) this.deleteEvent(foundEvent);
-          }
+      if (existingEventStartDate < eventToSetStartDate) {
+        for (let date = existingEventStartDate; date < eventToSetStartDate; date = addDateBy(date, 1)) {
+          const stringifiedDate = strigifyDate(date);
+          const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
+          const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
+          if (foundEvent) this.deleteEvent(foundEvent);
         }
+      }
 
-        for (let date = eventToSetStartDate; date <= eventToSetEndDate; date = addDateBy(date, 1)) {
-          const stringifiedDate: string = strigifyDate(date);
-          const day: number = getDay(stringifiedDate);
-          const prevSelected: boolean =  existingEvent.selectedDays[day];
-          const currSelected: boolean = eventToSet.selectedDays[day];
+      for (let date = eventToSetStartDate; date <= eventToSetEndDate; date = addDateBy(date, 1)) {
+        const stringifiedDate: string = strigifyDate(date);
+        const day: number = getDay(stringifiedDate);
+        const prevSelected: boolean =  existingEvent.selectedDays[day];
+        const currSelected: boolean = eventToSet.selectedDays[day];
 
-          // Step 2: (was false, stays false) No operation
-          if(!prevSelected && !currSelected) continue;
+        // Step 2: (was false, stays false) No operation
+        if(!prevSelected && !currSelected) continue;
 
-          // Step 2: (was false, now true) Create
-          else if (!prevSelected && currSelected) {
-            const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate };
-            this.addEvent(eventToSetCopy)
-          }
+        // Step 2: (was false, now true) Create
+        else if (!prevSelected && currSelected) {
+          const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate };
+          this.addEvent(eventToSetCopy)
+        }
 
           // Step 3: If (was true, stays true) Update
-          else if (prevSelected && currSelected) {
-            const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
-            const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-            if(foundEvent){
-              const eventToSetCopy: Event= { ...eventToSet, id: foundEvent.id, date: foundEvent.date}
-              this.updateEvent(foundEvent,eventToSetCopy);
-            }
-          }
-
-          // Step 4: If (was true, now false) Delete
-          else if (prevSelected && !currSelected) {
-            const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
-            const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-            if(foundEvent) this.deleteEvent(foundEvent);
+        else if (prevSelected && currSelected) {
+          const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
+          const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
+          if(foundEvent){
+            const eventToSetCopy: Event= { ...eventToSet, id: foundEvent.id, date: foundEvent.date}
+            this.updateEvent(foundEvent,eventToSetCopy);
           }
         }
-      } 
-    }
+
+          // Step 4: If (was true, now false) Delete
+        else if (prevSelected && !currSelected) {
+          const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
+          const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
+          if(foundEvent) this.deleteEvent(foundEvent);
+        }
+      }
+    } 
+  }
 
     private deleteEventIdFromDate(dateKey: string, eventId: string): void {
       const eventsSet = this.eventIdsByDay.get(dateKey);
@@ -261,7 +261,6 @@ class Calendar {
       const events: Event[] = Array.from(eventIds).map(eventId => this.eventsById.get(eventId)!);
       return events;
     }
-    
 }
 
 
