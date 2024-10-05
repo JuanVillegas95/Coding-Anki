@@ -36,15 +36,14 @@ export const addDateBy = (date: Date, count: number): Date => {
   return newDate;
 };
 
+
 // Returns the most recent Monday
 export const getMostRecentMonday = (): Date => {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
   const dayOfWeek = today.getUTCDay(); 
   const daysSinceMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
-  
   today.setUTCDate(today.getUTCDate() - daysSinceMonday); 
-  
   return today;
 }
 
