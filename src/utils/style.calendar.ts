@@ -3,7 +3,7 @@ import styled, { keyframes, css } from 'styled-components';
 import * as S from "@/utils/style.base"
 
 
-const CalendarWrapperDiv = styled(S.CenterDiv)`
+const CalendarWrapperDiv = styled(S.WrapperCenterDiv)`
   flex-direction: row;
   gap: 5px;
 `;

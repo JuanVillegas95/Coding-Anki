@@ -59,7 +59,11 @@ import oracle_text from "@/images/oracle-text.png"
 import logo from "@/images/logo.png"
 import acctually from "@/images/actually.png"
 import welcome from "@/images/welcome.png"
+import catError from "@/images/error.png"
+
+
 export {
+  catError,
   oracle, logo, acctually, welcome,oracle_text,
   removeUser, addUser,
   linkIn, linkOut,

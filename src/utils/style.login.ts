@@ -2,7 +2,7 @@ import * as S from "@/utils/style.base"
 import styled, { keyframes, css } from 'styled-components';
 
 
-export const LoginWrapperDiv = styled(S.CenterDiv)``;
+export const LoginWrapperDiv = styled(S.WrapperCenterDiv)``;
 
 export const LoginModalWrapperDiv = styled(S.ModalWrapperDiv)``;
 

@@ -31,6 +31,22 @@ export const LogoTextT = styled.p`
   font-size: 30px;
 `
 
+export const BigTextP = styled.p`
+  font-family: ${fredoka.style.fontFamily};
+  font-size: 50px;
+  font-weight: 600;
+`;
+
+export const MedTextP = styled.p`
+  font-family: ${fredoka.style.fontFamily};
+  font-size: 24px;
+`;
+
+export const SmallTextP = styled.p`
+  font-family: ${fredoka.style.fontFamily};
+  font-size: 24px;
+`;
+
 export const TitleP = styled.p`
   font-family: ${fredoka.style.fontFamily};
   font-size: 24px;
@@ -55,7 +71,7 @@ export const ListLi = styled.li`
 `;
 
 
-export const CenterDiv = styled.div`
+export const WrapperCenterDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -71,6 +87,7 @@ export const ModalWrapperDiv = styled.div<{ $zIndex: number }>`
     background: rgba(0,0,0,0.6);
     z-index: ${({ $zIndex }) => $zIndex};
 `;
+
 
 export const ModalContainerDiv = styled.div<{ $width: string, $height: string}>`
     position: fixed;
@@ -123,6 +140,19 @@ export const ButtonInput = styled.input.attrs({ type: "button" })`
   &:hover{
     cursor: pointer;
   }
+`
+
+export const ContainerRowDiv = styled.div<{ $width: string, $height: string, $gap?: string}>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background-color: white;
+  padding: 30px;
+
+  width: ${({ $width }) => $width};
+  height: ${({ $height }) => $height};
+  gap: ${({ $gap }) => $gap};
 `
 
 
