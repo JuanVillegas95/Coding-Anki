@@ -8,17 +8,15 @@ const DaySection: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
     <S.ContainerSection>
       {C.DAYS.map((day, i) => {
         const dayOfTheMonth = F.addDateBy(mondayDate, i);
-        const dayOfTheMonthNumber = dayOfTheMonth.getDate().toString();
+        const dayOfTheMonthNumber = dayOfTheMonth.getUTCDate().toString();
         const isToday = F.areDatesTheSame(dayOfTheMonth, new Date());
 
-        return (
-          <S.SectionDayDiv key={i}>
-            <S.DayNameP>{day.slice(0, 3)}</S.DayNameP>
-            <S.ContianerNumberDiv $isToday={isToday}>
-              <S.DayNumberP $isToday={isToday}>{dayOfTheMonthNumber}</S.DayNumberP>
-            </S.ContianerNumberDiv>
-          </S.SectionDayDiv>
-        );
+        return <S.SectionDayDiv key={i}>
+          <S.DayNameP>{day.slice(0, 3)}</S.DayNameP>
+          <S.ContianerNumberDiv $isToday={isToday}>
+            <S.DayNumberP $isToday={isToday}>{dayOfTheMonthNumber}</S.DayNumberP>
+          </S.ContianerNumberDiv>
+        </S.SectionDayDiv>
       })}
     </S.ContainerSection>
   );

@@ -37,47 +37,82 @@ class Calendar {
       this.eventIdsByDay = new Map<string, Set<string>>();
       this.eventIdsByGroupId = new Map<string, Set<string>>();
     }
+    private debugMaps(): void {
+      // Logging the eventsById map
+      console.log("Events By ID:");
+      this.eventsById.forEach((event, eventId) => {
+        console.log(`Event ID: ${eventId}`, event);
+      });
+    
+      // Logging the eventIdsByDay map
+      console.log("Event IDs By Day:");
+      this.eventIdsByDay.forEach((eventIdsSet, day) => {
+        console.log(`Day: ${day}`);
+        console.log("Event IDs:", Array.from(eventIdsSet).join(', '));
+      });
+    
+      // Logging the eventIdsByGroupId map
+      console.log("Event IDs By Group ID:");
+      this.eventIdsByGroupId.forEach((eventIdsSet, groupId) => {
+        console.log(`Group ID: ${groupId}`);
+        console.log("Event IDs:", Array.from(eventIdsSet).join(', '));
+      });
+    }
+    
+    private getEventSummary({selectedDays, id ,date, groupId, storedGroupId}: Event): string {
+      const selectedDaysString = selectedDays
+        .map((selected, index) => (selected ? index : null))
+        .filter(day => day !== null)
+        .join(', ');
+  
+      return `Event Summary:
+      - ID: ${id}
+      - Date: ${date}
+      - Group ID: ${groupId ?? 'None'}
+      - Stored Group ID: ${storedGroupId ?? 'None'}
+      - Selected Days: [${selectedDaysString || 'None'}]`;
+    }
 
     private deleteEvent(eventToDelete: Event): void {
       if(eventToDelete.groupId) this.deleteEventIdFromGroup(eventToDelete.groupId, eventToDelete.id);
       this.deleteEventIdFromDate(eventToDelete.date, eventToDelete.id);
       this.eventsById.delete(eventToDelete.id);
-      console.log("Event on %s day was deleted", eventToDelete.date);
+      
+      console.log("The following event was deleted", this.getEventSummary(eventToDelete));
     }
 
     private addEvent(newEvent: Event): void {
       if(newEvent.groupId) this.addEventIdToGroup(newEvent.groupId, newEvent.id);
       this.addEventIdToDate(newEvent.date, newEvent.id);
       this.eventsById.set(newEvent.id, newEvent);
-      console.log("Event on %s day was added", newEvent.date);
+      console.log("The following event was added", this.getEventSummary(newEvent));
+
     }
 
     // Will set the values of existingEvent from updatedEvent
     private updateEvent(existingEvent: Event, updatedEvent: Event){
       const updatedEventCopy: Event = { ...updatedEvent };
-
       if (existingEvent.date !== updatedEvent.date) {
         this.deleteEventIdFromDate(existingEvent.date, updatedEvent.id);
         this.addEventIdToDate(updatedEvent.date, updatedEvent.id);
       }
-
       this.eventsById.set(existingEvent.id, updatedEventCopy);
-      console.log("Event on %s day was updated", existingEvent.date);
+      console.log("The following event was updated", this.getEventSummary(updatedEvent));
+
     }
 
    
     public setEvent(eventToSet: Event): void {
       const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
 
-      if (!existingEvent){ this.addEvent(eventToSet); return; }
+      if (!existingEvent){ this.addEvent(eventToSet); 
+        return;}
 
       // Branch 1: If (was standalone, stays standalone) Update standalone.
       if(!existingEvent.groupId && !eventToSet.groupId) this.updateEvent(existingEvent,eventToSet);
       
       // Branch 2: If (was groupId, now standalone) Delete the standalone, Update the recurring instances.
-      //! IF SOMETHING GIVE PROBLEMS COME HERE
       else if(existingEvent.groupId && !eventToSet.groupId){
-        console.log("Branch 2, Delete the standalone, Update the recurring instances");
         const dependentEvents: Event[] = this.getEventsByGroupId(eventToSet.storedGroupId!);
 
         dependentEvents.forEach((dependentEvent: Event) =>{
@@ -90,21 +125,14 @@ class Calendar {
             this.updateEvent(dependentEvent,dependentEventCopy);
           }
         });
-
       }
 
       // Branch 3: If (was standalone, now groupId) Update standalone, Create new reucrring instances.
-       //! WHAT THE DAY WAS SELECTED STAY SELECTED BUT ITS OUT OF ITS RANGE 
       else if(!existingEvent.groupId && eventToSet.groupId){
-        console.log("Branch 3,  Create new reucrring instances");
+        console.log("Branch 3, was standalone, now groupId");
         // Step 1: Update the standalone
-        const updatedExitstingEvent: Event = { ...existingEvent, groupId: existingEvent.groupId };
-        updatedExitstingEvent.groupId = eventToSet.groupId;
-        updatedExitstingEvent.selectedDays = eventToSet.selectedDays;
-        updatedExitstingEvent.endDate = eventToSet.endDate;
-        this.eventsById.set(updatedExitstingEvent.id, updatedExitstingEvent);
-        this.addEventIdToGroup(updatedExitstingEvent.groupId, updatedExitstingEvent.id);
-
+        const eventToSetCopy: Event = { ...eventToSet, id: existingEvent.id, date: existingEvent.date };
+        this.updateEvent(existingEvent,eventToSetCopy)
         // Step 2: Create new instances (exculding the updated one)
         const startDate: Date = parseDateStringToUTC(eventToSet.startDate);
         const endDate: Date = parseDateStringToUTC(eventToSet.endDate);
@@ -113,7 +141,6 @@ class Calendar {
           const stringifiedDate: string = strigifyDate(date);
           const day: number = getDay(stringifiedDate);
           if(!eventToSet.selectedDays[day]) continue;
-          const eventToSetCopy: Event = { ...eventToSet };
           eventToSetCopy.id = uuidv4();
           eventToSetCopy.date = stringifiedDate;
           this.addEvent(eventToSetCopy);
@@ -140,6 +167,7 @@ class Calendar {
               if (eventToRemove) this.deleteEvent(eventToRemove); 
           }
         }
+
         if(existingEventStartDate < existingEventStartDate){
           for (
             let date = existingEventStartDate; 
@@ -175,6 +203,7 @@ class Calendar {
           else if (!prevSelected && currSelected) this.addEvent(eventToSet);
         }
       } 
+      // this.debugMaps();
     }
 
 

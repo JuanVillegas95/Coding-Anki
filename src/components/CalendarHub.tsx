@@ -31,25 +31,25 @@ const CalendarHub: React.FC = () => {
 
   useEffect(() => {
 
-    const fetchUserData = async (): Promise<void> => {
-      try {
-        if (!pathname) return;
-        const userId: string | undefined = pathname.split('/').pop();
-        console.log(userId)
-        const response = await fetch(`/calendar${userId}/api?userId=${userId}`);
-        // const data: UserData = await response.json();
+    // const fetchUserData = async (): Promise<void> => {
+    //   try {
+    //     if (!pathname) return;
+    //     const userId: string | undefined = pathname.split('/').pop();
+    //     console.log(userId)
+    //     const response = await fetch(`/calendar${userId}/api?userId=${userId}`);
+    //     // const data: UserData = await response.json();
 
-        if (response.ok) {
-          // router.replace(`/calendar?userId=${data.user.id}`);
-        }
-        else {
-          // Means i have to create the user
-        }
-      } catch (error) {
+    //     if (response.ok) {
+    //       // router.replace(`/calendar?userId=${data.user.id}`);
+    //     }
+    //     else {
+    //       // Means i have to create the user
+    //     }
+    //   } catch (error) {
 
-      }
-    }
-    fetchUserData();
+    //   }
+    // }
+    // fetchUserData();
   }, [pathname])
 
   const toggleLink = (): void => {
@@ -143,11 +143,8 @@ const CalendarHub: React.FC = () => {
 
   const getCurrentCalendar = (): Calendar => calendars!.get(currentCalendar.id) as Calendar;
 
-  const getEvents = (date: string): Event[] => {
-    const currentCalendar: Calendar = getCurrentCalendar();
-    const eventsByDate: Event[] = currentCalendar.getEventsByDate(date);
-    return eventsByDate;
-  };
+  const getEvents = (date: string): Event[] => getCurrentCalendar().getEventsByDate(date);
+
 
   return <React.Fragment >
     <S.CalendarWrapperDiv>

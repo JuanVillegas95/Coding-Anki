@@ -18,35 +18,51 @@ export const pixelsToHours = (pixels: number): number => pixels / C.HOUR_HEIGHT;
 // Convert time in minutes;
 export const timeToMinutes = (time: Time): number => hoursToMinutes(time.hours) + time.minutes;
 
-
-
-
-
 // Creates an array of n size;
 export const range = (size: number): number[] => [...Array(size).keys()]
 
 // Validates if two dates are in the same day
 export const areDatesTheSame = (first: Date, second: Date): boolean =>
-  first.getFullYear() === second.getFullYear() &&
-  first.getMonth() === second.getMonth() &&
-  first.getDate() === second.getDate();
+  first.getUTCFullYear() === second.getUTCFullYear() &&
+  first.getUTCMonth() === second.getUTCMonth() &&
+  first.getUTCDate() === second.getUTCDate();
+
 
 // Adds a specified number of days to the given date.
 export const addDateBy = (date: Date, count: number): Date => {
   const newDate = new Date(date.getTime());
-  newDate.setUTCDate(newDate.getUTCDate() + count); 
+  newDate.setUTCHours(0, 0, 0, 0);
+  newDate.setUTCDate(newDate.getUTCDate() + count);
   return newDate;
 };
-
 
 // Returns the most recent Monday
 export const getMostRecentMonday = (): Date => {
   const today = new Date();
-  const dayOfWeek = today.getDay();
-  const daysSinceMonday = (dayOfWeek + 6) % 7;
-  today.setDate(today.getDate() - daysSinceMonday);
+  today.setUTCHours(0, 0, 0, 0);
+  const dayOfWeek = today.getUTCDay(); 
+  const daysSinceMonday = (dayOfWeek === 0) ? 6 : dayOfWeek - 1;
+  
+  today.setUTCDate(today.getUTCDate() - daysSinceMonday); 
+  
   return today;
 }
+
+export const formatMonthUTC = (month: Date): string => {
+  return month.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
+}
+
+export const getMonth = (mondayDate: Date): string => {
+  const month: string = formatMonthUTC(mondayDate); 
+  for (let i = 0; i < 7; i++) {
+    const newDate: Date = addDateBy(mondayDate, i);
+    const newMonth: string = formatMonthUTC(newDate); 
+    if (month !== newMonth) {
+      return `${month} - ${newMonth}`;
+    }
+  }
+  return mondayDate.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });
+};
 
 
 // Calculates the top offset in pixels units given the time.
@@ -241,22 +257,7 @@ export const isNewEventValid = (newEvent: Event, events: Event[]): boolean => {
   return true;
 }
 
-export const formatMonth = (month: Date): string =>{
-  return month.toLocaleString('en-US', { month: 'short' })
-}
 
-export const getMonth = (mondayDate: Date): string => {
-
-  const month: string = formatMonth(mondayDate);
-  for(let i = 0; i<7; i++){
-    const newDate: Date = addDateBy(mondayDate,i);
-    const newMonth: string = formatMonth(newDate);
-    if(month !== newMonth){
-      return `${month} - ${newMonth}`
-    }
-  }
-  return mondayDate.toLocaleDateString('en-US', { month: 'long' });
-}
 
 export const generate24Hours = (): string[] => {
   const hourArray: string[] = [];

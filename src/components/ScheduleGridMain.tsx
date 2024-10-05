@@ -72,12 +72,12 @@ const ScheduleGridMain: React.FC<{
             e.preventDefault();
             e.stopPropagation();
             if (e.button !== C.LEFT_MOUSE_CLICK) return;
-
             const newEventStart: Time = F.calculateEventTime(e, columnDivRefs[0]);
             if (F.isEventOverlapping(getEvents(F.strigifyDate(date)), newEventStart)) return;
 
             setIsEventCreating(true);
             event.current = structuredClone(new Event(date, newEventStart))
+
         },
 
 
@@ -144,7 +144,6 @@ const ScheduleGridMain: React.FC<{
             event.current.groupId = null;
 
             if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
-
             setEvent(event.current);
         },
 
