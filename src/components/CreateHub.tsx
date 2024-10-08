@@ -80,7 +80,6 @@ const CreateHub: React.FC = () => {
                         </S.CreateIdWrapperDiv>
                         <S.CreateWrapperFooter>
                             <S.CreateUsernameInput onChange={(e) => handleUserNameInput(e)} />
-                            <S.CreateButtonInput onClick={handleButtonClick} />
                         </S.CreateWrapperFooter>
                     </S.CreateWrapperHeader>
                 </S.CreateWrapperMain>

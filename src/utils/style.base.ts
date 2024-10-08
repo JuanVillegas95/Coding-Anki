@@ -1,6 +1,6 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
-import { Fredoka, Varela_Round } from "next/font/google";
+import { Fredoka } from "next/font/google";
 
 
 const fredoka = Fredoka({
@@ -10,26 +10,6 @@ const fredoka = Fredoka({
     display: "swap",
   });
 
-const varela = Varela_Round({
-    weight: ["400"],
-    style: ["normal",],
-    subsets: ["latin"],
-    display: "swap",
-});
-
-export const LogoWrapperDiv = styled.div`
-  border-radius: 50%;
-`
-export const LogoTextT = styled.p`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: ${fredoka.style.fontFamily};
-  font-weight: 700;
-  color: black;
-  font-size: 30px;
-`
 
 export const BigTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
@@ -37,29 +17,32 @@ export const BigTextP = styled.p`
   font-weight: 600;
 `;
 
-export const MedTextP = styled.p`
+export const MedTextP = styled.p<{ $hover?: boolean}>`
   font-family: ${fredoka.style.fontFamily};
-  font-size: 24px;
+  font-size: 20px;
+
+  ${({ $hover }) => $hover ? `
+    &:hover{
+      cursor: pointer;
+      color: #C74634;
+    }
+  ` : null
+  }
 `;
 
 export const SmallTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
-  font-size: 24px;
+  font-size: 14px;
 `;
 
-export const TitleP = styled.p`
-  font-family: ${fredoka.style.fontFamily};
-  font-size: 24px;
-`;
-
-export const TextP = styled.p`
+export const ListOl = styled.ol<{ $gap?: string }>`
   font-family: ${fredoka.style.fontFamily};
   font-size: 20px;
-`;
+  display: flex;
+  flex-direction: column;
 
-export const ListOl = styled.ol`
-  font-family: ${fredoka.style.fontFamily};
-  font-size: 20px;
+  margin-left: 20px;
+  gap: ${({ $gap }) => $gap};
 `;
 
 export const ListUl = styled.ul`
@@ -78,7 +61,9 @@ export const WrapperCenterDiv = styled.div`
     height: 100vh;
 `;
 
-export const ModalWrapperDiv = styled.div<{ $zIndex: number }>`
+export const ModalWrapperDiv = styled.div<{ $zIndex: number, $gap?: string, $padding?: string }>`
+    display: flex;
+    flex-direction: column;
     position: fixed;
     top: 0;
     left: 0;
@@ -86,20 +71,36 @@ export const ModalWrapperDiv = styled.div<{ $zIndex: number }>`
     height: 100%;
     background: rgba(0,0,0,0.6);
     z-index: ${({ $zIndex }) => $zIndex};
+    z-index: ${({ $gap }) => $gap};
+    z-index: ${({ $padding }) => $padding};
+
 `;
 
 
-export const ModalContainerDiv = styled.div<{ $width: string, $height: string}>`
+export const ModalContainerDiv = styled.div<{ 
+  $width?: string, 
+  $height?: string, 
+  $padding?: string,
+  $gap?: string,
+  $isBorder?: boolean,
+}>`
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
     border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
 
-    width: ${({ $width }) => $width};
-    height: ${({ $height }) => $height};
+    ${({ $isBorder }) => $isBorder ? "border: black solid 3px;" : null }
+    gap: ${({ $gap }) => $gap || "auto"};
+    width: ${({ $width }) => $width || "auto"};
+    height: ${({ $height }) => $height || "auto"};
+    padding: ${({ $padding }) => $padding || '0'};
 `;
+
+
 
 export const SvgDiv = styled.div<{$color?: string, $size: string, $svgSize: string}>`
   display: flex;
@@ -127,45 +128,66 @@ export const ClickableSvgDiv = styled(SvgDiv)<{ $isBackgroundGrey?: boolean }>`
     }
 `;
 
-export const ButtonInput = styled.input.attrs({ type: "button" })`
-  width: 400px;
+export const ButtonInput = styled.input.attrs<{ 
+  text?: string, 
+  $width: string, 
+  $padding: string, 
+  $margin?: string 
+}>(({ text, $width, $padding }) => ({
+  type: "button",
+  value: text,
+}))`
+  font-family: ${fredoka.style.fontFamily};
   height: auto;
   border-radius: 12px;
   background-color: #312D2A;
   color: white;
-  padding: 10px;
   font-size: 20px;
   border: none;
   outline: none;
-  &:hover{
+  width: ${({ $width }) => $width};
+  padding: ${({ $padding }) => $padding};
+  margin: ${({ $margin }) => $margin }; 
+
+  &:hover {
     cursor: pointer;
   }
-`
+`;
 
-export const ContainerRowDiv = styled.div<{ $width: string, $height: string, $gap?: string}>`
+
+export const ContainerDiv = styled.div<{ 
+  $direction: string, 
+  $width?: string, 
+  $height?: string, 
+  $gap?: string, 
+  $padding?: string, 
+  $margin?: string, 
+  $wrap?: string, 
+  $justifyContent?: string, 
+  $alignItems?: string,
+  $isBorder?: boolean 
+}>`
+  position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
   border-radius: 12px;
   background-color: white;
-  padding: 30px;
 
-  width: ${({ $width }) => $width};
-  height: ${({ $height }) => $height};
+  
+  ${({ $isBorder }) => $isBorder ? "border: black solid 3px;" : null }
+  flex-wrap: ${({ $wrap }) => $wrap };
+  justify-content: ${({ $justifyContent }) => $justifyContent };
+  align-items: ${({ $alignItems }) => $alignItems };
+  flex-direction: ${({ $direction }) => $direction};
+  margin: ${({ $margin }) => $margin};
+  padding: ${({ $padding }) => $padding};
+  width: ${({ $width }) => $width || "auto"};
+  height: ${({ $height }) => $height || "auto"};
   gap: ${({ $gap }) => $gap};
-`
+`;
 
+export const CrossIconDiv = styled(ClickableSvgDiv)`
+  position: absolute;
+  top: -20px;
+  right: -20px;
+`;
 
-export const ContainerColDiv = styled.div<{ $width: string, $height: string, $gap?: string}>`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border-radius: 12px;
-  background-color: white;
-  padding: 30px;
-
-  width: ${({ $width }) => $width};
-  height: ${({ $height }) => $height};
-  gap: ${({ $gap }) => $gap};
-`

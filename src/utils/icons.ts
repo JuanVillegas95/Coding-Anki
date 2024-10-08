@@ -61,8 +61,12 @@ import acctually from "@/images/actually.png"
 import welcome from "@/images/welcome.png"
 import catError from "@/images/error.png"
 
+import whiteCat from "@/images/white cat.png"
+import brownCat from "@/images/brownCat.png"
+import appTitle from "@/images/purrfecttiming.png"
 
 export {
+  whiteCat, brownCat, appTitle,
   catError,
   oracle, logo, acctually, welcome,oracle_text,
   removeUser, addUser,

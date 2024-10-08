@@ -20,7 +20,7 @@ async function createPool(): Promise<void> {
           ? Number.parseInt(process.env.HTTPS_PROXY_PORT)
           : undefined, // Optional
         poolMax: 10,
-        poolMin: 10,
+        poolMin: 0,
       });
       console.log('Connection pool created successfully.');
     } catch (error) {
