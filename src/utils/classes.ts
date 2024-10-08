@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { FRIEND_STATUS, TOAST_TYPE, STATUS} from "@/utils/constants"
+import { TOAST_TYPE, STATUS} from "@/utils/constants"
 import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents } from "@/utils/functions";
 import * as I  from "@/utils/icons"
 

@@ -1,43 +1,62 @@
-import * as I from "@/utils/icons";
+import { 
+  success, 
+  info, 
+  error, 
+  disk, 
+  replace, 
+  confetti, 
+  trash, 
+  users, 
+  download, 
+  upload, 
+  print, 
+  interrogation, 
+  bell, 
+  cart, 
+  heart, 
+  star, 
+  mark, 
+  phone, 
+  information, 
+  coke, 
+  meh 
+} from "@/utils/icons";
 
 // Constants
-const HOUR_WIDTH: number = 60;
-const HOUR_HEIGHT: number = 70; // Quantity of pixels that corresponds to an hour
+export const HOUR_WIDTH = 60;
+export const HOUR_HEIGHT = 70; // Quantity of pixels that corresponds to an hour
 
-const CALENDAR_WIDTH: number = 1150;
-const CALENDAR_HEIGHT: number = 750;
-const HEADER_HEIGHT: number = 90;
-const HEADER_FONT_SIZE: number = 18;
-const SUBHEADER_HEIGHT: number = 50;
-const SUBHEADER_FONT_SIZE: number = 15;
-const HOURS_FONT_SIZE: number = 12.5;
-const DAYS_OF_THE_WEEK_HEIGHT: number = 70;
-const DAYS: string[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
-const SHORT_DURATION_THRESHOLD: number = 60; // Less than 60 minutes is a "SHORT" event.
-const MAX_DURATION_MINUTES: number = 20;
-const DRAG_THRESHOLD: number = 200
+export const CALENDAR_WIDTH = 1150;
+export const CALENDAR_HEIGHT = 750;
+export const HEADER_HEIGHT = 90;
+export const HEADER_FONT_SIZE = 18;
+export const SUBHEADER_HEIGHT = 50;
+export const SUBHEADER_FONT_SIZE = 15;
+export const HOURS_FONT_SIZE = 12.5;
+export const DAYS_OF_THE_WEEK_HEIGHT = 70;
+export const DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+export const SHORT_DURATION_THRESHOLD = 60; // Less than 60 minutes is a "SHORT" event.
+export const MAX_DURATION_MINUTES = 20;
+export const DRAG_THRESHOLD = 200;
+
 // Peripheral events
-const LEFT_MOUSE_CLICK: number = 0;
-const ESCAPE_KEYS: string[] = ["Escape", "Esc"];
-const ENTER_KEY: string = "Enter";
-
-
+export const LEFT_MOUSE_CLICK = 0;
+export const ESCAPE_KEYS = ["Escape", "Esc"];
+export const ENTER_KEY = "Enter";
 
 // Toast Type Enum
-enum TOAST_TYPE {
+export enum TOAST_TYPE {
   SUCCESS = 'SUCCESS',
   INFO = 'INFO',
   ERROR = 'ERROR',
 }
 
 // Toast Icon Mapping
-const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
-  [TOAST_TYPE.SUCCESS]: I.success,
-  [TOAST_TYPE.INFO]: I.info,
-  [TOAST_TYPE.ERROR]: I.error,
+export const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
+  [TOAST_TYPE.SUCCESS]: success,
+  [TOAST_TYPE.INFO]: info,
+  [TOAST_TYPE.ERROR]: error,
 };
-
-
 
 export enum STATUS {
   OK = "ok", // No warning should be shown.
@@ -46,31 +65,21 @@ export enum STATUS {
   EVENT_DELETE = "Recurring Event Delete", 
 }
 
-
-
-// Friend Status Enum
-enum FRIEND_STATUS {
-  PENDING = 'PENDING', // Initial state when a friend request is sent
-  ACCEPTED = 'ACCEPTED', // When the friend request is accepted
-  DECLINED = 'DECLINED', // When the friend request is declined
-}
-
 // Menu Icon Mapping
-const MENU: Record<string, React.ComponentType> = {
-  Save: I.disk,
-  Change: I.replace,
-  New: I.confetti,
-  Delete: I.trash,
-  Friends: I.users,
-  Import: I.download,
-  Export: I.upload,
-  Print: I.print,
-  Help: I.interrogation,
+export const MENU: Record<string, React.ComponentType> = {
+  Save: disk,
+  Change: replace,
+  New: confetti,
+  Delete: trash,
+  Friends: users,
+  Import: download,
+  Export: upload,
+  Print: print,
+  Help: interrogation,
 };
 
-
 // Color Scheme
-const COLORS: Record<string, {
+export const COLORS: Record<string, {
   primary: string;
   secondary: string;
   tertiary: string;
@@ -122,20 +131,21 @@ const COLORS: Record<string, {
   },
 };
 
+// Icons
 export const ICONS: Record<string, React.ComponentType> = {
-  bell: I.bell,
-  cart: I.cart,
-  heart: I.heart,
-  star: I.star,
-  mark: I.mark,
-  phone: I.phone,
-  information: I.information,
-  coke: I.coke,
-  meh: I.meh,
+  bell,
+  cart,
+  heart,
+  star,
+  mark,
+  phone,
+  information,
+  coke,
+  meh,
 };
 
 // Scrollbar Hiding CSS
-const HIDE_SCROLL_BAR: string = `
+export const HIDE_SCROLL_BAR = `
 &::-webkit-scrollbar {
   display: none;
 }
@@ -144,31 +154,4 @@ const HIDE_SCROLL_BAR: string = `
 scrollbar-width: none;
 `;
 
-export const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000; 
-
-
-export {
-  HOUR_HEIGHT,
-  HOUR_WIDTH,
-  HEADER_HEIGHT,
-  DAYS_OF_THE_WEEK_HEIGHT,
-  DAYS,
-  MAX_DURATION_MINUTES,
-  LEFT_MOUSE_CLICK,
-  CALENDAR_HEIGHT,
-  CALENDAR_WIDTH,
-  SUBHEADER_HEIGHT,
-  SUBHEADER_FONT_SIZE,
-  HOURS_FONT_SIZE,
-  HEADER_FONT_SIZE,
-  HIDE_SCROLL_BAR,
-  SHORT_DURATION_THRESHOLD,
-  ESCAPE_KEYS,
-  ENTER_KEY,
-  MENU,
-  TOAST_TYPE,
-  COLORS,
-  FRIEND_STATUS,
-  TOAST_ICON,
-  DRAG_THRESHOLD,
-};
+export const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;

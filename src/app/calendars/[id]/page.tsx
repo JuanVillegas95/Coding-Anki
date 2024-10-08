@@ -127,9 +127,7 @@ export default function CalendarHub() {
         const currentCalendar: Calendar = getCurrentCalendar();
         const newStatus: STATUS = currentCalendar.auditStatus(eventToSet); // Get the new status value
         setStatus(newStatus);
-
         if (newStatus === STATUS.OK) {
-            console.log(newStatus);
             setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
                 currentCalendar.commitEventRevisions();
                 const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
