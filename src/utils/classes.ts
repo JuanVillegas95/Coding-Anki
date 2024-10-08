@@ -102,6 +102,7 @@ class Calendar {
     else this.getEventsByGroupId(eventToDelete.groupId).forEach((event: Event) => this.deleteEvent(event));
   
   }
+
   public setEvent(eventToSet: Event): void {
     const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
     
@@ -213,7 +214,7 @@ class Calendar {
           }
         }
 
-          // Step 4: If (was true, now false) Delete
+          // Step 4: If (was true, now false) Deleted
         else if (prevSelected && !currSelected) {
           const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
           const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
