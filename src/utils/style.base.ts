@@ -11,15 +11,21 @@ const fredoka = Fredoka({
   });
 
 
+
+  export const HugeTextP = styled.p`
+  font-family: ${fredoka.style.fontFamily};
+  font-size: 100px;
+`;
+
+
 export const BigTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
   font-size: 50px;
-  font-weight: 600;
 `;
 
 export const MedTextP = styled.p<{ $hover?: boolean}>`
   font-family: ${fredoka.style.fontFamily};
-  font-size: 20px;
+  font-size: 25px;
 
   ${({ $hover }) => $hover ? `
     &:hover{
@@ -30,7 +36,19 @@ export const MedTextP = styled.p<{ $hover?: boolean}>`
   }
 `;
 
-export const SmallTextP = styled.p`
+export const SmallTextP = styled.p<{ $hover?: boolean}>`
+  font-family: ${fredoka.style.fontFamily};
+  font-size: 20px;
+  ${({ $hover }) => $hover ? `
+    &:hover{
+      cursor: pointer;
+      color: #C74634;
+    }
+  ` : null
+  }
+`;
+
+export const TinyTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
   font-size: 14px;
 `;
@@ -152,6 +170,26 @@ export const ButtonInput = styled.input.attrs<{
   &:hover {
     cursor: pointer;
   }
+`;
+
+export const TextInput = styled.input.attrs<{ 
+  $placeholder?: string, 
+  $width: string, 
+  $padding: string, 
+  $margin?: string 
+}>(({ $placeholder, $width, $padding }) => ({
+  type: "text",
+  placeholder: $placeholder,
+}))`
+  font-family: ${fredoka.style.fontFamily};
+  height: auto;
+  border-radius: 12px;
+  font-size: 20px;
+  border: none;
+  outline: none;
+  width: ${({ $width }) => $width};
+  padding: ${({ $padding }) => $padding};
+  margin: ${({ $margin }) => $margin }; 
 `;
 
 
