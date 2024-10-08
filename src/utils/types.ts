@@ -1,9 +1,5 @@
-import { Toast, Warning,Event } from "@/utils/classes"
+import { Toast,Event } from "@/utils/classes"
 
-export type WarningHandler = {
-    set: (newWarning: Warning) => void;
-    close: () => void;
-};
 
 export type ToastHandler = {
     push: (newToast: Toast) => void;

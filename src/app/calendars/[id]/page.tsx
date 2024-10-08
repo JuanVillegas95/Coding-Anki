@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { usePathname } from 'next/navigation';
-import { Event, Calendar, Toast, Warning, User } from "@/utils/classes";
+import { Event, Calendar, Toast, User } from "@/utils/classes";
 import { v4 as uuidv4 } from 'uuid';
 import CalendarHeader from "@/components/CalendarHeader"
 import TimeColumnAside from "@/components/TimeColumnAside"
@@ -17,18 +17,21 @@ import * as T from '@/utils/types';
 import * as I from '@/utils/icons';
 import * as S from '@/utils/style.calendar';
 
+import { STATUS } from "@/utils/constants";
+
 const currentCalendar = new Calendar("yes", "hi");
 
 export default function CalendarHub() {
     const [calendars, setCalendars] = useState<Map<string, Calendar>>(new Map([[currentCalendar.id, currentCalendar]]));
     const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
-    const [warning, setWarning] = useState<Warning>(new Warning());
     const [linkedCalendar, setLinkedCalendar] = useState<string>("")
     const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
     const asideRef = useRef<HTMLDivElement>(null);
     const mainRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
+
+    const [status, setStatus] = useState<STATUS>(STATUS.OK);
 
     useEffect(() => {
 
@@ -83,17 +86,6 @@ export default function CalendarHub() {
     }, []);
 
 
-    const warningHandler: T.WarningHandler = {
-        set: (newWarning: Warning): void => setWarning((prev) => ({ ...prev, ...newWarning })),
-        close: (): void => setWarning({
-            conflictEvents: null,
-            currentEvent: null,
-            recurringEvents: null,
-            beforeDragEvent: null,
-            status: C.WARNING_STATUS.NONE,
-        }),
-    };
-
     const toastHandeler: T.ToastHandler = {
         push: (newToast: Toast): void => {
             setToasts((prevToasts) => {
@@ -131,15 +123,22 @@ export default function CalendarHub() {
 
     const setLinkedCalendarFriend = (event: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(event.target.value)
 
-    const setEvent = (event: Event): void => {
+    const setEvent = (eventToSet: Event): void => {
         const currentCalendar: Calendar = getCurrentCalendar();
-        currentCalendar.setEvent(event);
-        setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
-            const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-            updatedCalendars.set(currentCalendar.id, currentCalendar);
-            return updatedCalendars;
-        });
+        const newStatus: STATUS = currentCalendar.auditStatus(eventToSet); // Get the new status value
+        setStatus(newStatus);
+
+        if (newStatus === STATUS.OK) {
+            console.log(newStatus);
+            setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+                currentCalendar.commitEventRevisions();
+                const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+                updatedCalendars.set(currentCalendar.id, currentCalendar);
+                return updatedCalendars;
+            });
+        }
     };
+
 
     const deleteEvent = (event: Event): void => {
         const currentCalendar: Calendar = getCurrentCalendar();

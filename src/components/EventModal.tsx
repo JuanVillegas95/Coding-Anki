@@ -4,7 +4,7 @@ import * as I from '@/utils/icons';
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 import * as T from '@/utils/types';
-import { Event, Toast, Warning } from '@/utils/classes';
+import { Event, Toast } from '@/utils/classes';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';

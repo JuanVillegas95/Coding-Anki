@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Event, Warning } from '@/utils/classes';
+import { Event } from '@/utils/classes';
 import WarningConflict from "@/components/WarningConflict"
 import WarningModify from "@/components/WarningModify"
 import WarningDelete from "@/components/WarningDelete"
@@ -10,11 +10,8 @@ import * as I from '@/utils/icons';
 import * as T from '@/utils/types';
 
 const WarningModal: React.FC<{
-    warning: Warning;
-    warningHandler: T.WarningHandler;
     calendarHandler: T.CalendarHandler;
-}> = ({ warningHandler, warning, calendarHandler, }) => {
-    const { status, currentEvent, conflictEvents, recurringEvents, beforeDragEvent } = warning;
+}> = ({ calendarHandler, }) => {
     return <div></div>
     // const handleConflict = () => {
     //     conflictEvents!.forEach((conflictEvent) => {

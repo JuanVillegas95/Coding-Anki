@@ -4,7 +4,7 @@ import * as F from '@/utils/functions';
 import * as C from '@/utils/constants';
 import * as T from "@/utils/types"
 import * as I from "@/utils/icons"
-import { Event, Time, Toast, Warning, User, Calendar } from '@/utils/classes';
+import { Event, Time, Toast, User, Calendar } from '@/utils/classes';
 import EventCard from './EventCard';
 import EventModal from './EventModal';
 import { v4 as uuidv4 } from 'uuid';
@@ -208,6 +208,7 @@ const ScheduleGridMain: React.FC<{
         {columnDivRefs.map((colRef, index) => {
             const date: Date = F.addDateBy(mondayDate, index);
             const filteredEvents: Event[] = getEvents(F.strigifyDate(date));
+
             return <S.CellColumnDiv
                 ref={colRef}
                 data-key={index}

@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { WARNING_STATUS, FRIEND_STATUS, TOAST_TYPE} from "@/utils/constants"
-import { strigifyDate, addDateBy, parseDateStringToUTC, getDay } from "@/utils/functions";
+import { FRIEND_STATUS, TOAST_TYPE, STATUS} from "@/utils/constants"
+import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents } from "@/utils/functions";
 import * as I  from "@/utils/icons"
 
 class User {
@@ -29,14 +29,39 @@ class Calendar {
   private eventsById: Map<string, Event>;  // Stores all event objects by their unique ID
   private eventIdsByDay: Map<string, Set<string>>;  // Maps specific dates as strings to Set<string> of event IDs for events on those days
   private eventIdsByGroupId: Map<string, Set<string>>; // Maps specific groupId as strings to Set<string> of event IDs for those events Ids
-  
+  private eventsToUpdate: [Event, Event][]; // Array of tuples [existingEvent, eventToSet]
+  private eventsToAdd: Event[];
+  private eventsToDelete: Event[];
+  private conflictingEvents: Event[];
+  private eventToSet: Event
+
   constructor(id: string = uuidv4(), name: string = "Something is wrong") {
+    this.auditStatus = this.auditStatus.bind(this);
       this.id = id;
       this.name = name;
       this.eventsById = new Map<string, Event>();
       this.eventIdsByDay = new Map<string, Set<string>>();
       this.eventIdsByGroupId = new Map<string, Set<string>>();
+      this.eventsToAdd = [];
+      this.eventsToDelete = [];
+      this.eventsToUpdate = [];
+      this.conflictingEvents = [];
+      this.eventToSet = new Event(new Date());
   }
+
+  public getConflictDetails(): [Event[], Event] {
+    return [this.conflictingEvents, this.eventToSet];
+  }
+
+  private clearEventStates(): void {
+    this.eventsToAdd = [];
+    this.eventsToDelete = [];
+    this.eventsToUpdate = [];
+    this.conflictingEvents = [];
+    this.eventToSet = new Event(new Date());
+  }
+
+
   private debugMaps(): void {
     // Logging the eventsById map
     console.log("Events By ID:");
@@ -58,7 +83,8 @@ class Calendar {
       console.log("Event IDs:", Array.from(eventIdsSet).join(', '));
     });
   }
-    
+
+
   private getEventSummary({selectedDays, id ,date, groupId, storedGroupId}: Event): string {
     const selectedDaysString = selectedDays
       .map((selected, index) => (selected ? index : null))
@@ -103,21 +129,22 @@ class Calendar {
   
   }
 
-  public setEvent(eventToSet: Event): void {
+  public auditStatus(eventToSet: Event): STATUS { 
+    this.eventToSet = eventToSet;
     const existingEvent: Event | undefined = this.eventsById.get(eventToSet.id);
     
-    if (!existingEvent){ this.addEvent(eventToSet); return; }
-
+    if (!existingEvent){ this.eventsToAdd.push(eventToSet); return STATUS.OK; }
+    
     // Branch 1: If (was standalone, stays standalone) Update standalone.
-    if(!existingEvent.groupId && !eventToSet.groupId) this.updateEvent(existingEvent,eventToSet);
-      
+    if(!existingEvent.groupId && !eventToSet.groupId) this.eventsToUpdate.push([existingEvent,eventToSet]);
+
     // Branch 2: If (was standalone, now groupId) Update standalone, Create new reucurring instances.
     else if(!existingEvent.groupId && eventToSet.groupId){
       console.log("Branch 3, was standalone, now groupId");
       // Step 1: Update the standalone
       const eventToSetCopy: Event = { ...eventToSet, id: existingEvent.id, date: existingEvent.date };
       this.addEventIdToGroup(eventToSetCopy.groupId!,eventToSetCopy.id);
-      this.updateEvent(existingEvent,eventToSetCopy)
+      this.eventsToUpdate.push([existingEvent,eventToSetCopy])
 
       // Step 2: Create new instances (exculding the updated one)
       const startDate: Date = parseDateStringToUTC(eventToSet.startDate);
@@ -129,7 +156,7 @@ class Calendar {
         if (!eventToSet.selectedDays[day]) continue;
         
         const newEventToSetCopy: Event = { ...eventToSetCopy, id: uuidv4(), date: stringifiedDate };
-        this.addEvent(newEventToSetCopy);
+        this.eventsToAdd.push(newEventToSetCopy);
       }
     }
 
@@ -139,9 +166,7 @@ class Calendar {
     
       // Step 1: Delete all recurring events from the group
       const eventsByGroupId: Event[] = this.getEventsByGroupId(existingEvent.groupId);
-      eventsByGroupId.forEach((event: Event) => {
-          this.deleteEvent(event);
-      });
+      eventsByGroupId.forEach((event: Event) => this.eventsToDelete.push(event));
 
       // Step 2: Update the existing event to standalone
       const booleanArray: boolean[] = Array(7).fill(false);
@@ -155,8 +180,7 @@ class Calendar {
           startDate: eventToSet.date, // Update start and end dates if needed
           endDate: ""
       };
-    
-      this.updateEvent(existingEvent, eventToSetCopy);
+      this.eventsToUpdate.push([existingEvent,eventToSetCopy])
     }
     
     // Branch 4: If (was groupdId, stays groupId)Update, Create or Delete according 'selectedDays' and 'dates' 
@@ -172,7 +196,7 @@ class Calendar {
           const stringifiedDate = strigifyDate(date);
           const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
           const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-          if (foundEvent) this.deleteEvent(foundEvent);
+          if (foundEvent)  this.eventsToDelete.push(foundEvent);
         }
       }
         
@@ -181,7 +205,7 @@ class Calendar {
           const stringifiedDate = strigifyDate(date);
           const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
           const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-          if (foundEvent) this.deleteEvent(foundEvent);
+          if (foundEvent) this.eventsToDelete.push(foundEvent);
         }
       }
 
@@ -197,7 +221,7 @@ class Calendar {
         // Step 2: (was false, now true) Create
         else if (!prevSelected && currSelected) {
           const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate};
-          this.addEvent(eventToSetCopy)
+          this.eventsToAdd.push(eventToSetCopy)
         }
 
           // Step 3: If (was true, stays true) Update
@@ -206,11 +230,11 @@ class Calendar {
           const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
           if(foundEvent){
             const eventToSetCopy: Event= { ...eventToSet, id: foundEvent.id, date: foundEvent.date}
-            this.updateEvent(foundEvent,eventToSetCopy);
+            this.eventsToUpdate.push([foundEvent,eventToSetCopy])
           }
           else{
             const eventToSetCopy: Event= { ...eventToSet, id: uuidv4(), date: stringifiedDate};
-            this.addEvent(eventToSetCopy)
+            this.eventsToAdd.push(eventToSetCopy)
           }
         }
 
@@ -218,10 +242,36 @@ class Calendar {
         else if (prevSelected && !currSelected) {
           const eventsByDate: Event[] = this.getEventsByDate(stringifiedDate);
           const foundEvent: Event | undefined = eventsByDate.find((eventByDate: Event) => eventByDate.groupId === existingEvent.groupId);
-          if(foundEvent) this.deleteEvent(foundEvent);
+          if(foundEvent) this.eventsToDelete.push(foundEvent);
         }
       }
     } 
+
+    this.eventsToAdd.forEach((eventToAdd: Event) => {
+      const filteredEvents = this.getEventsByDate(eventToAdd.date);
+      const conflictingEvents = getConflictingEvents(eventToAdd, filteredEvents);
+      this.conflictingEvents.push(...conflictingEvents);
+    });
+    
+    this.eventsToUpdate.forEach(([,eventToupdate] : [Event, Event]) => {
+      const filteredEvents = this.getEventsByDate(eventToupdate.date);
+      const conflictingEvents = getConflictingEvents(eventToupdate, filteredEvents);
+      this.conflictingEvents.push(...conflictingEvents);
+    });
+
+    if(this.conflictingEvents.length > 0) {
+      return STATUS.EVENT_CONFLICT
+    }
+    else {
+      return STATUS.OK;
+    }
+  }
+
+  public commitEventRevisions(): void{
+    this.eventsToAdd.forEach((eventToAdd: Event) => this.addEvent(eventToAdd));
+    this.eventsToUpdate.forEach(([existingEvent, eventToUpdate] : [Event, Event]) => this.updateEvent(existingEvent, eventToUpdate));
+    this.eventsToDelete.forEach((eventToDelete: Event) => this.deleteEvent(eventToDelete));
+    this.clearEventStates();
   }
 
     private deleteEventIdFromDate(dateKey: string, eventId: string): void {
@@ -341,27 +391,7 @@ class Toast {
   }
 }
 
-class Warning {
-  currentEvent: Event | null;
-  conflictEvents: Event[] | null;
-  recurringEvents: Event[] | null;
-  beforeDragEvent: Event | null;
-  status: WARNING_STATUS;
-
-  constructor(
-    status: WARNING_STATUS = WARNING_STATUS.NONE,
-    currentEvent: Event | null = null,
-    conflictEvents: Event[] | null = null,
-    recurringEvents:  Event[] | null = null,
-    beforeDragEvent: Event | null = null,
-  ) {
-    this.currentEvent = currentEvent;
-    this.conflictEvents = conflictEvents;
-    this.recurringEvents = recurringEvents;
-    this.status = status;
-    this.beforeDragEvent = beforeDragEvent;
-  }
-}
 
 
-export { Event, Time, Calendar, User, Toast, Warning};
+
+export { Event, Time, Calendar, User, Toast};

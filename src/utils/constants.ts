@@ -37,13 +37,15 @@ const TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
   [TOAST_TYPE.ERROR]: I.error,
 };
 
-// Warning Type Enum
-enum WARNING_STATUS {
-  NONE = "NONE", // No warning should be shown.
+
+
+export enum STATUS {
+  OK = "ok", // No warning should be shown.
   EVENT_CONFLICT = "Event Conflict", 
   EVENT_MODIFY = "Recurring Event Modify", 
   EVENT_DELETE = "Recurring Event Delete", 
 }
+
 
 
 // Friend Status Enum
@@ -161,7 +163,6 @@ export {
   HEADER_FONT_SIZE,
   HIDE_SCROLL_BAR,
   SHORT_DURATION_THRESHOLD,
-  WARNING_STATUS,
   ESCAPE_KEYS,
   ENTER_KEY,
   MENU,
