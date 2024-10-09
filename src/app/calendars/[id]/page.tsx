@@ -21,7 +21,7 @@ import { STATUS } from "@/utils/constants";
 
 const currentCalendar = new Calendar("yes", "hi");
 
-export default function CalendarHub() {
+export default function Calendars() {
     const [calendars, setCalendars] = useState<Map<string, Calendar>>(new Map([[currentCalendar.id, currentCalendar]]));
     const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
@@ -29,32 +29,7 @@ export default function CalendarHub() {
     const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
     const asideRef = useRef<HTMLDivElement>(null);
     const mainRef = useRef<HTMLDivElement>(null);
-    const pathname = usePathname();
-
     const [status, setStatus] = useState<STATUS>(STATUS.OK);
-
-    useEffect(() => {
-
-        // const fetchUserData = async (): Promise<void> => {
-        //   try {
-        //     if (!pathname) return;
-        //     const userId: string | undefined = pathname.split('/').pop();
-        //     console.log(userId)
-        //     const response = await fetch(`/calendar${userId}/api?userId=${userId}`);
-        //     // const data: UserData = await response.json();
-
-        //     if (response.ok) {
-        //       // router.replace(`/calendar?userId=${data.user.id}`);
-        //     }
-        //     else {
-        //       // Means i have to create the user
-        //     }
-        //   } catch (error) {
-
-        //   }
-        // }
-        // fetchUserData();
-    }, [pathname])
 
     const toggleLink = (): void => {
         const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;

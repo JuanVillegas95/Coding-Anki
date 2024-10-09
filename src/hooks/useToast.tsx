@@ -1,23 +1,25 @@
-import React, { useState, useEffect } from "react";
-import * as S from "@/utils/style.calendar";
+// useToast.ts
+import { useState, useCallback, useMemo } from "react";
 import { Toast } from "@/utils/classes";
+import { TOAST_TYPE } from "@/utils/constants";
 import { TOAST_ICON } from "@/utils/constants";
+import * as S from "@/utils/style.calendar";
+import React from "react";
 
-const useToast = (): [React.FC<{}>, (newToast: Toast) => void] => {
+const useToast = () => {
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map());
-    const [isVisible, setIsVisible] = useState<boolean>(false);
 
-    const pushToast = (newToast: Toast): void => {
+    const pushToast = useCallback((id: string, description: string, type: TOAST_TYPE): void => {
+        const newToast = new Toast(id, description, type);
         setToasts((prevToasts) => {
             if (prevToasts.has(newToast.id)) return prevToasts;
             const updatedToasts = new Map(prevToasts);
             updatedToasts.set(newToast.id, newToast);
             return updatedToasts;
         });
-        setIsVisible(true);
-    };
+    }, []);
 
-    const popToast = (): void => {
+    const popToast = useCallback((): void => {
         setToasts((prevToasts) => {
             if (prevToasts.size === 0) return prevToasts;
             const updatedToasts = new Map(prevToasts);
@@ -25,58 +27,63 @@ const useToast = (): [React.FC<{}>, (newToast: Toast) => void] => {
             if (lastKey) updatedToasts.delete(lastKey);
             return updatedToasts;
         });
-    };
+    }, []);
 
-    const tailToast = (): Toast | undefined => {
+    const tailToast = useCallback((): Toast | undefined => {
         const toastsArray = Array.from(toasts.values());
         return toastsArray[toastsArray.length - 1];
-    };
+    }, [toasts]);
 
-    const ToastComponent: React.FC<{}> = () => {
-        const currentToast = tailToast();
-        const onAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>): void => {
-            if (e.animationName === "toastAnimIn") {
-                setTimeout(() => {
-                    setIsVisible(false);
-                }, 2000);
-            }
-            if (e.animationName === "toastAnimOut") {
-                setTimeout(() => {
-                    popToast(); // Call popToast directly after animation
-                }, 1000);
-            }
+    // Toast component encapsulated within the hook
+    const ToastComponent = useMemo(() => {
+        const ToastMessage: React.FC = () => {
+            const [isVisible, setIsVisible] = useState<boolean>(true);
+            const latestToast = tailToast();
+
+            const onAnimationEnd = (e: React.AnimationEvent<HTMLDivElement>): void => {
+                if (e.animationName === "toastAnimIn") {
+                    setTimeout(() => {
+                        setIsVisible(false);
+                    }, 2000);
+                }
+                if (e.animationName === "toastAnimOut") {
+                    setTimeout(() => {
+                        setIsVisible(false);
+                        popToast();
+                    }, 1000);
+                }
+            };
+
+            if (!latestToast) return null;
+
+            return (
+                <S.ToastWrapperDiv>
+                    <S.ToastContainerDiv
+                        $isVisible={isVisible}
+                        onAnimationEndCapture={onAnimationEnd}
+                    >
+                        <S.ToastIconDiv
+                            $color={"black"}
+                            $size={20}
+                            $svgSize={20}
+                        >
+                            {React.createElement(TOAST_ICON[latestToast.type])}
+                        </S.ToastIconDiv>
+                        <S.ToastDescriptionP>
+                            {latestToast.description}
+                        </S.ToastDescriptionP>
+                    </S.ToastContainerDiv>
+                </S.ToastWrapperDiv>
+            );
         };
 
-        useEffect(() => {
-            if (currentToast) {
-                setIsVisible(true);
-            }
-        }, [currentToast]);
+        return ToastMessage;
+    }, [toasts, popToast, tailToast]);
 
-        if (!currentToast) return null;
-
-        return (
-            <S.ToastWrapperDiv>
-                <S.ToastContainerDiv
-                    $isVisible={isVisible}
-                    onAnimationEnd={onAnimationEnd}
-                >
-                    <S.ToastIconDiv
-                        $color={"black"}
-                        $size={20}
-                        $svgSize={20}
-                    >
-                        {React.createElement(TOAST_ICON[currentToast.type])}
-                    </S.ToastIconDiv>
-                    <S.ToastDescriptionP>
-                        {currentToast.description}
-                    </S.ToastDescriptionP>
-                </S.ToastContainerDiv>
-            </S.ToastWrapperDiv>
-        );
+    return {
+        pushToast,
+        ToastComponent,
     };
-
-    return [ToastComponent, pushToast];
 };
 
 export default useToast;

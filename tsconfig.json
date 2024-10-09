@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@/components/*": ["./src/components/*"],
+      "@/hooks/*": ["./src/hooks/*"],
       "@/server/*": ["./src/server/*"],
       "@/images/*": ["./public/images/*"],
       "@/svg/*": ["./public/svg/*"],

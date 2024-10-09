@@ -8,11 +8,11 @@ import Image from "next/image";
 import { TOAST_TYPE } from "@/utils/constants";
 import { useRouter } from "next/navigation";
 import { WrapperCenterDiv, ContainerDiv, ButtonInput, MedTextP, SmallTextP, HugeTextP, TextInput } from "@/utils/style.base"
-
+import useToast from "@/hooks/useToast";
 
 export default function Welcome() {
+    const { pushToast, ToastComponent } = useToast();
     const [isCopied, setIsCopied] = useState(false);
-    const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
     const [username, setUsername] = useState<string>("");
     const [userID, setUserID] = useState<string>("ced266c7-d7e3-4681-a343-0828ae597fc8");
     const router = useRouter();
@@ -24,40 +24,13 @@ export default function Welcome() {
 
     const handleCopy = (): void => {
         navigator.clipboard.writeText(userID).then(() => {
-            toastHandeler.push(new Toast("Text Copy", "ID was copied in your clipboard!", TOAST_TYPE.SUCCESS))
+            pushToast("Text Copy", "ID was copied in your clipboard!", TOAST_TYPE.SUCCESS);
             setIsCopied(true);
             setTimeout(() => setIsCopied(false), 2000);
         });
     };
 
-    const toastHandeler: ToastHandler = {
-        push: (newToast: Toast): void => {
-            setToasts((prevToasts) => {
-                if (prevToasts.has(newToast.id)) return prevToasts;
-                const updatedToasts = new Map(prevToasts);
-                updatedToasts.set(newToast.id, newToast);
-                return updatedToasts;
-            });
-        },
-
-        pop: (): void => {
-            setToasts((prevToasts) => {
-                if (prevToasts.size === 0) return prevToasts;
-                const updatedToasts = new Map(prevToasts);
-                const lastKey = Array.from(updatedToasts.keys()).pop();
-                if (lastKey) updatedToasts.delete(lastKey);
-                return updatedToasts;
-            });
-        },
-
-        getTail: (): Toast => {
-            const toastsArray = Array.from(toasts.values());
-            return toastsArray[toastsArray.length - 1];
-        },
-    }
-
     const handleButtonClick = () => router.replace("/calendar");
-
 
     return <React.Fragment>
         <WrapperCenterDiv>
@@ -83,10 +56,7 @@ export default function Welcome() {
                 </ContainerDiv>
             </ContainerDiv>
         </WrapperCenterDiv>
-        {(toasts.size > 0) && <ToastMessage
-            toast={toastHandeler.getTail()}
-            popToast={toastHandeler.pop}
-        />}
+        <ToastComponent />
     </React.Fragment>
 };
 

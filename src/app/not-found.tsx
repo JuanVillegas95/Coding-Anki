@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ContainerDiv, WrapperCenterDiv, BigTextP } from "@/utils/style.base";
 import { catError } from "@/utils/icons";
 
-export default function Error() {
+export default function NotFound() {
     return <WrapperCenterDiv >
         <ContainerDiv $direction="row" $height="400px" $width="800px" $gap="30px" $padding="80px" $isBorder={true} $isBorderRad={true} $justifyContent="center">
             <ContainerDiv $direction="column" $alignItems="center">
