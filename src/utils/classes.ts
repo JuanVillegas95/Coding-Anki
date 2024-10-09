@@ -124,10 +124,11 @@ class Calendar {
 
     // Will set the values of existingEvent from updatedEvent
   private updateEvent(existingEvent: Event, updatedEvent: Event){
-    // if (existingEvent.date !== updatedEvent.date) {
-    //   this.deleteEventIdFromDate(existingEvent.date, updatedEvent.id);
-    //   this.addEventIdToDate(updatedEvent.date, updatedEvent.id);
-    // }
+    if (existingEvent.date !== updatedEvent.date) {
+      "hi"
+      this.deleteEventIdFromDate(existingEvent.date, updatedEvent.id);
+      this.addEventIdToDate(updatedEvent.date, updatedEvent.id);
+    }
     this.eventsById.set(existingEvent.id, updatedEvent);
     console.log("The following event was updated", this.getEventSummary(updatedEvent));
   }

@@ -221,8 +221,8 @@ export const ContainerDiv = styled.div<{
   width: ${({ $width }) => $width || "auto"};
   height: ${({ $height }) => $height || "auto"};
   gap: ${({ $gap }) => $gap};
-  ${({ $isBorder }) => $isBorder ? "border-radius: 12px;" : null }
-  ${({ $isBorderRad }) => $isBorderRad ? "border: black solid 3px;" : null }
+  ${({ $isBorderRad }) => $isBorderRad ? "border-radius: 12px;" : null }
+  ${({ $isBorder }) => $isBorder ? "border: black solid 3px;" : null }
 `;
 
 export const CrossIconDiv = styled(ClickableSvgDiv)`

@@ -36,7 +36,7 @@ export default function Home() {
 
     return <React.Fragment>
         <WrapperCenterDiv>
-            <ContainerDiv $direction="column" $height="500px" $width="900px" $gap="20px" $padding="100px" $isBorder={true}>
+            <ContainerDiv $direction="column" $height="500px" $width="900px" $gap="20px" $padding="100px" $isBorder={true} $isBorderRad={true}>
                 <ContainerDiv $direction="row" $gap="20px">
                     <Image src={appTitle.src} alt={"Purrfect Timing"} width={660} height={120.12} />
                 </ContainerDiv>
@@ -59,7 +59,7 @@ export default function Home() {
             </ContainerDiv>
         </WrapperCenterDiv>
         {isWhyModal && <ModalWrapperDiv $zIndex={1} $gap="20px"  >
-            <ModalContainerDiv $width="800px" $height="800px" $padding="30px 40px" $gap="20px" $isBorder={true}>
+            <ModalContainerDiv $width="800px" $height="800px" $padding="30px 40px" $gap="20px" $isBorder={true} >
                 <ContainerDiv $direction="row" $wrap="nowrap" $alignItems="center">
                     <BigTextP style={{ textAlign: "center" }}>Why are we using Oracle for Authentication?</BigTextP>
                     <Image src={acctually.src} height={250} width={250} alt={"Actually"} />

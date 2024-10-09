@@ -61,7 +61,7 @@ export default function Welcome() {
 
     return <React.Fragment>
         <WrapperCenterDiv>
-            <ContainerDiv $direction="column" $height="500px" $width="800px" $gap="20px" $padding="60px" $isBorder={true} $justifyContent="center" $alignItems="center">
+            <ContainerDiv $direction="column" $height="500px" $width="800px" $gap="20px" $padding="60px" $isBorder={true} $isBorderRad={true} $justifyContent="center" $alignItems="center">
                 <HugeTextP>Welcome!</HugeTextP>
                 <ContainerDiv $direction="row" $gap="40px">
                     <Image
@@ -75,7 +75,7 @@ export default function Welcome() {
                         <SmallTextP onClick={handleCopy} $hover={true}>
                             {userID}
                         </SmallTextP>
-                        <ContainerDiv $direction="row" $width="400px" $gap="20px" $isBorder={true} $justifyContent="space-between">
+                        <ContainerDiv $direction="row" $width="400px" $gap="20px" $isBorder={true} $isBorderRad={true} $justifyContent="space-between">
                             <TextInput $padding="20px" $width="200px" />
                             <ButtonInput $padding="20px" $width="100px" $text="Next" style={{ borderRadius: "0" }} />
                         </ContainerDiv>
