@@ -132,14 +132,25 @@ export default function CalendarHub() {
 
     const commitEventRevisions = (): void => {
         setStatus(STATUS.OK)
-        const currentCalendar: Calendar = getCurrentCalendar();
-        currentCalendar.commitEventRevisions();
         setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+            const currentCalendar: Calendar = getCurrentCalendar();
+            currentCalendar.commitEventRevisions();
+            currentCalendar.clearEventStates()
             const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
             updatedCalendars.set(currentCalendar.id, currentCalendar);
             return updatedCalendars;
         });
-        currentCalendar.clearEventStates()
+    }
+
+    const cancelEventRevisions = (): void => {
+        setStatus(STATUS.OK)
+        setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+            const currentCalendar: Calendar = getCurrentCalendar();
+            currentCalendar.clearEventStates();
+            const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            return updatedCalendars;
+        });
     }
 
     const deleteEvent = (event: Event): void => {
@@ -156,16 +167,7 @@ export default function CalendarHub() {
 
     const getEvents = (date: string): Event[] => getCurrentCalendar().getEventsByDate(date);
 
-    const cancelStatus = (): void => {
-        setStatus(STATUS.OK)
-        setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
-            const currentCalendar: Calendar = getCurrentCalendar();
-            currentCalendar.clearEventStates();
-            const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-            updatedCalendars.set(currentCalendar.id, currentCalendar);
-            return updatedCalendars;
-        });
-    }
+
 
     return <React.Fragment >
         <S.CalendarWrapperDiv>
@@ -199,8 +201,8 @@ export default function CalendarHub() {
         />}
         {(status !== STATUS.OK) && <StatusModal
             status={status}
-            cancelStatus={cancelStatus}
             conflictDetails={getCurrentCalendar().getConflictDetails()}
+            cancelEventRevisions={cancelEventRevisions}
             commitEventRevisions={commitEventRevisions}
         />}
     </React.Fragment >

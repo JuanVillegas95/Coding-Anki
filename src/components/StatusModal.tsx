@@ -8,15 +8,15 @@ import { BigTextP, ContainerDiv, ModalContainerDiv, ModalWrapperDiv } from '@/ut
 
 export const StatusModal: React.FC<{
     status: STATUS,
-    cancelStatus: () => void;
     conflictDetails: [Event, Event[]];
+    cancelEventRevisions: () => void;
     commitEventRevisions: () => void;
-}> = ({ status, conflictDetails, cancelStatus, commitEventRevisions }) => {
+}> = ({ status, conflictDetails, cancelEventRevisions, commitEventRevisions }) => {
     return <WarningLayout label={status}>
         <div></div>
         {status === STATUS.EVENT_CONFLICT && <ConflictStatus
             conflictDetails={conflictDetails}
-            cancelStatus={cancelStatus}
+            cancelEventRevisions={cancelEventRevisions}
             commitEventRevisions={commitEventRevisions}
         />}
     </WarningLayout>

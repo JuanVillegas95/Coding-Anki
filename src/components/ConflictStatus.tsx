@@ -6,9 +6,9 @@ import { ButtonInput, ContainerDiv, MedTextP } from "@/utils/style.base";
 
 export const ConflictStatus: React.FC<{
     conflictDetails: [Event, Event[]];
-    cancelStatus: () => void;
+    cancelEventRevisions: () => void;
     commitEventRevisions: () => void;
-}> = ({ conflictDetails, cancelStatus, commitEventRevisions }) => {
+}> = ({ conflictDetails, cancelEventRevisions, commitEventRevisions }) => {
     const [conflictEventIndex, setConflictEventIndex] = useState<number>(0);
     const [eventToSet, conflictingEvents]: [Event, Event[]] = conflictDetails;
 
@@ -54,7 +54,7 @@ export const ConflictStatus: React.FC<{
                 $text="Cancel"
                 $width="400px"
                 $padding="20px"
-                onClick={cancelStatus}
+                onClick={cancelEventRevisions}
             />
         </ContainerDiv>
     </React.Fragment>
