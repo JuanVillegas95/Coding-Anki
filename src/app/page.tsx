@@ -44,7 +44,7 @@ export default function Home() {
                     <Image src={brownCat.src} alt={"Brown cat"} width={150} height={150} />
                     <ContainerDiv $direction="column" $gap="30px" >
                         <ButtonInput
-                            text="Authenticate"
+                            $text="Authenticate"
                             $width="325px"
                             $padding="15px"
                             $margin="30px 0 0 0"

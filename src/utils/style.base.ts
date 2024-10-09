@@ -147,13 +147,13 @@ export const ClickableSvgDiv = styled(SvgDiv)<{ $isBackgroundGrey?: boolean }>`
 `;
 
 export const ButtonInput = styled.input.attrs<{ 
-  text?: string, 
+  $text?: string, 
   $width: string, 
   $padding: string, 
   $margin?: string 
-}>(({ text, $width, $padding }) => ({
+}>(({ $text, $width, $padding }) => ({
   type: "button",
-  value: text,
+  value: $text,
 }))`
   font-family: ${fredoka.style.fontFamily};
   height: auto;
@@ -204,14 +204,14 @@ export const ContainerDiv = styled.div<{
   $justifyContent?: string, 
   $alignItems?: string,
   $isBorder?: boolean 
+  $isBorderRad?: boolean 
 }>`
   position: relative;
   display: flex;
-  border-radius: 12px;
   background-color: white;
 
-  
-  ${({ $isBorder }) => $isBorder ? "border: black solid 3px;" : null }
+
+
   flex-wrap: ${({ $wrap }) => $wrap };
   justify-content: ${({ $justifyContent }) => $justifyContent };
   align-items: ${({ $alignItems }) => $alignItems };
@@ -221,11 +221,37 @@ export const ContainerDiv = styled.div<{
   width: ${({ $width }) => $width || "auto"};
   height: ${({ $height }) => $height || "auto"};
   gap: ${({ $gap }) => $gap};
+  ${({ $isBorder }) => $isBorder ? "border-radius: 12px;" : null }
+  ${({ $isBorderRad }) => $isBorderRad ? "border: black solid 3px;" : null }
 `;
 
 export const CrossIconDiv = styled(ClickableSvgDiv)`
   position: absolute;
   top: -20px;
   right: -20px;
+`;
+
+
+
+
+
+
+const WarningEventsWarningDiv = styled.div`
+  display: flex;
+  gap: 5px;
+`
+
+
+const WarningButton = styled.input.attrs({ type: "button" })`
+  background-color: #f44336;
+  padding: 20px;
+  border-radius: 8px;
+  color: black;
+  border: none;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
 `;
 

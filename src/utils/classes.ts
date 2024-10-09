@@ -49,11 +49,20 @@ class Calendar {
       this.eventToSet = new Event(new Date());
   }
 
-  public getConflictDetails(): [Event[], Event] {
-    return [this.conflictingEvents, this.eventToSet];
+  public debugEvents() {
+    console.log('Events to Add:', this.eventsToAdd);
+    console.log('Events to Delete:', this.eventsToDelete);
+    console.log('Events to Update:', this.eventsToUpdate);
+    console.log('Conflicting Events:', this.conflictingEvents);
+    console.log('Event to Set:', this.eventToSet);
   }
 
-  private clearEventStates(): void {
+  
+  public getConflictDetails(): [Event, Event[]] {
+    return [this.eventToSet, this.conflictingEvents];
+  }
+
+  public clearEventStates(): void {
     this.eventsToAdd = [];
     this.eventsToDelete = [];
     this.eventsToUpdate = [];
@@ -62,7 +71,7 @@ class Calendar {
   }
 
 
-  private debugMaps(): void {
+  public debugMaps(): void {
     // Logging the eventsById map
     console.log("Events By ID:");
     this.eventsById.forEach((event, eventId) => {
@@ -268,10 +277,10 @@ class Calendar {
   }
 
   public commitEventRevisions(): void{
+    if(this.conflictingEvents.length > 0 ) this.conflictingEvents.forEach((eventToDelete: Event) => this.deleteEvent(eventToDelete));
     this.eventsToAdd.forEach((eventToAdd: Event) => this.addEvent(eventToAdd));
     this.eventsToUpdate.forEach(([existingEvent, eventToUpdate] : [Event, Event]) => this.updateEvent(existingEvent, eventToUpdate));
     this.eventsToDelete.forEach((eventToDelete: Event) => this.deleteEvent(eventToDelete));
-    this.clearEventStates();
   }
 
     private deleteEventIdFromDate(dateKey: string, eventId: string): void {

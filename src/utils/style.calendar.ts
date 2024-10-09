@@ -1103,100 +1103,6 @@ const FriendCalendarSelect = styled.select`
   }
 `
 
-const WarningWrapperDiv = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 4;
-`;
-
-const WarningContainerDiv = styled.div`
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: 420px;
-    flex: 0 1 600px;
-    transform: translate(-50%, -50%);
-    background: white;
-    border-radius: 1rem;
-`;
-
-const WarningMain = styled.main<{ $center: boolean }>`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: ${({$center}) => $center ? "center" : "space-between"};
-  padding: 15px 30px;
-`;
-
-const WarningFooter = styled.footer`
-  display: flex;
-  flex-direction: column;
-  border-top: 1px solid lightgrey;
-  padding: 10px 30px;
-  margin-top: 15px;
-  gap: 15px;
-`;
-
-const WarningHeader = styled.header`
-  padding: 10px;
-  border-bottom: 1px solid lightgray;
-  text-align: center;
-`;
-
-const WarningP = styled.p`
-  padding: 10px 30px;
-  text-align: justify; 
-`;
-
-const Warningh1 = styled.h1`
-  font-size: 20px;
-  font-weight: 500;
-`;
-
-const WarrningEventWrapperDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
-
-const WarrningEventh2 = styled.h2`
-  font-size: 15px;
-  font-weight: 500;
-  margin-bottom: 10px;
-`
-
-
-const WarningEventsWarningDiv = styled.div`
-  display: flex;
-  gap: 5px;
-`
-
-const WarningIconDiv = styled(ClickableDiv)`
-border-radius: 15px;
-  &:hover{
-    background-color: lightgray;
-  }
-`
-
-const WarningButton = styled.input.attrs({ type: "button" })`
-  background-color: #f44336;
-  padding: 20px;
-  border-radius: 8px;
-  color: black;
-  border: none;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  flex: 1;
-`;
-
 const LinkIconImg = styled.img`
   width: 40px;
   height: 40px;
@@ -1216,18 +1122,6 @@ const HeaderRigthestWrapperDiv = styled.div`
 export{
   HeaderRigthestWrapperDiv,
   LinkIconImg,
-  WarningButton,
-  WarningIconDiv,
-  WarningEventsWarningDiv,
-  WarrningEventh2,
-  WarrningEventWrapperDiv,
-  Warningh1,
-  WarningMain,
-  WarningFooter,
-  WarningHeader,
-  WarningP,
-  WarningWrapperDiv,
-  WarningContainerDiv,
   CalerndarLi,
   CalendarListContainerDiv,
   FriendCalendarSelect,

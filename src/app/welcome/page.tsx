@@ -5,9 +5,9 @@ import { Toast } from "@/utils/classes";
 import { ToastHandler } from "@/utils/types";
 import ToastMessage from "@/components/ToastMessage";
 import Image from "next/image";
-import { TOAST_TYPE, TOAST_ICON } from "@/utils/constants";
+import { TOAST_TYPE } from "@/utils/constants";
 import { useRouter } from "next/navigation";
-import { WrapperCenterDiv, ContainerDiv, ButtonInput, MedTextP, ModalWrapperDiv, ModalContainerDiv, CrossIconDiv, ListLi, ListOl, BigTextP, SmallTextP, HugeTextP, TextInput } from "@/utils/style.base"
+import { WrapperCenterDiv, ContainerDiv, ButtonInput, MedTextP, SmallTextP, HugeTextP, TextInput } from "@/utils/style.base"
 
 
 export default function Welcome() {
@@ -77,7 +77,7 @@ export default function Welcome() {
                         </SmallTextP>
                         <ContainerDiv $direction="row" $width="400px" $gap="20px" $isBorder={true} $justifyContent="space-between">
                             <TextInput $padding="20px" $width="200px" />
-                            <ButtonInput $padding="20px" $width="100px" text="Next" style={{ borderRadius: "0" }} />
+                            <ButtonInput $padding="20px" $width="100px" $text="Next" style={{ borderRadius: "0" }} />
                         </ContainerDiv>
                     </ContainerDiv>
                 </ContainerDiv>

@@ -27,7 +27,7 @@ export const HOUR_WIDTH = 60;
 export const HOUR_HEIGHT = 70; // Quantity of pixels that corresponds to an hour
 
 export const CALENDAR_WIDTH = 1150;
-export const CALENDAR_HEIGHT = 750;
+export const CALENDAR_HEIGHT = 900;
 export const HEADER_HEIGHT = 90;
 export const HEADER_FONT_SIZE = 18;
 export const SUBHEADER_HEIGHT = 50;

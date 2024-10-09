@@ -5,6 +5,7 @@ import * as I from "@/utils/icons";
 import * as S from "@/utils/style.calendar";
 import * as C from "@/utils/constants";
 import * as F from "@/utils/functions";
+import { ContainerDiv, ClickableSvgDiv, MedTextP } from "@/utils/style.base";
 
 const ConflictEvent: React.FC<{
     event: Event;
@@ -23,47 +24,45 @@ const ConflictEvent: React.FC<{
         cursor: "default",
     }
 
-    return (
-        <S.WarrningEventWrapperDiv>
-            <S.WarningEventsWarningDiv >
-                {areConflicts && <S.WarningIconDiv $svgSize={15} $size={25} $color={"black"} onClick={moveLeft}>
-                    {React.createElement(I.left)}
-                </S.WarningIconDiv>}
-                <S.WarrningEventh2>{label}</S.WarrningEventh2>
-                {areConflicts && <S.WarningIconDiv $svgSize={15} $size={25} $color={"black"} onClick={moveRight} >
-                    {React.createElement(I.right)}
-                </S.WarningIconDiv>}
-            </S.WarningEventsWarningDiv>
-            <S.EventDiv
-                key={id}
-                $fromTop={0}
-                $height={200}
-                $backgroundColor={C.COLORS[color].secondary}
-                $borderColor={C.COLORS[color].primary}
-                $isDragged={false}
-                style={warningStyle}
-                $borderStyle={borderStyle}
-                $isFriendEvent={false}
-                $isLinked={false}
-            >
-                <S.EventTopDiv $color={C.COLORS[color].primary} />
-                <S.EventBodyDiv>
-                    <LongEvent
-                        color={color}
-                        startHours={F.formatTime(start.hours)}
-                        startMinutes={F.formatTime(start.minutes)}
-                        endHours={F.formatTime(end.hours)}
-                        endMinutes={F.formatTime(end.minutes)}
-                        icon={icon}
-                        title={title}
-                        description={description}
-                        isLinked={false}
-                    />
-                </S.EventBodyDiv>
-                <S.EventBottomDiv />
-            </S.EventDiv>
-        </S.WarrningEventWrapperDiv>
-    );
+    return <ContainerDiv $direction="column" $justifyContent="center" $alignItems="center" $gap="10px">
+        <ContainerDiv $direction="row" $alignItems="center" $wrap="wrap"  >
+            {areConflicts && <ClickableSvgDiv $svgSize="20px" $size="30px" $isBackgroundGrey={true} onClick={moveLeft}>
+                {React.createElement(I.left)}
+            </ClickableSvgDiv>}
+            <MedTextP>{label}</MedTextP>
+            {areConflicts && <ClickableSvgDiv $svgSize="20px" $size="30px" $isBackgroundGrey={true} onClick={moveRight} >
+                {React.createElement(I.right)}
+            </ClickableSvgDiv>}
+        </ContainerDiv>
+        <S.EventDiv
+            key={id}
+            $fromTop={0}
+            $height={200}
+            $backgroundColor={C.COLORS[color].secondary}
+            $borderColor={C.COLORS[color].primary}
+            $isDragged={false}
+            style={warningStyle}
+            $borderStyle={borderStyle}
+            $isFriendEvent={false}
+            $isLinked={false}
+        >
+            <S.EventTopDiv $color={C.COLORS[color].primary} />
+            <S.EventBodyDiv>
+                <LongEvent
+                    color={color}
+                    startHours={F.formatTime(start.hours)}
+                    startMinutes={F.formatTime(start.minutes)}
+                    endHours={F.formatTime(end.hours)}
+                    endMinutes={F.formatTime(end.minutes)}
+                    icon={icon}
+                    title={title}
+                    description={description}
+                    isLinked={false}
+                />
+            </S.EventBodyDiv>
+            <S.EventBottomDiv />
+        </S.EventDiv>
+    </ContainerDiv>
 };
 
 export default ConflictEvent;

@@ -10,7 +10,7 @@ import DaySection from "@/components/DaySection"
 import ScheduleGridMain from "@/components/ScheduleGridMain";
 import MenuAside from "@/components/MenuAside";
 import ToastMessage from "@/components/ToastMessage";
-import WarningModal from "@/components/WarningModal";
+import { StatusModal } from "@/components/StatusModal";
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 import * as T from '@/utils/types';
@@ -125,18 +125,22 @@ export default function CalendarHub() {
 
     const setEvent = (eventToSet: Event): void => {
         const currentCalendar: Calendar = getCurrentCalendar();
-        const newStatus: STATUS = currentCalendar.auditStatus(eventToSet); // Get the new status value
-        setStatus(newStatus);
-        if (newStatus === STATUS.OK) {
-            setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
-                currentCalendar.commitEventRevisions();
-                const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-                updatedCalendars.set(currentCalendar.id, currentCalendar);
-                return updatedCalendars;
-            });
-        }
+        const newStatus: STATUS = currentCalendar.auditStatus(eventToSet);
+        if (newStatus === STATUS.OK) commitEventRevisions();
+        else setStatus(newStatus)
     };
 
+    const commitEventRevisions = (): void => {
+        setStatus(STATUS.OK)
+        const currentCalendar: Calendar = getCurrentCalendar();
+        currentCalendar.commitEventRevisions();
+        setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+            const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            return updatedCalendars;
+        });
+        currentCalendar.clearEventStates()
+    }
 
     const deleteEvent = (event: Event): void => {
         const currentCalendar: Calendar = getCurrentCalendar();
@@ -152,6 +156,16 @@ export default function CalendarHub() {
 
     const getEvents = (date: string): Event[] => getCurrentCalendar().getEventsByDate(date);
 
+    const cancelStatus = (): void => {
+        setStatus(STATUS.OK)
+        setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
+            const currentCalendar: Calendar = getCurrentCalendar();
+            currentCalendar.clearEventStates();
+            const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
+            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            return updatedCalendars;
+        });
+    }
 
     return <React.Fragment >
         <S.CalendarWrapperDiv>
@@ -183,13 +197,12 @@ export default function CalendarHub() {
             toast={toastHandeler.getTail()}
             popToast={toastHandeler.pop}
         />}
-        {/* {
-      (warning.status !== C.WARNING_STATUS.NONE) && <WarningModal
-        warning={warning}
-        warningHandler={warningHandler}
-        calendarHandler={calendarHandler}
-      />
-    } */}
+        {(status !== STATUS.OK) && <StatusModal
+            status={status}
+            cancelStatus={cancelStatus}
+            conflictDetails={getCurrentCalendar().getConflictDetails()}
+            commitEventRevisions={commitEventRevisions}
+        />}
     </React.Fragment >
 };
 
