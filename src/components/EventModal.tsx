@@ -9,15 +9,16 @@ import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
 import DaySelector from './DaySelector';
+import { TOAST_TYPE } from '@/utils/constants';
 
 const EventModal: React.FC<{
     event: React.MutableRefObject<Event | null>;
     setEvent: (event: Event) => void;
     deleteEvent: (event: Event) => void;
-    addToast: (newToast: Toast) => void;
+    pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
     isModalOpen: boolean;
     closeModal: () => void;
-}> = ({ isModalOpen, closeModal, addToast, event, setEvent, deleteEvent }) => {
+}> = ({ isModalOpen, closeModal, pushToast, event, setEvent, deleteEvent }) => {
     const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
         ...event.current!,
         start: { ...event.current!.start },
@@ -50,11 +51,11 @@ const EventModal: React.FC<{
     const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const title = e.target.value;
         if (title.length > 40) {
-            addToast(new Toast(
+            pushToast(
                 "Invalid title length",
                 "Event title must be under 40 characters.",
                 C.TOAST_TYPE.INFO,
-            ));
+            );
             return;
         }
         setCurrentEvent({ ...currentEvent, title })
@@ -66,11 +67,11 @@ const EventModal: React.FC<{
     const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const description = e.target.value;
         if (description.length > 200) {
-            addToast(new Toast(
+            pushToast(
                 "Invalid description",
                 "Event description must be under 200 characters.",
                 C.TOAST_TYPE.INFO
-            ));
+            );
             return;
         }
         setCurrentEvent({ ...currentEvent, description })
@@ -119,22 +120,22 @@ const EventModal: React.FC<{
         const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
 
         if (startDate >= endDate) {
-            addToast(new Toast(
+            pushToast(
                 "Handle date",
                 "The start date cannot be after the end date",
                 C.TOAST_TYPE.INFO
-            ));
+            );
             return;
         }
 
         if (updatedEvent.endDate) {
             const dateDifference = endDate.getTime() - startDate.getTime();
             if (dateDifference > C.ONE_YEAR_IN_MS) {
-                addToast(new Toast(
+                pushToast(
                     "Handle date",
                     "The event duration cannot be greater than one year.",
                     C.TOAST_TYPE.INFO
-                ));
+                );
                 return;
             }
         }
@@ -182,23 +183,22 @@ const EventModal: React.FC<{
         e.preventDefault();
         if (currentEvent.groupId) {
             if (!currentEvent.endDate) {
-                addToast(new Toast(
+                pushToast(
                     "Handle end time",
                     "End time must be valid",
                     C.TOAST_TYPE.INFO
-                ));
-                return;
-            }
-            if (F.isEndBeforeStart(currentEvent)) {
-                addToast(new Toast(
-                    "Handle time",
-                    "The end time cannot be before the start time",
-                    C.TOAST_TYPE.INFO
-                ));
+                );
                 return;
             }
         }
-
+        if (F.isEndBeforeStart(currentEvent)) {
+            pushToast(
+                "Handle time",
+                "The end time cannot be before the start time",
+                C.TOAST_TYPE.INFO
+            );
+            return;
+        }
         setEvent(currentEvent);
         closeModal();
     }

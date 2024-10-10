@@ -11,6 +11,7 @@ import ScheduleGridMain from "@/components/ScheduleGridMain";
 import MenuAside from "@/components/MenuAside";
 import ToastMessage from "@/components/ToastMessage";
 import { StatusModal } from "@/components/StatusModal";
+import useToast from "@/hooks/useToast";
 import * as C from '@/utils/constants';
 import * as F from '@/utils/functions';
 import * as T from '@/utils/types';
@@ -30,6 +31,8 @@ export default function Calendars() {
     const asideRef = useRef<HTMLDivElement>(null);
     const mainRef = useRef<HTMLDivElement>(null);
     const [status, setStatus] = useState<STATUS>(STATUS.OK);
+    const { pushToast, ToastComponent } = useToast();
+
 
     const toggleLink = (): void => {
         const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;
@@ -60,34 +63,6 @@ export default function Calendars() {
         };
     }, []);
 
-
-    const toastHandeler: T.ToastHandler = {
-        push: (newToast: Toast): void => {
-            setToasts((prevToasts) => {
-                if (prevToasts.has(newToast.id)) return prevToasts;
-
-                const updatedToasts = new Map(prevToasts);
-                updatedToasts.set(newToast.id, newToast);
-
-                return updatedToasts;
-            });
-        },
-
-        pop: (): void => {
-            setToasts((prevToasts) => {
-                if (prevToasts.size === 0) return prevToasts;
-                const updatedToasts = new Map(prevToasts);
-                const lastKey = Array.from(updatedToasts.keys()).pop();
-                if (lastKey) updatedToasts.delete(lastKey);
-                return updatedToasts;
-            });
-        },
-
-        getTail: (): Toast => {
-            const toastsArray = Array.from(toasts.values());
-            return toastsArray[toastsArray.length - 1];
-        },
-    }
 
     const weekHandler: T.WeekHandler = {
         next: () => setMondayDate(F.addDateBy(mondayDate, 7)),
@@ -160,7 +135,7 @@ export default function Calendars() {
                     deleteEvent={deleteEvent}
                     getEvents={getEvents}
                     mondayDate={mondayDate}
-                    addToast={toastHandeler.push}
+                    pushToast={pushToast}
                     mainRef={mainRef}
                     isLinked={(linkIcon === I.linkIn.src)}
                 />
@@ -170,10 +145,7 @@ export default function Calendars() {
                 setLinkedCalendar={setLinkedCalendarFriend}
             />
         </S.CalendarWrapperDiv>
-        {(toasts.size > 0) && <ToastMessage
-            toast={toastHandeler.getTail()}
-            popToast={toastHandeler.pop}
-        />}
+        <ToastComponent />
         {(status !== STATUS.OK) && <StatusModal
             status={status}
             conflictDetails={getCurrentCalendar().getConflictDetails()}

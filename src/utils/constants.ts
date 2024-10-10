@@ -154,4 +154,11 @@ export const HIDE_SCROLL_BAR = `
 scrollbar-width: none;
 `;
 
+export const USER_SELECT_NONE = `
+  -webkit-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none; 
+`
+
 export const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;

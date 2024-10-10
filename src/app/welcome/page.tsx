@@ -1,9 +1,6 @@
 "use client"
 import React, { useState } from "react";
 import { welcome } from "@/utils/icons";
-import { Toast } from "@/utils/classes";
-import { ToastHandler } from "@/utils/types";
-import ToastMessage from "@/components/ToastMessage";
 import Image from "next/image";
 import { TOAST_TYPE } from "@/utils/constants";
 import { useRouter } from "next/navigation";
@@ -44,7 +41,9 @@ export default function Welcome() {
                         alt={"Welcome Cat"}
                     />
                     <ContainerDiv $direction="column" $gap="15px">
-                        <MedTextP style={{ paddingRight: "80px" }}>This is your ID share it with your friends so they can add you!</MedTextP>
+                        <MedTextP style={{ paddingRight: "80px" }}>
+                            This is your ID share it with your friends so they can add you!
+                        </MedTextP>
                         <SmallTextP onClick={handleCopy} $hover={true}>
                             {userID}
                         </SmallTextP>

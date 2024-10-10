@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Fredoka } from "next/font/google";
-
+import { USER_SELECT_NONE } from "@/utils/constants"
 
 const fredoka = Fredoka({
     weight: ["300", "400", "500", "600", "700"],
@@ -9,10 +9,7 @@ const fredoka = Fredoka({
     subsets: ["latin"],
     display: "swap",
   });
-
-
-
-  export const HugeTextP = styled.p`
+export const HugeTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
   font-size: 100px;
 `;
@@ -26,7 +23,7 @@ export const BigTextP = styled.p`
 export const MedTextP = styled.p<{ $hover?: boolean}>`
   font-family: ${fredoka.style.fontFamily};
   font-size: 25px;
-
+  ${USER_SELECT_NONE}
   ${({ $hover }) => $hover ? `
     &:hover{
       cursor: pointer;
@@ -39,10 +36,12 @@ export const MedTextP = styled.p<{ $hover?: boolean}>`
 export const SmallTextP = styled.p<{ $hover?: boolean}>`
   font-family: ${fredoka.style.fontFamily};
   font-size: 20px;
+  ${USER_SELECT_NONE}
   ${({ $hover }) => $hover ? `
     &:hover{
       cursor: pointer;
       color: #C74634;
+      
     }
   ` : null
   }
@@ -73,10 +72,10 @@ export const ListLi = styled.li`
 
 
 export const WrapperCenterDiv = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 `;
 
 export const ModalWrapperDiv = styled.div<{ $zIndex: number, $gap?: string, $padding?: string }>`
