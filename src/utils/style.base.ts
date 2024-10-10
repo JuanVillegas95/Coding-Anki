@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Fredoka } from "next/font/google";
-import { USER_SELECT_NONE } from "@/utils/constants"
+import { USER_SELECT_NONE, HIDE_SCROLL_BAR } from "@/utils/constants"
 
 const fredoka = Fredoka({
     weight: ["300", "400", "500", "600", "700"],
@@ -50,6 +50,8 @@ export const SmallTextP = styled.p<{ $hover?: boolean}>`
 export const TinyTextP = styled.p`
   font-family: ${fredoka.style.fontFamily};
   font-size: 14px;
+  overflow: hidden;        
+  text-overflow: ellipsis;   
 `;
 
 export const ListOl = styled.ol<{ $gap?: string }>`
@@ -88,8 +90,8 @@ export const ModalWrapperDiv = styled.div<{ $zIndex: number, $gap?: string, $pad
     height: 100%;
     background: rgba(0,0,0,0.6);
     z-index: ${({ $zIndex }) => $zIndex};
-    z-index: ${({ $gap }) => $gap};
-    z-index: ${({ $padding }) => $padding};
+    gap: ${({ $gap }) => $gap};
+    padding: ${({ $padding }) => $padding};
 
 `;
 
@@ -137,20 +139,25 @@ export const SvgDiv = styled.div<{$color?: string, $size: string, $svgSize: stri
   }
 `;
 
-export const ClickableSvgDiv = styled(SvgDiv)<{ $isBackgroundGrey?: boolean }>`
-    &:hover{
-      cursor: pointer;
-      background-color: ${({ $isBackgroundGrey }) => $isBackgroundGrey ? "lightgrey" : "transparent"};
-      border-radius: ${({ $isBackgroundGrey }) => $isBackgroundGrey ? "50%" : "0"};
-    }
+export const ClickableSvgDiv = styled(SvgDiv)<{ 
+  $isBackgroundGrey?: boolean,
+  $isSelect?: boolean;
+  }>`
+  position: ${({ $isSelect }) => $isSelect ? "relative" : "static"};
+  &:hover{
+    cursor: pointer;
+    background-color: ${({ $isBackgroundGrey }) => $isBackgroundGrey ? "#F8F8F8" : "transparent"};
+    border-radius: ${({ $isBackgroundGrey }) => $isBackgroundGrey ? "50%" : "0"};
+  }
 `;
 
 export const ButtonInput = styled.input.attrs<{ 
   $text?: string, 
   $width: string, 
   $padding: string, 
-  $margin?: string 
-}>(({ $text, $width, $padding }) => ({
+  $margin?: string,
+  $fontSize?: string,
+}>(({ $text, $width, $padding, $fontSize}) => ({
   type: "button",
   value: $text,
 }))`
@@ -159,9 +166,10 @@ export const ButtonInput = styled.input.attrs<{
   border-radius: 12px;
   background-color: #312D2A;
   color: white;
-  font-size: 20px;
   border: none;
   outline: none;
+
+  font-size: ${({ $fontSize }) => $fontSize || "20px"};
   width: ${({ $width }) => $width};
   padding: ${({ $padding }) => $padding};
   margin: ${({ $margin }) => $margin }; 
@@ -171,24 +179,25 @@ export const ButtonInput = styled.input.attrs<{
   }
 `;
 
-export const TextInput = styled.input.attrs<{ 
-  $placeholder?: string, 
-  $width: string, 
-  $padding: string, 
-  $margin?: string 
-}>(({ $placeholder, $width, $padding }) => ({
+export const TextInput = styled.input.attrs<{
+  $placeholder?: string;
+  $padding: string;
+  $margin?: string;
+  $fontSize?: string,
+}>(({ $placeholder }) => ({
   type: "text",
   placeholder: $placeholder,
 }))`
   font-family: ${fredoka.style.fontFamily};
   height: auto;
   border-radius: 12px;
-  font-size: 20px;
+  font-size: ${({ $fontSize }) => $fontSize || "20px"};
   border: none;
   outline: none;
-  width: ${({ $width }) => $width};
+  width: 100%;
   padding: ${({ $padding }) => $padding};
-  margin: ${({ $margin }) => $margin }; 
+  margin: ${({ $margin }) => $margin};
+  flex-grow: 1;
 `;
 
 
@@ -204,13 +213,12 @@ export const ContainerDiv = styled.div<{
   $alignItems?: string,
   $isBorder?: boolean 
   $isBorderRad?: boolean 
+  $position?: string
 }>`
-  position: relative;
   display: flex;
   background-color: white;
 
-
-
+  position: ${({ $position }) => $position || "relative"};
   flex-wrap: ${({ $wrap }) => $wrap };
   justify-content: ${({ $justifyContent }) => $justifyContent };
   align-items: ${({ $alignItems }) => $alignItems };
@@ -220,37 +228,22 @@ export const ContainerDiv = styled.div<{
   width: ${({ $width }) => $width || "auto"};
   height: ${({ $height }) => $height || "auto"};
   gap: ${({ $gap }) => $gap};
-  ${({ $isBorderRad }) => $isBorderRad ? "border-radius: 12px;" : null }
-  ${({ $isBorder }) => $isBorder ? "border: black solid 3px;" : null }
+  ${({ $isBorderRad }) => $isBorderRad ? "border-radius: 12px" : null };
+  ${({ $isBorder }) => $isBorder ? "border: black solid 3px" : null };
+  ${HIDE_SCROLL_BAR}
+  ${USER_SELECT_NONE}
 `;
 
 export const CrossIconDiv = styled(ClickableSvgDiv)`
   position: absolute;
   top: -20px;
   right: -20px;
+  ${USER_SELECT_NONE}
 `;
 
-
-
-
-
-
-const WarningEventsWarningDiv = styled.div`
-  display: flex;
-  gap: 5px;
+export const SelectOption = styled.span`
+  padding: 5px;
+  &:hover{
+    background-color: #F8F8F8;
+  }
 `
-
-
-const WarningButton = styled.input.attrs({ type: "button" })`
-  background-color: #f44336;
-  padding: 20px;
-  border-radius: 8px;
-  color: black;
-  border: none;
-  font-size: 15px;
-  font-weight: bold;
-  cursor: pointer;
-  text-align: center;
-  flex: 1;
-`;
-

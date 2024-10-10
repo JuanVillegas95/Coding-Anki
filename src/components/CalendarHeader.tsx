@@ -3,14 +3,20 @@ import * as S from '@/utils/style.calendar';
 import * as I from '@/utils/icons';
 import * as F from '@/utils/functions';
 import * as T from '@/utils/types';
-
+import { timeZone } from "@/utils/icons";
+import { ClickableSvgDiv } from "@/utils/style.base";
+import { Select } from "@/components/Select";
+import { timeZones } from "@/utils/timeZones"
 
 const CalendarHeader: React.FC<{
     mondayDate: Date,
     weekHandler: T.WeekHandler
     linkIcon: string;
     toggleLink: () => void;
-}> = ({ weekHandler, mondayDate, linkIcon, toggleLink }) => {
+    setTimeZoneSelect: (timeZone: string) => void;
+}> = ({ weekHandler, mondayDate, linkIcon, toggleLink, setTimeZoneSelect }) => {
+    const [isTimeZone, setIsTimeZone] = useState<boolean>(false)
+    const toggleTimeZone = (): void => setIsTimeZone((prevValue) => !prevValue);
 
     return <S.ContainerHeader>
         <S.CalendarNameDiv>
@@ -39,6 +45,16 @@ const CalendarHeader: React.FC<{
             </S.ChangeWeekDiv>
         </S.HeaderRigthestWrapperDiv>
         <S.LinkIconImg src={linkIcon} onClick={toggleLink} />
+        <Select
+            icon={timeZone}
+            size="40px"
+            svgSize="40px"
+            width={200}
+            options={timeZones}
+            isOpen={isTimeZone}
+            toggleSelect={toggleTimeZone}
+            setOption={setTimeZoneSelect}
+        />
     </S.ContainerHeader>
 };
 

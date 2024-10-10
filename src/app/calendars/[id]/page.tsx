@@ -33,12 +33,13 @@ export default function Calendars() {
     const [status, setStatus] = useState<STATUS>(STATUS.OK);
     const { pushToast, ToastComponent } = useToast();
 
+    const [timeZone, setTimeZone] = useState<string>("")
+
 
     const toggleLink = (): void => {
         const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;
         setLinkIcon(icon);
     }
-
 
     useEffect(() => {
         const syncScroll = () => {
@@ -70,8 +71,9 @@ export default function Calendars() {
         curr: () => setMondayDate(F.getMostRecentMonday()),
     };
 
+    const setTimeZoneSelect = (timeZone: string): void => setTimeZone(timeZone)
 
-    const setLinkedCalendarFriend = (event: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(event.target.value)
+    const setLinkedCalendarFriend = (e: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(e.target.value)
 
     const setEvent = (eventToSet: Event): void => {
         const currentCalendar: Calendar = getCurrentCalendar();
@@ -127,6 +129,7 @@ export default function Calendars() {
                     weekHandler={weekHandler}
                     linkIcon={linkIcon}
                     toggleLink={toggleLink}
+                    setTimeZoneSelect={setTimeZoneSelect}
                 />
                 <TimeColumnAside asideRef={asideRef} />
                 <DaySection mondayDate={mondayDate} />

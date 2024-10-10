@@ -11,7 +11,23 @@ export default function Home() {
     const router = useRouter();
 
     const handleLogin = async () => {
+        // try {
+        //     const response = await fetch("/login/api/?oauth_id=juan_oauth_id", { method: "GET" });
+        //     const data: UserData = await response.json();
+        //     if (response.ok) {
+        //         console.log(data)
+        //         console.log(data.user)
+        //         console.log(data.user.ID)
 
+        //         console.log(`/calendar/${data.user.ID}`)
+        //         router.push(`/calendar/${data.user.ID}`);
+        //     }
+        //     else {
+        //         // Means i have to create the user
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        // }
     }
 
     const openWhyModal = (): void => setIsWhyModal(true);

@@ -26,6 +26,7 @@ export class User {
 export class Calendar {
   id: string;
   name: string;
+  private timeZone;
   private eventsById: Map<string, Event>;  // Stores all event objects by their unique ID
   private eventIdsByDay: Map<string, Set<string>>;  // Maps specific dates as strings to Set<string> of event IDs for events on those days
   private eventIdsByGroupId: Map<string, Set<string>>; // Maps specific groupId as strings to Set<string> of event IDs for those events Ids
@@ -39,6 +40,7 @@ export class Calendar {
     this.auditStatus = this.auditStatus.bind(this);
       this.id = id;
       this.name = name;
+      this.timeZone = ""
       this.eventsById = new Map<string, Event>();
       this.eventIdsByDay = new Map<string, Set<string>>();
       this.eventIdsByGroupId = new Map<string, Set<string>>();
@@ -47,6 +49,14 @@ export class Calendar {
       this.eventsToUpdate = [];
       this.conflictingEvents = [];
       this.eventToSet = new Event(new Date());
+  }
+
+  public getTimeZone(): string{
+    return this.timeZone;
+  }
+
+  public setTimeZone(newTimeZone: string){
+    this.timeZone = newTimeZone;
   }
 
   public debugEvents() {
