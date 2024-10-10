@@ -9,6 +9,7 @@ import EventCard from './EventCard';
 import EventModal from './EventModal';
 import { v4 as uuidv4 } from 'uuid';
 import { TOAST_TYPE } from '@/utils/constants';
+import { throttle } from 'lodash';
 
 const ScheduleGridMain: React.FC<{
     setEvent: (event: Event) => void;
@@ -100,6 +101,8 @@ const ScheduleGridMain: React.FC<{
 
 
     };
+
+
     const eventOnMouseMove = {
         drag: (e: React.MouseEvent<HTMLDivElement>, colRef: React.RefObject<HTMLDivElement>) => {
             e.preventDefault();
@@ -110,25 +113,34 @@ const ScheduleGridMain: React.FC<{
 
             if (!dragThreshold.current) return;
 
+            const previousStart = event.current.start;
+            const previousEnd = event.current.end;
+
+            if (!event.current.groupId) {
+                // const currentEventDayWeek: number = F.getDay(event.current.date);
+                // const enteredEventDayWeek: number = parseInt(colRef.current!.dataset.key as string);
+                // event.current.date = F.strigifyDate(
+                //     F.addDateBy(
+                //         F.parseDateStringToUTC(event.current.date),
+                //         Math.sign(enteredEventDayWeek - currentEventDayWeek)
+                //     )
+                // );
+                // event.current.selectedDays = new Array(7).fill(false);
+                // event.current.selectedDays[F.getDay(event.current.date)] = true;
+            }
+
             const [start, end] = F.calculateTimeOnDrag(e, colRef, event.current);
             event.current.start = start;
             event.current.end = end;
 
-            if (!event.current.groupId) {
-                const currentEventDayWeek: number = F.getDay(event.current.date);
-                const enteredEventDayWeek: number = parseInt(colRef.current!.dataset.key as string);
-                event.current.date = F.strigifyDate(
-                    F.addDateBy(
-                        F.parseDateStringToUTC(event.current.date),
-                        Math.sign(enteredEventDayWeek - currentEventDayWeek)
-                    )
-                );
-                event.current.selectedDays = new Array(7).fill(false);
-                event.current.selectedDays[F.getDay(event.current.date)] = true;
+            // Perform validation while dragging
+            if (!F.isNewEventValid(event.current, getEvents(event.current.date))) {
+                // If invalid, revert to the previous position
+                event.current.start = previousStart;
+                event.current.end = previousEnd;
+                return;
             }
 
-
-            if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
             setEvent(event.current);
         },
 
@@ -213,10 +225,10 @@ const ScheduleGridMain: React.FC<{
                 key={index}
                 onMouseDown={(e) => eventOnMouseDown.create(e, date)}
                 onMouseMove={(e) => {
-                    eventOnMouseMove.create(e);
-                    eventOnMouseMove.drag(e, colRef);
-                    eventOnMouseMove.top(e);
-                    eventOnMouseMove.bottom(e);
+                    if (isEventCreating) eventOnMouseMove.create(e);
+                    else if (isEventDragging) eventOnMouseMove.drag(e, colRef);
+                    else if (isEventResizingTop) eventOnMouseMove.top(e);
+                    else if (isEventResizingBottom) eventOnMouseMove.bottom(e);
                 }}
             >
                 {F.range(48).map((j) => <S.CellDiv key={j} />)}

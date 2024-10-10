@@ -3,7 +3,7 @@ import { TOAST_TYPE, STATUS} from "@/utils/constants"
 import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents } from "@/utils/functions";
 import * as I  from "@/utils/icons"
 
-class User {
+export class User {
   id: string;  
   oauthId: string;  
   calendars: Map<string, Calendar>;  
@@ -23,7 +23,7 @@ class User {
 }
 
 
-class Calendar {
+export class Calendar {
   id: string;
   name: string;
   private eventsById: Map<string, Event>;  // Stores all event objects by their unique ID
@@ -332,7 +332,7 @@ class Calendar {
 
 
 
-class Event {
+export class Event {
   id: string;
   date: string; //YYYY-MM-DD 
   title: string;
@@ -378,7 +378,7 @@ class Event {
   }
 }
 
-class Time {
+export class Time {
   hours: number;
   minutes: number;
 
@@ -388,7 +388,7 @@ class Time {
   }
 }
 
-class Toast {
+export class Toast {
   id: string
   description: string;
   type: TOAST_TYPE; 
@@ -403,4 +403,3 @@ class Toast {
 
 
 
-export { Event, Time, Calendar, User, Toast};

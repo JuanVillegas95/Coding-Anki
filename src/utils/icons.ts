@@ -1,109 +1,59 @@
-import heart from "@/svg/heart.svg"
-import rightArrow from "@/svg/arrow-right.svg"
-import left from "@/svg/angle-left.svg"
-import right from "@/svg/angulo-derecho.svg"
-import cross from "@/svg/cross.svg"
-import bell from "@/svg/bell.svg"
-import cart from "@/svg/cart.svg"
-import interrogation from "@/svg/interrogation.svg"
-import mark from "@/svg/mark.svg"
-import star from "@/svg/star.svg"
-import search from "@/svg/search.svg"
-import following from "@/svg/following.svg"
-import link from "@/svg/link.svg"
-import horizontalDots from "@/svg/grip-dots-h.svg"
-import verticalDots from "@/svg/grip-dots-vertical.svg"
-import dropdown from "@/svg/angulo-derecho.svg"
-import emptyCircle from "@/svg/empty-circle.svg"
-import fullCircle from "@/svg/full-circle.svg"
-
-
-import users from "@/svg/users.svg"
-import add from "@/svg/add.svg"
-import disk from "@/svg/disk.svg"
-import download from "@/svg/download.svg"
-import print from "@/svg/print.svg"
-import upload from "@/svg/upload.svg"
-import confetti from "@/svg/confetti.svg"
-import trash from "@/svg/trash.svg"
-import replace from "@/svg/replace.svg"
-
-import phone from "@/svg/phone.svg"
-import information from "@/svg/information.svg"
-import coke from "@/svg/coke.svg"
-import meh from "@/svg/meh.svg"
-
-import purple from "@/svg/purple.svg"
-import blue from "@/svg/blue.svg"
-import orange from "@/svg/orange.svg"
-import brown from "@/svg/brown.svg"
-import gray from "@/svg/gray.svg"
-import pink from "@/svg/pink.svg"
-import teal from "@/svg/teal.svg"
-import red from "@/svg/red.svg"
-import yellow from "@/svg/yellow.svg"
-
-import error from "@/svg/bad.svg"
-import success from "@/svg/good.svg"
-import info from "@/svg/info.svg"
-import removeUser from "@/svg/remove-user.svg"
-import addUser from "@/svg/user-add.svg"
-
-import calendar from "@/svg/calendar.svg"
-import group from "@/svg/group.svg"
-import linkIn from "@/gif/link-in.gif"
-import linkOut from "@/gif/link-out.gif"
-
-import oracle from "@/images/oracle.png"
-import oracle_text from "@/images/oracle-text.png"
-import logo from "@/images/logo.png"
-import acctually from "@/images/actually.png"
-import welcome from "@/images/welcome.png"
-import catError from "@/images/error.png"
-
-import whiteCat from "@/images/white cat.png"
-import brownCat from "@/images/brownCat.png"
-import appTitle from "@/images/purrfecttiming.png"
-
-export {
-  whiteCat, brownCat, appTitle,
-  catError,
-  oracle, logo, acctually, welcome,oracle_text,
-  removeUser, addUser,
-  linkIn, linkOut,
-  calendar, group,
-  add, disk, download, print, upload, confetti, trash, replace,
-  success, error, info,
-  link,
-  heart,
-  rightArrow,
-  left,
-  right,
-  cross,
-  bell,
-  cart,
-  interrogation,
-  mark,
-  star,
-  purple,
-  blue,
-  orange,
-  brown,
-  gray,
-  pink,
-  phone,
-  information,
-  coke,
-  meh,
-  teal,
-  red,
-  yellow,
-  search,
-  following,
-  horizontalDots,
-  verticalDots,
-  dropdown,
-  emptyCircle,
-  fullCircle,
-  users,
-}
+export { default as heart } from "@/svg/heart.svg";
+export { default as rightArrow } from "@/svg/arrow-right.svg";
+export { default as left } from "@/svg/angle-left.svg";
+export { default as right } from "@/svg/angulo-derecho.svg";
+export { default as cross } from "@/svg/cross.svg";
+export { default as bell } from "@/svg/bell.svg";
+export { default as cart } from "@/svg/cart.svg";
+export { default as interrogation } from "@/svg/interrogation.svg";
+export { default as mark } from "@/svg/mark.svg";
+export { default as star } from "@/svg/star.svg";
+export { default as search } from "@/svg/search.svg";
+export { default as following } from "@/svg/following.svg";
+export { default as link } from "@/svg/link.svg";
+export { default as horizontalDots } from "@/svg/grip-dots-h.svg";
+export { default as verticalDots } from "@/svg/grip-dots-vertical.svg";
+export { default as dropdown } from "@/svg/angulo-derecho.svg";
+export { default as emptyCircle } from "@/svg/empty-circle.svg";
+export { default as fullCircle } from "@/svg/full-circle.svg";
+export { default as users } from "@/svg/users.svg";
+export { default as add } from "@/svg/add.svg";
+export { default as disk } from "@/svg/disk.svg";
+export { default as download } from "@/svg/download.svg";
+export { default as print } from "@/svg/print.svg";
+export { default as upload } from "@/svg/upload.svg";
+export { default as confetti } from "@/svg/confetti.svg";
+export { default as trash } from "@/svg/trash.svg";
+export { default as replace } from "@/svg/replace.svg";
+export { default as phone } from "@/svg/phone.svg";
+export { default as information } from "@/svg/information.svg";
+export { default as coke } from "@/svg/coke.svg";
+export { default as meh } from "@/svg/meh.svg";
+export { default as purple } from "@/svg/purple.svg";
+export { default as blue } from "@/svg/blue.svg";
+export { default as orange } from "@/svg/orange.svg";
+export { default as brown } from "@/svg/brown.svg";
+export { default as gray } from "@/svg/gray.svg";
+export { default as pink } from "@/svg/pink.svg";
+export { default as teal } from "@/svg/teal.svg";
+export { default as red } from "@/svg/red.svg";
+export { default as yellow } from "@/svg/yellow.svg";
+export { default as error } from "@/svg/bad.svg";
+export { default as success } from "@/svg/good.svg";
+export { default as info } from "@/svg/info.svg";
+export { default as removeUser } from "@/svg/remove-user.svg";
+export { default as addUser } from "@/svg/user-add.svg";
+export { default as calendar } from "@/svg/calendar.svg";
+export { default as group } from "@/svg/group.svg";
+export { default as linkIn } from "@/gif/link-in.gif";
+export { default as linkOut } from "@/gif/link-out.gif";
+export { default as oracle } from "@/images/oracle.png";
+export { default as oracle_text } from "@/images/oracle-text.png";
+export { default as logo } from "@/images/logo.png";
+export { default as acctually } from "@/images/actually.png";
+export { default as welcome } from "@/images/welcome.png";
+export { default as catError } from "@/images/error.png";
+export { default as whiteCat } from "@/images/white cat.png";
+export { default as brownCat } from "@/images/brownCat.png";
+export { default as appTitle } from "@/images/purrfecttiming.png";
+export { default as timeZone } from "@/svg/time-zone.svg";
