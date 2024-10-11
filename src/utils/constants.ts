@@ -79,7 +79,22 @@ export const MENU: Record<string, React.ComponentType> = {
 };
 
 // Color Scheme
-export const COLORS: Record<string, {
+
+export enum COLOR {
+  PURPLE = "purple",
+  BLUE = "blue",
+  PINK = "pink",
+  ORANGE = "orange",
+  GRAY = "gray",
+  BROWN = "brown",
+  TEAL = "teal",
+  RED = "red",
+  YELLOW = "yellow",
+}
+
+
+
+export const COLORS: Record<COLOR, {
   primary: string;
   secondary: string;
   tertiary: string;
@@ -131,8 +146,21 @@ export const COLORS: Record<string, {
   },
 };
 
+export enum ICON {
+  BELL = "bell",
+  CART = "cart",
+  HEART = "heart",
+  STAR = "star",
+  MARK = "mark",
+  PHONE = "phone",
+  INFORMATION = "information",
+  COKE = "coke",
+  MEH = "meh",
+}
+
+
 // Icons
-export const ICONS: Record<string, React.ComponentType> = {
+export const ICONS: Record<ICON, React.ComponentType> = {
   bell,
   cart,
   heart,

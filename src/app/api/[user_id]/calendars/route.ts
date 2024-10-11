@@ -62,6 +62,9 @@ export async function GET(request: Request, { params }: { params: { user_id: str
             color: row.COLOR,
             height: row.HEIGHT,
             topOffset: row.TOP_OFFSET,
+            groupId: row.GROUP_ID,
+            startDate: row.START_DATE,
+            endDate: row.END_DATE,
           });
         }
       });

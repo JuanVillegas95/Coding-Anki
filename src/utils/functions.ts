@@ -180,7 +180,7 @@ export const calculateEventEnd = ({ start, height }: Event): Time => {
 }
 
 // Calculates the event duration
-export const calculateEventDuration = ({ start, end }: Event): Time => {
+export const calculateEventDuration = ( start: Time, end: Time ): Time => {
   const totalStartMinutes: number = timeToMinutes(start);
   const totalEndMinutes: number = timeToMinutes(end);
 
@@ -293,4 +293,30 @@ export const parseDateStringToUTC = (dateString: string): Date => {
 
   // Use Date.UTC to create a UTC date
   return new Date(Date.UTC(year, month - 1, day)); // Month is 0-indexed
+};
+
+export const calculateStartAndEndTime = (topOffset: number, height: number): { start: Time, end: Time } => {
+  // Convert the topOffset to hours using the pixelsToHours utility function
+  const startHours = pixelsToHours(topOffset);
+  
+  // Convert the fractional hours to full hours and minutes
+  const startFullHours = Math.floor(startHours);
+  const startMinutes = Math.round((startHours - startFullHours) * 60);
+  
+  // Create the start time object
+  const start: Time = new Time(startFullHours, startMinutes);
+  // Calculate the total pixel value for the end time (topOffset + height)
+  const endPixels = topOffset + height;
+  
+  // Convert the total pixels to hours using the pixelsToHours utility function
+  const endHours = pixelsToHours(endPixels);
+  
+  // Convert the fractional hours to full hours and minutes
+  const endFullHours = Math.floor(endHours);
+  const endMinutes = Math.round((endHours - endFullHours) * 60);
+  
+  // Create the end time object
+  const end: Time = new Time(endFullHours, endMinutes);
+
+  return { start, end };
 };

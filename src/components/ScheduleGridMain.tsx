@@ -10,6 +10,7 @@ import EventModal from './EventModal';
 import { v4 as uuidv4 } from 'uuid';
 import { TOAST_TYPE } from '@/utils/constants';
 import { throttle } from 'lodash';
+import { strigifyDate } from "@/utils/functions"
 
 const ScheduleGridMain: React.FC<{
     setEvent: (event: Event) => void;
@@ -76,7 +77,7 @@ const ScheduleGridMain: React.FC<{
             if (F.isEventOverlapping(getEvents(F.strigifyDate(date)), newEventStart)) return;
 
             setIsEventCreating(true);
-            event.current = structuredClone(new Event(date, newEventStart))
+            event.current = structuredClone(new Event(strigifyDate(date), newEventStart))
 
         },
 
@@ -151,7 +152,7 @@ const ScheduleGridMain: React.FC<{
 
             event.current.end = F.calculateEventTime(e, columnDivRefs[0]);
             event.current.height = F.calculateEventHeight(event.current);
-            event.current.duration = F.calculateEventDuration(event.current);
+            event.current.duration = F.calculateEventDuration(event.current.start, event.current.end);
             event.current.selectedDays[F.getDay(event.current.date)] = true;
             event.current.groupId = null;
 
@@ -166,7 +167,7 @@ const ScheduleGridMain: React.FC<{
 
             event.current.end = F.calculateEventTime(e, columnDivRefs[0]);
             event.current.height = F.calculateEventHeight(event.current);
-            event.current.duration = F.calculateEventDuration(event.current);
+            event.current.duration = F.calculateEventDuration(event.current.start, event.current.end);
 
             if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
 
@@ -180,7 +181,7 @@ const ScheduleGridMain: React.FC<{
 
             event.current.start = F.calculateEventTime(e, columnDivRefs[0]);
             event.current.height = F.calculateEventHeight(event.current);
-            event.current.duration = F.calculateEventDuration(event.current);
+            event.current.duration = F.calculateEventDuration(event.current.start, event.current.end);
 
             if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
 

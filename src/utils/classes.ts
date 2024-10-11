@@ -1,12 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
-import { TOAST_TYPE, STATUS} from "@/utils/constants"
-import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents } from "@/utils/functions";
+import { TOAST_TYPE, STATUS, COLOR, ICON} from "@/utils/constants"
+import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents, calculateStartAndEndTime, calculateEventDuration} from "@/utils/functions";
 import { ServerCalendar, ServerEvent } from "@/utils/types";
 export class User {
-  id: string;  
-  oauthId: string;  
-  calendars: Map<string, Calendar>;  
-  friendIds: Set<string>;  
+  private id: string;  
+  private oauthId: string;  
+  private calendars: Map<string, Calendar>;  
+  private friendIds: Set<string>;  
 
   constructor(
     id: string = uuidv4(),
@@ -19,14 +19,40 @@ export class User {
     this.calendars = calendars;
     this.friendIds = friendIds;
   }
-  //! Still need to load other data (id, ouathId, friendsIds).
-  public mapData(data: ServerCalendar[]){
-    data.forEach(( fetchedCalendar: ServerCalendar ) => {
-      const { id, events, timezone, name } = fetchedCalendar;
+  // //! Still need to load other data (id, ouathId, friendsIds).
+  // public mapData(data: ServerCalendar[]){
+  //   data.forEach(( { id: calendarId, events: fetchedEvents, timezone, name }: ServerCalendar ) => {
+  //     if(!timezone) timezone = "";
+  //     const newCalendar: Calendar = new Calendar(calendarId,name,timezone);
+  //     fetchedEvents.forEach(( fetchedEvent: ServerEvent 
+  //       ) => {
+  //         const newEvent: Event =  this.proccessFetchedEvent(fetchedEvent);
+  //         // newCalendar.addEventById()
+  //         // this.calendars.set(calendar_id,)
+  //       });
+  //   });
+  // }
 
-      new Calendar(id,name,timezone,)
-    });
-  }
+  // private proccessFetchedEvent(serverEvent: ServerEvent): Event{
+  //   const { start, end }: { start: Time, end: Time } = calculateStartAndEndTime(serverEvent.topOffset, serverEvent.height);
+  //   const duration: Time = calculateEventDuration(start, end);
+  //   return new Event(
+  //     serverEvent.eventDate,
+  //     start,
+  //     serverEvent.groupId,
+  //     false,
+  //     serverEvent.height,
+  //     serverEvent.id,
+  //     serverEvent.title ? serverEvent.title : "",
+  //     serverEvent.description ? serverEvent.description :  "",
+  //     serverEvent.color as COLOR,
+  //     end,
+  //     duration,
+  //     serverEvent.groupId,
+  //     serverEvent.iconName as ICON,
+
+  //   );
+  // }
 }
 
 
@@ -335,11 +361,21 @@ export class Calendar {
       }
     }
 
-    private addEventIdToDate(dateKey: string, eventId: string): void {
+    public addEventIdToDate(dateKey: string, eventId: string): void {
       if (this.eventIdsByDay.has(dateKey)) this.eventIdsByDay.get(dateKey)!.add(eventId);
       else this.eventIdsByDay.set(dateKey, new Set([eventId]));
     }
 
+    public addEventIdToGroup(groupId: string, eventId: string): void {
+      if (this.eventIdsByGroupId.has(groupId)) this.eventIdsByGroupId.get(groupId)!.add(eventId);
+      else this.eventIdsByGroupId.set(groupId, new Set([eventId]));
+    }
+
+    public addEventById(event: Event): void {
+      if (!this.eventsById.has(event.id)) this.eventsById.set(event.id, event);
+    }
+  
+    
     private deleteEventIdFromGroup(groupId: string, eventId: string): void {
       const eventsSet = this.eventIdsByGroupId.get(groupId);
       if (eventsSet) {
@@ -349,12 +385,6 @@ export class Calendar {
         }
       }
     }
-
-    private addEventIdToGroup(groupId: string, eventId: string): void {
-      if (this.eventIdsByGroupId.has(groupId)) this.eventIdsByGroupId.get(groupId)!.add(eventId);
-      else this.eventIdsByGroupId.set(groupId, new Set([eventId]));
-    }
-    
     private getEventsByGroupId(groupId: string): Event[] {
       const eventIds = this.eventIdsByGroupId.get(groupId);
       if (!eventIds) return []; 
@@ -371,17 +401,14 @@ export class Calendar {
     }
 }
 
-
-
-
 export class Event {
   id: string;
-  date: string; //YYYY-MM-DD 
+  date: string; 
   title: string;
   description: string;
   height: number;
-  icon: string;
-  color: string;
+  icon: ICON;
+  color: COLOR;
   isFriendEvent: boolean;
 
   duration: Time;
@@ -392,28 +419,30 @@ export class Event {
   endDate: string;
   groupId: string | null;
   storedGroupId: string | null; // In order to handle then toggleing
-
   selectedDays: boolean[];
+
+
 constructor(
     date: string = "",
     start: Time = new Time(),
     groupId: string | null = null,
     isFriendEvent: boolean = false,
-    height: number = -1,
+    height: number = 0,
     id: string = uuidv4(),
     title: string = "",
     description: string = "",
-    color: string = "purple",
-    end: Time = new Time(-1, -1),
-    duration: Time = new Time(-1, -1),
+    color: COLOR = COLOR.GRAY,
+    end: Time = new Time(),
+    duration: Time = new Time(),
     storedGroupId: string | null = null,
-    icon: string = "star",
+    icon: ICON = ICON.STAR,
     selectedDays: boolean[] = new Array(7).fill(false),
+    startDate: string = date,
     endDate: string = ""
   ) {
     this.id = id;
     this.date = date; 
-    this.startDate = date;
+    this.startDate = startDate;
     this.start = start;
     this.end = end;
     this.title = title;
