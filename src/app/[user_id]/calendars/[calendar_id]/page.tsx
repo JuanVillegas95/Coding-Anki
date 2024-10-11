@@ -21,9 +21,9 @@ import * as S from '@/utils/style.calendar';
 import { STATUS } from "@/utils/constants";
 
 const currentCalendar = new Calendar("yes", "hi");
-
+const currentCalId: string = currentCalendar.getId()
 export default function Calendars() {
-    const [calendars, setCalendars] = useState<Map<string, Calendar>>(new Map([[currentCalendar.id, currentCalendar]]));
+    const [calendars, setCalendars] = useState<Map<string, Calendar>>(new Map([[currentCalId, currentCalendar]]));
     const [mondayDate, setMondayDate] = useState<Date>(F.getMostRecentMonday());
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map())
     const [linkedCalendar, setLinkedCalendar] = useState<string>("")
@@ -35,6 +35,34 @@ export default function Calendars() {
 
     const [timeZone, setTimeZone] = useState<string>("")
 
+
+    const [calendar, setCalendar] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const calendarId = '1';
+    const userId = "juan_id";
+
+    useEffect(() => {
+        const fetchCalendar = async () => {
+            try {
+                const response = await fetch(`/api/${userId}/calendars/`);
+
+                if (!response.ok) throw new Error('Failed to fetch calendar');
+                const data = await response.json();
+                console.log(data);
+            }
+            catch (err) {
+                if (err instanceof Error) setError(err.message);
+                else setError("An unexpected error occurred");
+            }
+            finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCalendar();
+    }, [calendarId]);
 
     const toggleLink = (): void => {
         const icon: string = (linkIcon === I.linkIn.src) ? I.linkOut.src : I.linkIn.src;
@@ -89,7 +117,7 @@ export default function Calendars() {
             currentCalendar.commitEventRevisions();
             currentCalendar.clearEventStates()
             const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            updatedCalendars.set(currentCalId, currentCalendar);
             return updatedCalendars;
         });
     }
@@ -100,7 +128,7 @@ export default function Calendars() {
             const currentCalendar: Calendar = getCurrentCalendar();
             currentCalendar.clearEventStates();
             const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            updatedCalendars.set(currentCalId, currentCalendar);
             return updatedCalendars;
         });
     }
@@ -110,12 +138,12 @@ export default function Calendars() {
         currentCalendar.deleteEventSubmit(event);
         setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
             const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
-            updatedCalendars.set(currentCalendar.id, currentCalendar);
+            updatedCalendars.set(currentCalId, currentCalendar);
             return updatedCalendars;
         });
     };
 
-    const getCurrentCalendar = (): Calendar => calendars!.get(currentCalendar.id) as Calendar;
+    const getCurrentCalendar = (): Calendar => calendars!.get(currentCalId) as Calendar;
 
     const getEvents = (date: string): Event[] => getCurrentCalendar().getEventsByDate(date);
 

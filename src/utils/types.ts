@@ -21,35 +21,34 @@ export type UserData = {
     }
 }
 
-export type EventData = {
-    event: {
-      ID: string;
-      CALENDAR_ID: string;
-      GROUP_ID: string;
-      TITLE: string;
-      DESCRIPTION: string;
-      EVENT_DATE: string;
-      ICON_NAME: string;
-      COLOR: string;
-      HEIGHT: number;
-      TOP_OFFSET: number;
-    };
-  };
+export type ServerCalendarEventRow = {
+  CALENDAR_ID: string;
+  CALENDAR_NAME: string;
+  TIMEZONE: string;
+  EVENT_ID: string;
+  EVENT_TITLE: string;
+  DESCRIPTION: string;
+  EVENT_DATE: string;
+  ICON_NAME: string;
+  COLOR: string;
+  HEIGHT: number;
+  TOP_OFFSET: number;
+}
+  
+export type ServerEvent = {
+  id: string;
+  title: string;
+  description: string;
+  eventDate: string;
+  iconName: string;
+  color: string;
+  height: number;
+  topOffset: number;
+}
 
-  export type CalendarData = {
-    calendar: {
-      ID: string;
-      USER_ID: string;
-      NAME: string;
-    };
-  };
-
-  
-  
-  export type FriendshipData = {
-    friendship: {
-      USER_ID: string;
-      FRIEND_ID: string;
-    };
-  };
-  
+export type ServerCalendar = {
+  id: string;
+  name: string;
+  timezone: string;
+  events: ServerEvent[];
+}

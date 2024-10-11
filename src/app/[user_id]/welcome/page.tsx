@@ -56,7 +56,7 @@ export default function Welcome() {
                         <SmallTextP onClick={handleCopy} $hover={true}>
                             {userID}
                         </SmallTextP>
-                        <SearchBar width="400px" buttonWidth="100px" buttonText="Next" padding="20px" />
+                        <SearchBar width="400px" buttonWidth="100px" buttonText="Next" padding="20px" fontSize="20px" />
                     </ContainerDiv>
                 </ContainerDiv>
             </ContainerDiv>

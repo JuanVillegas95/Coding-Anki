@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { TOAST_TYPE, STATUS} from "@/utils/constants"
 import { strigifyDate, addDateBy, parseDateStringToUTC, getDay, getConflictingEvents } from "@/utils/functions";
-import * as I  from "@/utils/icons"
-
+import { ServerCalendar, ServerEvent } from "@/utils/types";
 export class User {
   id: string;  
   oauthId: string;  
@@ -20,13 +19,21 @@ export class User {
     this.calendars = calendars;
     this.friendIds = friendIds;
   }
+  //! Still need to load other data (id, ouathId, friendsIds).
+  public mapData(data: ServerCalendar[]){
+    data.forEach(( fetchedCalendar: ServerCalendar ) => {
+      const { id, events, timezone, name } = fetchedCalendar;
+
+      new Calendar(id,name,timezone,)
+    });
+  }
 }
 
 
 export class Calendar {
-  id: string;
-  name: string;
-  private timeZone;
+  private id: string;
+  private name: string;
+  private timeZone: string;
   private eventsById: Map<string, Event>;  // Stores all event objects by their unique ID
   private eventIdsByDay: Map<string, Set<string>>;  // Maps specific dates as strings to Set<string> of event IDs for events on those days
   private eventIdsByGroupId: Map<string, Set<string>>; // Maps specific groupId as strings to Set<string> of event IDs for those events Ids
@@ -36,24 +43,49 @@ export class Calendar {
   private conflictingEvents: Event[];
   private eventToSet: Event
 
-  constructor(id: string = uuidv4(), name: string = "Something is wrong") {
+  constructor(
+    id: string = uuidv4(),
+    name: string = "Set Calendar Name",
+    timeZone: string = "",
+    eventsById: Map<string, Event> = new Map(),
+    eventIdsByDay: Map<string, Set<string>> = new Map(),
+    eventIdsByGroupId: Map<string, Set<string>> = new Map(),
+  ) {
     this.auditStatus = this.auditStatus.bind(this);
       this.id = id;
       this.name = name;
-      this.timeZone = ""
-      this.eventsById = new Map<string, Event>();
-      this.eventIdsByDay = new Map<string, Set<string>>();
-      this.eventIdsByGroupId = new Map<string, Set<string>>();
+      this.timeZone = timeZone;
+      this.eventsById = eventsById;
+      this.eventIdsByDay = eventIdsByDay;
+      this.eventIdsByGroupId = eventIdsByGroupId;
       this.eventsToAdd = [];
       this.eventsToDelete = [];
       this.eventsToUpdate = [];
       this.conflictingEvents = [];
-      this.eventToSet = new Event(new Date());
+      this.eventToSet = new Event();
   }
+
+  public setId(id: string): void {
+    this.id = id;
+  }
+
+  public getId(): string {
+    return this.id;
+  }
+
+  public setName(name: string): void {
+    this.name = name;
+  }
+
+  public getName(): string {
+    return this.id;
+  }
+
 
   public getTimeZone(): string{
     return this.timeZone;
   }
+
 
   public setTimeZone(newTimeZone: string){
     this.timeZone = newTimeZone;
@@ -77,7 +109,7 @@ export class Calendar {
     this.eventsToDelete = [];
     this.eventsToUpdate = [];
     this.conflictingEvents = [];
-    this.eventToSet = new Event(new Date());
+    this.eventToSet = new Event();
   }
 
 
@@ -362,28 +394,38 @@ export class Event {
   storedGroupId: string | null; // In order to handle then toggleing
 
   selectedDays: boolean[];
-  constructor(
-    date: Date, 
-    start: Time = new Time(), 
-    groupId: string | null = null, 
+constructor(
+    date: string = "",
+    start: Time = new Time(),
+    groupId: string | null = null,
     isFriendEvent: boolean = false,
-    height: number = -1, 
-    ) {
-    this.id = uuidv4();
-    this.date = strigifyDate(date);
-    this.startDate = this.date;
+    height: number = -1,
+    id: string = uuidv4(),
+    title: string = "",
+    description: string = "",
+    color: string = "purple",
+    end: Time = new Time(-1, -1),
+    duration: Time = new Time(-1, -1),
+    storedGroupId: string | null = null,
+    icon: string = "star",
+    selectedDays: boolean[] = new Array(7).fill(false),
+    endDate: string = ""
+  ) {
+    this.id = id;
+    this.date = date; 
+    this.startDate = date;
     this.start = start;
-    this.end = new Time(-1, -1);
-    this.title = "";
-    this.description = "";
-    this.color = "purple";
+    this.end = end;
+    this.title = title;
+    this.description = description;
+    this.color = color;
     this.height = height;
-    this.duration = new Time(-1, -1);
-    this.storedGroupId = null;
-    this.icon = "star";
+    this.duration = duration;
+    this.storedGroupId = storedGroupId;
+    this.icon = icon;
     this.groupId = groupId;
-    this.selectedDays = new Array(7).fill(false);
-    this.endDate = "";
+    this.selectedDays = selectedDays;
+    this.endDate = endDate;
     this.isFriendEvent = isFriendEvent;
   }
 }
