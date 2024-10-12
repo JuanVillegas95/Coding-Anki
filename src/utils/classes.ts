@@ -20,39 +20,51 @@ export class User {
     this.friendIds = friendIds;
   }
   // //! Still need to load other data (id, ouathId, friendsIds).
-  // public mapData(data: ServerCalendar[]){
-  //   data.forEach(( { id: calendarId, events: fetchedEvents, timezone, name }: ServerCalendar ) => {
-  //     if(!timezone) timezone = "";
-  //     const newCalendar: Calendar = new Calendar(calendarId,name,timezone);
-  //     fetchedEvents.forEach(( fetchedEvent: ServerEvent 
-  //       ) => {
-  //         const newEvent: Event =  this.proccessFetchedEvent(fetchedEvent);
-  //         // newCalendar.addEventById()
-  //         // this.calendars.set(calendar_id,)
-  //       });
-  //   });
-  // }
+  public mapData(data: ServerCalendar[]){
+    data.forEach(( { id: calendarId, events: fetchedEvents, timezone, name }: ServerCalendar ) => {
+      if(!timezone) timezone = "";
+      const newCalendar: Calendar = new Calendar(calendarId,name,timezone);
+      fetchedEvents.forEach(( fetchedEvent: ServerEvent 
+        ) => {
+          const newEvent: Event =  this.proccessFetchedEvent(fetchedEvent);
+          // newCalendar.addEventById()
+          // this.calendars.set(calendar_id,)
+        });
+    });
+  }
 
-  // private proccessFetchedEvent(serverEvent: ServerEvent): Event{
-  //   const { start, end }: { start: Time, end: Time } = calculateStartAndEndTime(serverEvent.topOffset, serverEvent.height);
-  //   const duration: Time = calculateEventDuration(start, end);
-  //   return new Event(
-  //     serverEvent.eventDate,
-  //     start,
-  //     serverEvent.groupId,
-  //     false,
-  //     serverEvent.height,
-  //     serverEvent.id,
-  //     serverEvent.title ? serverEvent.title : "",
-  //     serverEvent.description ? serverEvent.description :  "",
-  //     serverEvent.color as COLOR,
-  //     end,
-  //     duration,
-  //     serverEvent.groupId,
-  //     serverEvent.iconName as ICON,
+  private proccessFetchedEvent(serverEvent: ServerEvent): Event{
+    const { start, end }: { start: Time, end: Time } = calculateStartAndEndTime(serverEvent.topOffset, serverEvent.height);
+    const duration: Time = calculateEventDuration(start, end);
+    if(serverEvent.groupId && serverEvent.startDate && serverEvent.endDate){
+      const startDate: Date = parseDateStringToUTC(serverEvent.startDate);
+      const selectedDays: boolean[] = Array<boolean>(7).fill(false);
 
-  //   );
-  // }
+      for (
+        let i: number = 0, date: Date = startDate; 
+        i<7; 
+        i++, date = addDateBy(date, 1)
+        ) {
+          const stringifiedDate: string = strigifyDate(date);
+          selectedDays[getDay(stringifiedDate)] = true;
+      }
+    }
+    return new Event(
+      serverEvent.eventDate,
+      start,
+      serverEvent.groupId,
+      false,
+      serverEvent.height,
+      serverEvent.id,
+      serverEvent.title ? serverEvent.title : "",
+      serverEvent.description ? serverEvent.description :  "",
+      serverEvent.color as COLOR,
+      end,
+      duration,
+      serverEvent.groupId,
+      serverEvent.iconName as ICON,
+    );
+  }
 }
 
 
