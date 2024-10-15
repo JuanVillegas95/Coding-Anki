@@ -1,8 +1,8 @@
 "use client"
 import React from "react";
 import Image from "next/image";
-import { ContainerDiv, WrapperCenterDiv, BigTextP } from "@/utils/style.base";
-import { catError } from "@/utils/icons";
+import { ContainerDiv, WrapperCenterDiv, BigTextP } from "../utils/style.base";
+import { catError } from "../utils/icons";
 
 export default function NotFound() {
     return <WrapperCenterDiv >

@@ -1,6 +1,5 @@
 import React from 'react';
-import * as S from '@/utils/style.calendar';
-import * as F from '@/utils/functions';
+import * as S from '../utils/style.calendar';
 
 const DateInput: React.FC<{
     text: string;

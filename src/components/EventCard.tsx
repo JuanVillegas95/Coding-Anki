@@ -1,63 +1,61 @@
 import React from 'react';
-import { Event } from '@/utils/classes';
 import ShortEvent from './ShortEvent';
 import LongEvent from './LongEvent';
-import * as S from '@/utils/style.calendar';
-import * as F from '@/utils/functions';
-import * as C from '@/utils/constants';
-import * as T from '@/utils/types';
+import * as S from '../utils/style.calendar';
+import { Event, COLORS } from "@/classes/Event";
+import { MyTime } from '@/classes/MyTime';
 
 const EventCard: React.FC<{
     event: Event;
-    isEventDragging: boolean;
-    eventOnMouseDown: T.EventOnMouseDownType;
-    isLinked: boolean
-    eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
-}> = ({ event, isEventDragging, eventOnMouseDown, eventOnClick, isLinked }) => {
-    const { id, height, start, end, duration, color, title, description, groupId, isFriendEvent, icon } = event;
-    const totalMinutes = F.timeToMinutes(duration);
-    const topOffset = F.calculateTopOffset(start);
-const isShortEvent = totalMinutes < C.SHORT_DURATION_THRESHOLD;
-    const borderStyle: string = groupId ? "solid" : "dotted";
+    // isEventDragging: boolean;
+    // eventOnMouseDown: T.EventOnMouseDownType;
+    // isLinked: boolean
+    // eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
+}> = ({ event }) => {
+    const { startTime, endTime, color, title, description, icon, recurringId } = event.getAttributes();
+    const totalMinutes = event.getDurationMinutes();
+    const topOffset = startTime.getTimeInPixels();
+    const height = event.getHeight();
+    const isShortEvent = totalMinutes < Event.THRESHOLD_MINUTES;
+    const borderStyle: string = recurringId ? "solid" : "dotted";
 
     return <S.EventDiv
-        key={id}
         $fromTop={topOffset}
         $height={height}
-        $backgroundColor={C.COLORS[color].secondary}
-        $borderColor={C.COLORS[color].primary}
-        $isDragged={isEventDragging}
+        $backgroundColor={COLORS[color].secondary}
+        $borderColor={COLORS[color].primary}
+        $isDragged={false}
         $borderStyle={borderStyle}
-        onClick={(e) => eventOnClick(e, event)}
-        $isFriendEvent={isFriendEvent}
-        $isLinked={isLinked}
+        // onClick={(e) => eventOnClick(e, event)}
+        $isFriendEvent={false}
+        $isLinked={false}
     >
         <S.EventTopDiv
-            $color={isShortEvent ? "transparent" : C.COLORS[color].primary}
-            onMouseDown={(e) => eventOnMouseDown.top(e, event)}
+            $color={isShortEvent ? "transparent" : COLORS[color].primary}
+            // onMouseDown={(e) => eventOnMouseDown.top(e, event)}
             onClick={(e) => { e.stopPropagation() }}
         />
-        <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)}
-        >
+        {/* <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)} */}
+        <S.EventBodyDiv>
             {isShortEvent ?
-                <ShortEvent title={title} />
+                <ShortEvent title={title ? title : ""} />
                 :
                 <LongEvent
                     color={color}
-                    startHours={F.formatTime(start.hours)}
-                    startMinutes={F.formatTime(start.minutes)}
-                    endHours={F.formatTime(end.hours)}
-                    endMinutes={F.formatTime(end.minutes)}
+                    startHours={MyTime.formatTime(startTime.getHours())}
+                    startMinutes={MyTime.formatTime(startTime.getMinutes())}
+                    endHours={MyTime.formatTime(endTime.getHours())}
+                    endMinutes={MyTime.formatTime(endTime.getMinutes())}
                     icon={icon}
-                    title={title}
-                    description={description}
-                    isLinked={isLinked}
+                    title={title ? title : ""}
+                    description={description ? description : ""}
+                    isLinked={false}
                 />
             }
         </S.EventBodyDiv>
         <S.EventBottomDiv
             onClick={(e) => { e.stopPropagation() }}
-            onMouseDown={(e) => eventOnMouseDown.bottom(e, event)}
+        // onMouseDown={(e) => eventOnMouseDown.bottom(e, event)}
         />
     </S.EventDiv>
 };

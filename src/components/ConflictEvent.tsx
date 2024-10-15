@@ -1,11 +1,11 @@
 import React from "react";
 import LongEvent from "@/components/LongEvent";
-import { Event } from "@/utils/classes";
-import * as I from "@/utils/icons";
-import * as S from "@/utils/style.calendar";
-import * as C from "@/utils/constants";
-import * as F from "@/utils/functions";
-import { ContainerDiv, ClickableSvgDiv, MedTextP } from "@/utils/style.base";
+import { Event } from "../classes/Calendar";
+import * as I from "../utils/icons";
+import * as S from "../utils/style.calendar";
+import * as C from "../utils/constants";
+import * as F from "../utils/functions";
+import { ContainerDiv, ClickableSvgDiv, MedTextP } from "../utils/style.base";
 
 const ConflictEvent: React.FC<{
     event: Event;

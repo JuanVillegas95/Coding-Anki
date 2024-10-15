@@ -1,10 +1,35 @@
 // useToast.ts
 import { useState, useCallback, useMemo } from "react";
-import { Toast } from "@/utils/classes";
-import { TOAST_TYPE } from "@/utils/constants";
-import { TOAST_ICON } from "@/utils/constants";
-import * as S from "@/utils/style.calendar";
+import * as S from "../utils/style.calendar";
+
 import React from "react";
+import { success, info, error} from "@/utils/icons"
+
+enum TOAST_TYPE {
+    SUCCESS = "SUCCESS",
+    INFO = "INFO",
+    ERROR = "ERROR",
+}
+  
+class Toast {
+    id: string;
+    description: string;
+    type: TOAST_TYPE; 
+    // Constructor
+    constructor(id: string, description: string, type: TOAST_TYPE) { 
+      this.id = id;
+      this.description = description;
+      this.type = type;
+    }
+  
+    public static readonly TOAST_TYPE = TOAST_TYPE;
+  
+    public static readonly TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
+      [TOAST_TYPE.SUCCESS]: success,
+      [TOAST_TYPE.INFO]: info,
+      [TOAST_TYPE.ERROR]: error,
+    };
+}
 
 const useToast = () => {
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map());
@@ -56,25 +81,23 @@ const useToast = () => {
 
             if (!latestToast) return null;
 
-            return (
-                <S.ToastWrapperDiv>
-                    <S.ToastContainerDiv
-                        $isVisible={isVisible}
-                        onAnimationEndCapture={onAnimationEnd}
+            return <S.ToastWrapperDiv>
+                <S.ToastContainerDiv
+                    $isVisible={isVisible}
+                    onAnimationEndCapture={onAnimationEnd}
+                >
+                    <S.ToastIconDiv
+                        $color={"black"}
+                        $size={20}
+                        $svgSize={20}
                     >
-                        <S.ToastIconDiv
-                            $color={"black"}
-                            $size={20}
-                            $svgSize={20}
-                        >
-                            {React.createElement(TOAST_ICON[latestToast.type])}
-                        </S.ToastIconDiv>
-                        <S.ToastDescriptionP>
-                            {latestToast.description}
-                        </S.ToastDescriptionP>
-                    </S.ToastContainerDiv>
-                </S.ToastWrapperDiv>
-            );
+                        {React.createElement(Toast.TOAST_ICON[latestToast.type])}
+                    </S.ToastIconDiv>
+                    <S.ToastDescriptionP>
+                        {latestToast.description}
+                    </S.ToastDescriptionP>
+                </S.ToastContainerDiv>
+            </S.ToastWrapperDiv>
         };
 
         return ToastMessage;
@@ -83,6 +106,7 @@ const useToast = () => {
     return {
         pushToast,
         ToastComponent,
+        TOAST_TYPE,
     };
 };
 

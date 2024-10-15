@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { ClickableSvgDiv, ContainerDiv, TinyTextP, SelectOption } from "@/utils/style.base";
+import { ClickableSvgDiv, ContainerDiv, TinyTextP, SelectOption } from "../utils/style.base";
 import { SearchBar } from "@/components/SearchBar";
-import { TOAST_TYPE } from "@/utils/constants";
+import { TOAST_TYPE } from "../utils/constants";
 import useToast from "@/hooks/useToast";
 
 export const Select: React.FC<{

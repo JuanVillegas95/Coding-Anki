@@ -1,20 +1,20 @@
-import React from 'react';
-import * as S from '@/utils/style.calendar';
-import * as C from '@/utils/constants';
-import * as F from '@/utils/functions';
-
-const DaySection: React.FC<{ mondayDate: Date }> = ({ mondayDate }) => {
+import React, { useEffect } from 'react';
+import * as S from '../utils/style.calendar';
+import { MyDate } from '@/classes/MyDate';
+const DaySection: React.FC<{ monday: MyDate }> = ({ monday }) => {
+  // useEffect(() => {
+  //   console.log(monday)
+  // }, [monday])
   return (
     <S.ContainerSection>
-      {C.DAYS.map((day, i) => {
-        const dayOfTheMonth = F.addDateBy(mondayDate, i);
-        const dayOfTheMonthNumber = dayOfTheMonth.getUTCDate().toString();
-        const isToday = F.areDatesTheSame(dayOfTheMonth, new Date());
-
+      {MyDate.DAYS.map((day, i) => {
+        const temp: MyDate = new MyDate(monday.getMyDate())
+        temp.addBy(i);
+        const isToday: boolean = temp.areDatesTheSame(new Date())
         return <S.SectionDayDiv key={i}>
           <S.DayNameP>{day.slice(0, 3)}</S.DayNameP>
           <S.ContianerNumberDiv $isToday={isToday}>
-            <S.DayNumberP $isToday={isToday}>{dayOfTheMonthNumber}</S.DayNumberP>
+            <S.DayNumberP $isToday={isToday}>{temp.getMyDate().getDate()}</S.DayNumberP>
           </S.ContianerNumberDiv>
         </S.SectionDayDiv>
       })}

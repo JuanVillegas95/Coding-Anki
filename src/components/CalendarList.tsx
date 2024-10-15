@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
-import * as S from '@/utils/style.calendar';
-import * as C from '@/utils/constants';
-import { Calendar, User } from '@/utils/classes';
+import * as S from '../utils/style.calendar';
+import * as C from '../utils/constants';
+import { Calendar, User } from '../classes/Calendar';
 
 const USER: User = new User(
     "a", // Generating a unique user ID

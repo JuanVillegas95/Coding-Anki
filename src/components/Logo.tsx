@@ -1,6 +1,6 @@
 import React from "react";
-import { logo } from "@/utils/icons";
-import { LogoTextT, LogoWrapperDiv } from "@/utils/style.base";
+import { logo } from "../utils/icons";
+import { LogoTextT, LogoWrapperDiv } from "../utils/style.base";
 import Image from "next/image";
 
 const Logo: React.FC = () => (

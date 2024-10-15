@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Event } from "@/utils/classes";
+import { Event } from "../classes/Calendar";
 import ConflictEvent from "@/components/ConflictEvent";
-import * as S from "@/utils/style.calendar";
-import { ButtonInput, ContainerDiv, MedTextP } from "@/utils/style.base";
+import * as S from "../utils/style.calendar";
+import { ButtonInput, ContainerDiv, MedTextP } from "../utils/style.base";
 
 export const ConflictStatus: React.FC<{
     conflictDetails: [Event, Event[]];

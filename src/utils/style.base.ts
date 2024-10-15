@@ -1,7 +1,46 @@
 import React from 'react';
 import styled, { keyframes, css } from 'styled-components';
 import { Fredoka } from "next/font/google";
-import { USER_SELECT_NONE, HIDE_SCROLL_BAR } from "@/utils/constants"
+
+
+export const CALENDAR_WIDTH = 1150;
+export const CALENDAR_HEIGHT = 900;
+export const HEADER_HEIGHT = 90;
+export const HEADER_FONT_SIZE = 18;
+export const SUBHEADER_HEIGHT = 50;
+export const SUBHEADER_FONT_SIZE = 15;
+export const HOURS_FONT_SIZE = 12.5;
+export const DAYS_OF_THE_WEEK_HEIGHT = 70;
+
+
+
+// Peripheral events
+export const LEFT_MOUSE_CLICK = 0;
+export const ESCAPE_KEYS = ["Escape", "Esc"];
+export const ENTER_KEY = "Enter";
+
+
+
+
+
+// Scrollbar Hiding CSS
+export const HIDE_SCROLL_BAR = `
+&::-webkit-scrollbar {
+  display: none;
+}
+
+-ms-overflow-style: none;
+scrollbar-width: none;
+`;
+
+export const USER_SELECT_NONE = `
+  -webkit-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none; 
+`
+
+
 
 const fredoka = Fredoka({
     weight: ["300", "400", "500", "600", "700"],

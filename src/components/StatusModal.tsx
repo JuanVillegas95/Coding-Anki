@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
-import { Event } from '@/utils/classes';
+// import { Event } from '../classes/Calendar';
 import { ConflictStatus } from "@/components/ConflictStatus"
-import WarningModify from "@/components/WarningModify"
-import WarningDelete from "@/components/WarningDelete"
-import { STATUS } from '@/utils/constants';
-import { BigTextP, ContainerDiv, ModalContainerDiv, ModalWrapperDiv } from '@/utils/style.base';
+// import WarningModify from "@/components/WarningModify"
+// import WarningDelete from "@/components/WarningDelete"
+// import { STATUS } from '../utils/constants';
+import { BigTextP, ContainerDiv, ModalContainerDiv, ModalWrapperDiv } from '../utils/style.base';
 
 export const StatusModal: React.FC<{
-    status: STATUS,
-    conflictDetails: [Event, Event[]];
-    cancelEventRevisions: () => void;
-    commitEventRevisions: () => void;
-}> = ({ status, conflictDetails, cancelEventRevisions, commitEventRevisions }) => {
-    return <WarningLayout label={status}>
-        <div></div>
-        {status === STATUS.EVENT_CONFLICT && <ConflictStatus
-            conflictDetails={conflictDetails}
-            cancelEventRevisions={cancelEventRevisions}
-            commitEventRevisions={commitEventRevisions}
-        />}
-    </WarningLayout>
-};
+    // status: STATUS,
+    // conflictDetails: [Event, Event[]];
+    // cancelEventRevisions: () => void;
+    // commitEventRevisions: () => void;
+}> = ({
+    // status, conflictDetails, cancelEventRevisions, commitEventRevisions 
+}) => {
+        return <div></div>
+        // return <WarningLayout label={status}>
+        //     <div></div>
+        //     {status === STATUS.EVENT_CONFLICT && <ConflictStatus
+        //         conflictDetails={conflictDetails}
+        //         cancelEventRevisions={cancelEventRevisions}
+        //         commitEventRevisions={commitEventRevisions}
+        //     />}
+        // </WarningLayout>
+    };
 
 
 const WarningLayout: React.FC<{

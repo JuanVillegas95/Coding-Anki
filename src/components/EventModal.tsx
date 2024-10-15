@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import * as S from '@/utils/style.calendar';
-import * as I from '@/utils/icons';
-import * as C from '@/utils/constants';
-import * as F from '@/utils/functions';
-import * as T from '@/utils/types';
-import { Event, Toast } from '@/utils/classes';
+import * as S from '../utils/style.calendar';
+import * as I from '../utils/icons';
+import * as C from '../utils/constants';
+import * as F from '../utils/functions';
+import * as T from '../utils/types';
+import { Event, Toast } from '../classes/Calendar';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
 import DaySelector from './DaySelector';
-import { TOAST_TYPE } from '@/utils/constants';
+import { TOAST_TYPE } from '../utils/constants';
 
 const EventModal: React.FC<{
     event: React.MutableRefObject<Event | null>;
@@ -19,6 +19,7 @@ const EventModal: React.FC<{
     isModalOpen: boolean;
     closeModal: () => void;
 }> = ({ isModalOpen, closeModal, pushToast, event, setEvent, deleteEvent }) => {
+    const tempDependentId = useRef<string | null>(null); //! This dependent id for toggoling groupId
     const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
         ...event.current!,
         start: { ...event.current!.start },

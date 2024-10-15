@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import * as S from '@/utils/style.calendar';
-import { Toast } from '@/utils/classes';
-import { TOAST_ICON } from '@/utils/constants';
+import * as S from '../utils/style.calendar';
+import { Toast } from '../classes/Calendar';
+import { TOAST_ICON } from '../utils/constants';
 
 const ToastMessage: React.FC<{
     toast: Toast,

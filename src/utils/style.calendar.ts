@@ -1,6 +1,36 @@
-import * as C from "@/utils/constants"
-import styled, { keyframes, css } from 'styled-components';
-import * as S from "@/utils/style.base"
+import styled, { keyframes, css } from "styled-components";
+import { MyTime } from "@/classes/MyTime";
+import * as S from "./style.base"
+
+export const CALENDAR_WIDTH = 1150;
+export const CALENDAR_HEIGHT = 900;
+export const HEADER_HEIGHT = 90;
+export const HEADER_FONT_SIZE = 18;
+export const SUBHEADER_HEIGHT = 50;
+export const SUBHEADER_FONT_SIZE = 15;
+export const HOURS_FONT_SIZE = 12.5;
+export const DAYS_OF_THE_WEEK_HEIGHT = 70;
+
+export const LEFT_MOUSE_CLICK = 0;
+export const ESCAPE_KEYS = ["Escape", "Esc"];
+export const ENTER_KEY = "Enter";
+
+export const HIDE_SCROLL_BAR = `
+&::-webkit-scrollbar {
+  display: none;
+}
+
+-ms-overflow-style: none;
+scrollbar-width: none;
+`;
+
+export const USER_SELECT_NONE = `
+  -webkit-user-select: none;
+  -moz-user-select: none; 
+  -ms-user-select: none; 
+  user-select: none; 
+`
+
 
 
 const CalendarWrapperDiv = styled(S.WrapperCenterDiv)`
@@ -10,18 +40,18 @@ const CalendarWrapperDiv = styled(S.WrapperCenterDiv)`
 
 
 const CalendarContainerDiv = styled.div`
-  width: ${C.CALENDAR_WIDTH}px;
-  height: ${C.CALENDAR_HEIGHT}px;
+  width: ${CALENDAR_WIDTH}px;
+  height: ${CALENDAR_HEIGHT}px;
   margin-left: 30px;
   padding-bottom: 5px;
   border-radius: 12px;
   background-color: white;
   display: grid;
-  grid-template-rows: ${C.HEADER_HEIGHT}px ${C.DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
-  grid-template-columns: ${C.HOUR_WIDTH}px 1fr;
+  grid-template-rows: ${HEADER_HEIGHT}px ${DAYS_OF_THE_WEEK_HEIGHT}px 1fr; 
+  grid-template-columns: ${MyTime.HOURS_WIDTH_PIXELS}px 1fr;
   grid-template-areas: "header header" "aside subheader" "aside main";
 
-  ${C.HIDE_SCROLL_BAR} 
+  ${HIDE_SCROLL_BAR} 
   @media print {
     position: absolute;
     left: -10px;
@@ -159,14 +189,14 @@ const ContainerAside = styled.aside`
   text-align: center; 
   align-items: center; 
   justify-items: center; 
-  margin-top: ${C.DAYS_OF_THE_WEEK_HEIGHT - 7}px;
+  margin-top: ${DAYS_OF_THE_WEEK_HEIGHT - 7}px;
   overflow-y: scroll;
-  ${C.HIDE_SCROLL_BAR} 
+  ${HIDE_SCROLL_BAR} 
 `;
 
 const ContainerSection = styled.section`
   grid-area: subheader;
-  height: ${C.SUBHEADER_HEIGHT}px;
+  height: ${SUBHEADER_HEIGHT}px;
   align-items: center; 
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -208,7 +238,7 @@ const ContainerMain = styled.main`
   margin-right: 15px;
   position: relative;
   overflow-y: scroll;
-  ${C.HIDE_SCROLL_BAR}
+  ${HIDE_SCROLL_BAR}
     display: grid;
   grid-template-columns: repeat(7, 1fr);
   position: relative;
@@ -228,15 +258,15 @@ const CellColumnDiv = styled.div`
 `;
 
 const CellDiv = styled.div`
-  height: calc(${C.HOUR_HEIGHT}px / 2);
+  height: calc(${MyTime.HOURS_HEIGHT_PIXELS}px / 2);
   box-shadow: .3px .2px 0 0 slategray;
 `;
 
 const HourDiv = styled.div<{ $marginBottom: number; $isEven: boolean }>`
   font-family: 'Poppins', sans-serif;
-  font-size: ${C.HOURS_FONT_SIZE}px;
+  font-size: ${HOURS_FONT_SIZE}px;
   font-weight: 550;
-  height: ${C.HOUR_HEIGHT / 2}px;
+  height: ${MyTime.HOURS_HEIGHT_PIXELS / 2}px;
   margin-bottom: ${({ $marginBottom }) => $marginBottom}px;
   color: ${({ $isEven }) => ($isEven ? '#A9A9A9' : 'black')};
   box-sizing: border-box;
@@ -334,7 +364,7 @@ const ModalTextArea = styled.textarea.attrs({rows: 5, placeholder: "Description"
   resize: none;
   width: 100%;
   padding: 10px;
-  ${C.HIDE_SCROLL_BAR}
+  ${HIDE_SCROLL_BAR}
 `;
 
 const Row3Div = styled.div`
@@ -874,7 +904,7 @@ const FriendContainerDiv = styled.div`
 const MenuWrapperAside = styled.aside`
   width: 200px;
   margin-right: 30px;
-  height: ${C.CALENDAR_HEIGHT}px;
+  height: ${CALENDAR_HEIGHT}px;
 `
 
 const slideInFromBottom = keyframes`
@@ -1037,7 +1067,7 @@ const CalendarListContainerDiv = styled.div`
   overflow-y: scroll;
   flex: 1;
   height: 100%;
-  ${C.HIDE_SCROLL_BAR};
+  ${HIDE_SCROLL_BAR};
 `
 
 const FriendsContainerDiv = styled(CalendarListContainerDiv)`

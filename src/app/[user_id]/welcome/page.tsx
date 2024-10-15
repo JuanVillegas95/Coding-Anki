@@ -1,10 +1,10 @@
 "use client"
 import React, { useState } from "react";
-import { welcome } from "@/utils/icons";
+import { welcome } from "../../../utils/icons";
 import Image from "next/image";
-import { TOAST_TYPE } from "@/utils/constants";
+import { TOAST_TYPE } from "../../../utils/constants";
 import { useRouter } from "next/navigation";
-import { WrapperCenterDiv, ContainerDiv, MedTextP, SmallTextP, HugeTextP } from "@/utils/style.base"
+import { WrapperCenterDiv, ContainerDiv, MedTextP, SmallTextP, HugeTextP } from "../../../utils/style.base"
 import useToast from "@/hooks/useToast";
 import { SearchBar } from "@/components/SearchBar";
 export default function Welcome() {

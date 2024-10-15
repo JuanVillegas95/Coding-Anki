@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { brownCat, whiteCat, appTitle, acctually, cross } from "@/utils/icons";
-import { WrapperCenterDiv, ContainerDiv, ButtonInput, MedTextP, ModalWrapperDiv, ModalContainerDiv, CrossIconDiv, ListLi, ListOl, BigTextP, SmallTextP } from "@/utils/style.base"
+import { brownCat, whiteCat, appTitle, acctually, cross } from "../utils/icons";
+import { WrapperCenterDiv, ContainerDiv, ButtonInput, MedTextP, ModalWrapperDiv, ModalContainerDiv, CrossIconDiv, ListLi, ListOl, BigTextP, SmallTextP } from "../utils/style.base"
 
 
 export default function Home() {

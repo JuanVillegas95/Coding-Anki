@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getConnection } from "@/server/oracledb";
 import OracleDB from "oracledb";
-import { ServerCalendarEventRow, ServerCalendar, ServerEvent } from "@/utils/types"
+import { ServerCalendarEventRow, ServerCalendar, ServerEvent } from "../../../../utils/types"
 
 export async function GET(request: Request, { params }: { params: { user_id: string } }) {
   const userId: string = params.user_id;
@@ -64,7 +64,7 @@ export async function GET(request: Request, { params }: { params: { user_id: str
             topOffset: row.TOP_OFFSET,
             groupId: row.GROUP_ID,
             startDate: row.START_DATE,
-            endDate: row.END_DATE,
+            endDate: row.END_DATE
           });
         }
       });

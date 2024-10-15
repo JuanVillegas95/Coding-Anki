@@ -1,15 +1,14 @@
 import React from 'react';
-import * as S from '@/utils/style.calendar';
-import * as I from '@/utils/icons';
-import * as C from "@/utils/constants"
-
+import * as S from '../utils/style.calendar';
+import * as I from '../utils/icons';
+import { ICONS, ICON, COLOR, COLORS } from '@/classes/Event';
 const LongEvent: React.FC<{
-    color: string;
+    color: COLOR;
     startHours: string;
     startMinutes: string;
     endHours: string;
     endMinutes: string;
-    icon: string;
+    icon: ICON;
     title: string;
     description: string;
     isLinked: boolean;
@@ -17,11 +16,11 @@ const LongEvent: React.FC<{
     return (
         <S.ContainerLongEventDiv>
             <S.LongEventHeader
-                $color={C.COLORS[color].primary}
+                $color={COLORS[color].primary}
                 $isLinked={isLinked}
             >
                 {!isLinked && <S.LongEventIconDiv $color={'white'} $size={13} $svgSize={13}>
-                    {React.createElement(C.ICONS[icon])}
+                    {React.createElement(ICONS[icon])}
                 </S.LongEventIconDiv>}
                 <S.LongEventTimeDiv $isLinked={isLinked}>
                     <S.LongEventStartDiv $isLinked={isLinked}>
@@ -39,8 +38,8 @@ const LongEvent: React.FC<{
             <S.LongEventBodyDiv>
                 <S.LongEventTitleP>{title}</S.LongEventTitleP>
                 <S.LongEventDescriptionP>{description}</S.LongEventDescriptionP>
-                <S.LongEventIconBodyDiv $color={C.COLORS[color].tertiary} $size={40} $svgSize={40}>
-                    {React.createElement(C.ICONS[icon])}
+                <S.LongEventIconBodyDiv $color={COLORS[color].tertiary} $size={40} $svgSize={40}>
+                    {React.createElement(ICONS[icon])}
                 </S.LongEventIconBodyDiv>
             </S.LongEventBodyDiv>
         </S.ContainerLongEventDiv>

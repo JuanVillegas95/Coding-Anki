@@ -1,5 +1,5 @@
 import React from "react";
-import { ContainerDiv, TextInput, ButtonInput } from "@/utils/style.base";
+import { ContainerDiv, TextInput, ButtonInput } from "../utils/style.base";
 
 export const SearchBar: React.FC<{
     onClick?: () => void;
