@@ -5,7 +5,8 @@ import { Event } from "@/classes/Event";
 import { MyDate, stringifiedDate } from "@/classes/MyDate"
 import { MyTime, hoursMinutes, pixels } from '@/classes/MyTime';
 import { RecurringDetails } from "@/classes/RecurringDetails"
-
+import { HourLine } from './HourLine';
+import EventModal from './EventModal'
 const LEFT_MOUSE_CLICK: number = 0;
 
 const ScheduleGridMain: React.FC<{
@@ -17,20 +18,23 @@ const ScheduleGridMain: React.FC<{
     // isLinked: boolean;
 }> = ({ mainRef, monday, setEvent, getEvents }) => {
     const columnDivRefs: React.RefObject<HTMLDivElement>[] = new Array(7).fill(null).map(() => useRef<HTMLDivElement>(null));
+    const [isEventModal, setIsEventModal] = useState<boolean>(false);
     const [isCreate, setIsCreate] = useState<boolean>(false);
     const [isDrag, setIsDrag] = useState<boolean>(false);
     const [isTop, setIsTop] = useState<boolean>(false);
     const [isBot, setIsBot] = useState<boolean>(false);
+    const dragThreshold = useRef<boolean>(false);
     const event = useRef<Event | null>(null);
 
-    // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    // const dragThreshold = useRef<boolean>(false);
 
-    // const closeModal = (): void => {
-    //     setIsModalOpen(false);
-    //     event.current = null
-    // };
-    // const openModal = (): void => setIsModalOpen(true);
+    const closeModal = (): void => {
+        event.current = null;
+        setIsEventModal(false)
+    };
+
+    const openModal = (): void => {
+        setIsEventModal(true)
+    };
 
     const createOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, columnDate: MyDate) => {
         e.preventDefault(); e.stopPropagation();
@@ -47,14 +51,14 @@ const ScheduleGridMain: React.FC<{
     const topOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => {
         e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK) return;
-        event.current = eventToResize.clone();
+        event.current = eventToResize;
         setIsTop(true)
     }
 
     const botOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => {
         e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK) return;
-        event.current = eventToResize.clone();
+        event.current = eventToResize;
         setIsBot(true)
     }
 
@@ -62,7 +66,7 @@ const ScheduleGridMain: React.FC<{
         e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK) return;
         // dragThreshold.current = false;
-        event.current = eventToDrag.clone();
+        event.current = eventToDrag;
         setIsDrag(true);
     };
 
@@ -96,7 +100,6 @@ const ScheduleGridMain: React.FC<{
         if (e.button !== LEFT_MOUSE_CLICK || !isBot || !event.current) return;
 
         const clonedEvent: Event = event.current.clone();
-
         const distanceFromTop: pixels = (e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top);
         clonedEvent.setEndTime(new MyTime(distanceFromTop));
 
@@ -108,27 +111,23 @@ const ScheduleGridMain: React.FC<{
     const dragOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[], colRef: React.RefObject<HTMLDivElement>) => {
         e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK || !isDrag || !event.current) return;
+
         // dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= DRAG_THRESHOLD);
         // if (!dragThreshold.current) return;
 
         const clonedEvent: Event = event.current.clone();
-
         const enterDayWeek: number = parseInt(colRef.current!.dataset.key as string);
         const distanceFromTop: pixels = e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top;
-        const { startTime, endTime }: { startTime: MyTime, endTime: MyTime } = clonedEvent.getTimeOnDrag(distanceFromTop);
-
+        clonedEvent.adjustTime(distanceFromTop);
         clonedEvent.adjustDate(enterDayWeek);
-        clonedEvent.setStartTime(startTime);
-        clonedEvent.setEndTime(endTime);
 
         if (!clonedEvent.isValid(events)) return;
 
-        // Update with the cloned event
         setEvent(clonedEvent, null);
     };
 
     const stopAction = (): void => {
-        // if (isCreate && event.current) openModal();
+        if (isCreate && event.current) openModal();
         setIsBot(false);
         setIsDrag(false);
         setIsTop(false);
@@ -142,13 +141,11 @@ const ScheduleGridMain: React.FC<{
         else if (isDrag) dragOnMouseMove(e, events, colRef);
     };
 
-
-    // const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, clickedEvent: Event): void => {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     event.current = clickedEvent;
-    //     openModal();
-    // };
+    const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, clickedEvent: Event): void => {
+        e.preventDefault(); e.stopPropagation();
+        event.current = clickedEvent;
+        openModal();
+    };
 
 
     return <S.ContainerMain
@@ -177,26 +174,23 @@ const ScheduleGridMain: React.FC<{
                             topOnMouseDown={topOnMouseDown}
                             botOnMouseDown={botOnMouseDown}
                             dragOnMouseDown={dragOnMouseDown}
-                        // isEventDragging={isEventDragging}
-                        // eventOnMouseDown={eventOnMouseDown}
-                        // eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
+                            isDrag={isDrag}
+                            eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
                         // isLinked={isLinked}
                         />
                     ))}
                 </S.CellColumnDiv>
             })
         }
-        {/* <S.HourLineDiv
-            $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}
-        /> */}
-        {/* {isModalOpen && <EventModal
-            isModalOpen={isModalOpen}
+        <HourLine />
+        {isEventModal && <EventModal
+            isEventModal={isEventModal}
             closeModal={closeModal}
             event={event}
-            pushToast={pushToast}
+            // pushToast={pushToast}
             setEvent={setEvent}
-            deleteEvent={deleteEvent}
-        />} */}
+        // deleteEvent={deleteEvent}
+        />}
 
     </S.ContainerMain >
 

@@ -1,6 +1,9 @@
 import { MyDate } from "@/classes/MyDate";
 import { eventId } from "@/classes/Event";
 
+export type recurringId = string | null;
+
+
 export class RecurringDetails {
     private eventIds: Set<eventId>; 
     private startDate: MyDate;
@@ -8,9 +11,9 @@ export class RecurringDetails {
     private selectedDays: boolean[];
 
     constructor(
-        eventIds: Set<eventId> = new Set(),
         startDate: MyDate,
         endDate: MyDate,
+        eventIds: Set<eventId> = new Set(),
         selectedDays: boolean[] = Array(7).fill(false) // Corrected syntax here
     ){
         this.eventIds = eventIds;

@@ -1,11 +1,10 @@
 import { MyTime, pixels } from "@/classes/MyTime"
 import { MyDate } from "@/classes/MyDate"
-import { RecurringDetails } from "@/classes/RecurringDetails";
+import { recurringId } from "@/classes/RecurringDetails";
 import { bell, cart, heart, star, mark, phone, information, coke, meh } from "@/utils/icons"
 import { v4 as uuidv4 } from "uuid";
 
 export type eventId = string;
-export type recurringId = string | null;
 export type EventAttributes = {
   eventId: eventId,
   recurringId: recurringId,
@@ -111,11 +110,12 @@ export class Event {
       return true;
     }
 
-    public getTimeOnDrag(distanceFromTop: pixels): {startTime: MyTime, endTime: MyTime} {
+    public adjustTime(distanceFromTop: pixels): void {
       const padding: pixels = this.getHeight() / 2;
       const startTime: MyTime = new MyTime(distanceFromTop - padding);
       const endTime: MyTime = new MyTime (startTime.getTimeInPixels() + this.getHeight());
-      return { startTime, endTime };
+      this.setStartTime(startTime);
+      this.setEndTime(endTime);
     };
 
     public adjustDate(enterDatWeek: number): void {

@@ -6,16 +6,16 @@ import { Event, COLORS } from "@/classes/Event";
 import { MyTime } from '@/classes/MyTime';
 
 const EventCard: React.FC<{
+    eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
     topOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => void;
     botOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => void;
     dragOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToDrag: Event) => void;
     event: Event;
-
+    isDrag: boolean;
 
     // eventOnMouseDown: T.EventOnMouseDownType;
     // isLinked: boolean
-    // eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
-}> = ({ event, topOnMouseDown, botOnMouseDown, dragOnMouseDown }) => {
+}> = ({ event, topOnMouseDown, botOnMouseDown, dragOnMouseDown, isDrag, eventOnClick }) => {
     const { startTime, endTime, color, title, description, icon, recurringId } = event.getAttributes();
     const totalMinutes = event.getDurationMinutes();
     const topOffset = startTime.getTimeInPixels();
@@ -28,9 +28,9 @@ const EventCard: React.FC<{
         $height={height}
         $backgroundColor={COLORS[color].secondary}
         $borderColor={COLORS[color].primary}
-        $isDragged={false}
+        $isDragged={isDrag}
         $borderStyle={borderStyle}
-        // onClick={(e) => eventOnClick(e, event)}
+        onClick={(e) => eventOnClick(e, event)}
         $isFriendEvent={false}
         $isLinked={false}
     >
@@ -38,7 +38,6 @@ const EventCard: React.FC<{
             $color={isShortEvent ? "transparent" : COLORS[color].primary}
             onMouseDown={(e) => topOnMouseDown(e, event)}
         />
-        {/* <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)} */}
         <S.EventBodyDiv onMouseDown={(e) => dragOnMouseDown(e, event)}>
             {isShortEvent ?
                 <ShortEvent title={title ? title : ""} />

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Events } from "@/classes/Events"
 import { Event, eventId } from "@/classes/Event";
-import { RecurringDetails } from "@/classes/RecurringDetails";
+import { RecurringDetails, recurringId } from "@/classes/RecurringDetails";
 import { disk, replace, confetti, trash, users, download, upload, print, interrogation } from "@/utils/icons";
 import { stringifiedDate } from "@/classes/MyDate";
 
@@ -47,6 +47,8 @@ export class Calendar {
 
   public getEventsByDate(date: stringifiedDate): Event[] { return this.events.getEventsByDate(date); };
   
+  public getRecurringDetails(recurringId: recurringId): RecurringDetails | null { return this.events.getRecurringDetails(recurringId)}
+
   // public clearEventStates(): void {
   //   this.eventsToAdd = [];
   //   this.eventsToDelete = [];

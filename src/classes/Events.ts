@@ -1,6 +1,6 @@
-import { eventId, recurringId, Event } from "@/classes/Event";
+import { eventId, Event } from "@/classes/Event";
 import { stringifiedDate } from "@/classes/MyDate";
-import { RecurringDetails } from "@/classes/RecurringDetails";
+import { RecurringDetails, recurringId } from "@/classes/RecurringDetails";
 
 
 export class Events {
@@ -27,6 +27,11 @@ export class Events {
     this.collidingEvents = [];
   };
 
+  public getRecurringDetails(recurringId: recurringId): RecurringDetails | null {
+    if(!this.recurringDetailsMap.has(recurringId)) return null;
+    return this.recurringDetailsMap.get(recurringId)!;
+  }
+
   public getEventsByDate(date: stringifiedDate): Event[] {
     const events: Event[] = [];
     const eventIdsCopy: Set<eventId> | undefined = this.eventIdsMap.get(date);
@@ -40,7 +45,6 @@ export class Events {
 
   public hasEvent(eventId: eventId): boolean { return this.eventsMap.has(eventId); };
 
-  //! If is the first time adding a groupEvent you shall give the recurringDetails with the info loaded
   public addEvent(newEvent: Event, recurringDetails: RecurringDetails | null): void {
     const eventId: eventId = newEvent.getEventId();
     const stringifiedDate: stringifiedDate = newEvent.getDate().getStringifiedDate();
@@ -64,7 +68,6 @@ export class Events {
     const stringifiedDate: stringifiedDate = eventToDelete.getDate().getStringifiedDate();
     const recurringId: recurringId = eventToDelete.getRecurringId();
 
-    // Deleting in recurringDetailsMap
     if(recurringId) {
       const recurringDetailsCopy: RecurringDetails = this.recurringDetailsMap.get(recurringId)!
       recurringDetailsCopy.deleteEventId(eventId);
@@ -93,9 +96,7 @@ export class Events {
     if(!recurringDetails){
       const oldDay: string =  exisitngEvent.getDate().getStringifiedDate();
       const newDay: string =  updatedEvent.getDate().getStringifiedDate();
-      console.log(oldDay, newDay)
       if(oldDay !== newDay){
-        console.log("hi")
 
         const eventIdsCopy: Set<eventId> = this.eventIdsMap.get(oldDay)!
         eventIdsCopy.delete(eventId)
@@ -103,14 +104,13 @@ export class Events {
 
         if (!(this.eventIdsMap.has(newDay))) this.eventIdsMap.set(newDay, new Set([eventId]));
         else this.eventIdsMap.get(newDay)!.add(eventId);
-  
-
-        
       }
       this.eventsMap.set(eventId, updatedEvent);
+      console.log("The following event was updated", updatedEvent.getSummary());
+      return;
     }
-
-    // console.log("The following event was updated", updatedEvent.getSummary());
+    
+    
   };
 };
 
@@ -123,18 +123,3 @@ export enum STATUS {
   EVENT_DELETE = "Recurring Event Delete", 
 }
 
-// export const getConflictingEvents = (newEvent: Event, events: Event[]): Event[] => {
-//   const conflictingEvents: Event[] = [];
-//   const newEventStartMinutes = timeToMinutes(newEvent.start);
-//   const newEventEndMinutes = timeToMinutes(newEvent.end);
-
-//   for (const event of events) {
-//     if (newEvent.id === event.id) continue;
-//     const eventStartMinutes = timeToMinutes(event.start);
-//     const eventEndMinutes = timeToMinutes(event.end);
-
-//     if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes)conflictingEvents.push(event);
-//   }
-
-//   return conflictingEvents; 
-// };

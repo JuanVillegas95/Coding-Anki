@@ -1,43 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as S from '../utils/style.calendar';
 import * as I from '../utils/icons';
-import * as C from '../utils/constants';
-import * as F from '../utils/functions';
-import * as T from '../utils/types';
-import { Event, Toast } from '../classes/Calendar';
 import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
 import DaySelector from './DaySelector';
-import { TOAST_TYPE } from '../utils/constants';
+import { COLOR, COLORS, Event, ICON, ICONS, recurringId } from "@/classes/Event";
+import { RecurringDetails } from "@/classes/RecurringDetails";
+import { MyDate } from '@/classes/MyDate';
 
 const EventModal: React.FC<{
+    setEvent: (eventToSet: Event, recurringDetails: RecurringDetails | null) => void;
     event: React.MutableRefObject<Event | null>;
-    setEvent: (event: Event) => void;
-    deleteEvent: (event: Event) => void;
-    pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
-    isModalOpen: boolean;
+    // deleteEvent: (event: Event) => void;
+    // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
+    isEventModal: boolean;
     closeModal: () => void;
-}> = ({ isModalOpen, closeModal, pushToast, event, setEvent, deleteEvent }) => {
-    const tempDependentId = useRef<string | null>(null); //! This dependent id for toggoling groupId
-    const [currentEvent, setCurrentEvent] = useState<Event>({ // Deep copying nested objects
-        ...event.current!,
-        start: { ...event.current!.start },
-        end: { ...event.current!.end },
-        selectedDays: [...event.current!.selectedDays]
-    })
+}> = ({ isEventModal, closeModal, event, setEvent }) => {
+    const [currEvent, setCurrEvent] = useState<Event>(event.current!.clone())
+    const [currRecurringDetails, setCurrRecurringDetails] = useState<RecurringDetails | null>(null)
+    const tempRecurringId = useRef<recurringId>(event.current!.getRecurringId());
+
 
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
 
-    useEffect(() => {
-        const handleKeyboardEvent = (e: KeyboardEvent) => {
-            if (C.ESCAPE_KEYS.includes(e.key) && isModalOpen) closeModal();
-        };
+    // useEffect(() => {
+    //     const handleKeyboardEvent = (e: KeyboardEvent) => {
+    //         if (C.ESCAPE_KEYS.includes(e.key) && isModalOpen) closeModal();
+    //     };
 
-        window.addEventListener('keydown', handleKeyboardEvent);
-        return () => window.removeEventListener('keydown', handleKeyboardEvent);
-    }, [isModalOpen]);
+    //     window.addEventListener('keydown', handleKeyboardEvent);
+    //     return () => window.removeEventListener('keydown', handleKeyboardEvent);
+    // }, [isModalOpen]);
 
     const toggleIconMenu = () => {
         if (isColorMenu) setIsColorMenu(false);
@@ -51,127 +46,122 @@ const EventModal: React.FC<{
 
     const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const title = e.target.value;
-        if (title.length > 40) {
-            pushToast(
-                "Invalid title length",
-                "Event title must be under 40 characters.",
-                C.TOAST_TYPE.INFO,
-            );
-            return;
-        }
-        setCurrentEvent({ ...currentEvent, title })
+        // if (title.length > 40) {
+        //     pushToast(
+        //         "Invalid title length",
+        //         "Event title must be under 40 characters.",
+        //         C.TOAST_TYPE.INFO,
+        //     );
+        //     return;
+        // }
+        const clonedEvent: Event = currEvent.clone();
+        clonedEvent.setTitle(title)
+        setCurrEvent(clonedEvent)
     };
 
-    const handleIcon = (icon: string): void => { setCurrentEvent({ ...currentEvent, icon }) };
-    const handleColor = (color: string): void => { setCurrentEvent({ ...currentEvent, color }) };
+    const handleIcon = (icon: ICON): void => {
+        const clonedEvent: Event = currEvent.clone();
+        clonedEvent.setIcon(icon)
+        setCurrEvent(clonedEvent)
+    };
+    const handleColor = (color: COLOR): void => {
+        const clonedEvent: Event = currEvent.clone();
+        clonedEvent.setColor(color)
+        setCurrEvent(clonedEvent)
+    };
 
     const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const description = e.target.value;
-        if (description.length > 200) {
-            pushToast(
-                "Invalid description",
-                "Event description must be under 200 characters.",
-                C.TOAST_TYPE.INFO
-            );
-            return;
-        }
-        setCurrentEvent({ ...currentEvent, description })
+        // if (description.length > 200) {
+        //     pushToast(
+        //         "Invalid description",
+        //         "Event description must be under 200 characters.",
+        //         C.TOAST_TYPE.INFO
+        //     );
+        //     return;
+        // }
+        const clonedEvent: Event = currEvent.clone();
+        clonedEvent.setDescription(description);
+        setCurrEvent(clonedEvent);
     };
 
     const handleTime = (e: React.ChangeEvent<HTMLSelectElement>, tag: string): void => {
         const value = parseInt(e.target.value);
 
-        const updatedEvent: Event = {
-            ...currentEvent,
-            start: { ...currentEvent.start },
-            end: { ...currentEvent.end },
-        };
+        const clonedEvent: Event = currEvent.clone();
 
         switch (tag) {
-            case 'StartHour': { updatedEvent.start.hours = value; } break;
-            case 'StartMinute': { updatedEvent.start.minutes = value; } break;
-            case 'EndHour': { updatedEvent.end.hours = value; } break;
-            case 'EndMinute': { updatedEvent.end.minutes = value; } break;
+            case 'StartHour': { clonedEvent.getStartTime().setHours(value); } break;
+            case 'StartMinute': { clonedEvent.getStartTime().setMinutes(value); } break;
+            case 'EndHour': { clonedEvent.getStartTime().setHours(value); } break;
+            case 'EndMinute': { clonedEvent.getStartTime().setMinutes(value); } break;
         }
 
-        updatedEvent.duration = F.calculateEventDuration(updatedEvent);
-        updatedEvent.height = F.calculateEventHeight(updatedEvent);
-        //! Bananas
-        // const newConflictEvents: Event[] = F.getConflictingEvents(updatedEvent, events);
+        setCurrEvent(clonedEvent)
+    };
 
-        // ! CHECK THIS
-        // if (newConflictEvents.length > 0) {
-        //     warningHandeler.set(new Warning(C.WARNING_STATUS.EVENT_CONFLICT, updatedEvent, newConflictEvents))
-        //     closeModal();
-        //     return;
-        // }
+    const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
+        e.preventDefault();
 
-        setCurrentEvent(updatedEvent)
+        const clonedEvent: Event = currEvent.clone();
+
+        if (!tempRecurringId.current) tempRecurringId.current = uuidv4();
+        if (clonedEvent.getRecurringId()) clonedEvent.setRecurringId(null);
+        else clonedEvent.setRecurringId(tempRecurringId.current)
+        const startDate: MyDate = new MyDate(currEvent.getDate().getMyDate());
+        const endDate: MyDate = new MyDate(MyDate.NULL);
+        setCurrRecurringDetails(new RecurringDetails(startDate, endDate))
     };
 
     const handleDate = (e: React.ChangeEvent<HTMLInputElement>, label: string): void => {
-        // Extract year, month, and day from the input
         const date: string = e.target.value;
-        const updatedEvent: Event = { ...currentEvent };
+        // const clonedEvent: Event = currentEvent.clone();
 
-        if (label === "Start") updatedEvent.startDate = date;
-        if (label === "End") updatedEvent.endDate = date;
+        // if (label === "Start") updatedEvent.startDate = date;
+        // if (label === "End") updatedEvent.endDate = date;
 
-        const startDate: Date = F.parseDateStringToUTC(updatedEvent.startDate)
-        const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
+        // const startDate: Date = F.parseDateStringToUTC(updatedEvent.startDate)
+        // const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
 
-        if (startDate >= endDate) {
-            pushToast(
-                "Handle date",
-                "The start date cannot be after the end date",
-                C.TOAST_TYPE.INFO
-            );
-            return;
-        }
+        // if (startDate >= endDate) {
+        //     pushToast(
+        //         "Handle date",
+        //         "The start date cannot be after the end date",
+        //         C.TOAST_TYPE.INFO
+        //     );
+        //     return;
+        // }
 
-        if (updatedEvent.endDate) {
-            const dateDifference = endDate.getTime() - startDate.getTime();
-            if (dateDifference > C.ONE_YEAR_IN_MS) {
-                pushToast(
-                    "Handle date",
-                    "The event duration cannot be greater than one year.",
-                    C.TOAST_TYPE.INFO
-                );
-                return;
-            }
-        }
+        // if (updatedEvent.endDate) {
+        //     const dateDifference = endDate.getTime() - startDate.getTime();
+        //     if (dateDifference > C.ONE_YEAR_IN_MS) {
+        //         pushToast(
+        //             "Handle date",
+        //             "The event duration cannot be greater than one year.",
+        //             C.TOAST_TYPE.INFO
+        //         );
+        //         return;
+        //     }
+        // }
 
-        setCurrentEvent(updatedEvent)
+        // setCurrentEvent(updatedEvent)
     };
 
 
     const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
-        const isSelected: boolean = e.target.checked;
-        const updatedEvent: Event = { ...currentEvent, selectedDays: [...currentEvent.selectedDays] };
-        updatedEvent.selectedDays[index] = isSelected;
-        setCurrentEvent(updatedEvent)
+        // const isSelected: boolean = e.target.checked;
+        // const updatedEvent: Event = { ...currentEvent, selectedDays: [...currentEvent.selectedDays] };
+        // updatedEvent.selectedDays[index] = isSelected;
+        // setCurrentEvent(updatedEvent)
     };
 
 
-    const handleRecurringEvent = (e: React.MouseEvent<HTMLButtonElement>): void => {
-        e.preventDefault();
-        const updatedEvent: Event = {
-            ...currentEvent,
-            groupId: currentEvent.groupId,
-            storedGroupId: currentEvent.storedGroupId,
-        };
 
-        if (!updatedEvent.storedGroupId) updatedEvent.storedGroupId = uuidv4();
-        if (updatedEvent.groupId) updatedEvent.groupId = null;
-        else updatedEvent.groupId = updatedEvent.storedGroupId;
-
-        setCurrentEvent(updatedEvent)
-    };
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        deleteEvent(currentEvent);
-        closeModal();
+        // e.preventDefault();
+        // deleteEvent(currentEvent);
+        // closeModal();
     };
 
     const handleCloseModal = () => {
@@ -182,25 +172,26 @@ const EventModal: React.FC<{
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (currentEvent.groupId) {
-            if (!currentEvent.endDate) {
-                pushToast(
-                    "Handle end time",
-                    "End time must be valid",
-                    C.TOAST_TYPE.INFO
-                );
-                return;
-            }
-        }
-        if (F.isEndBeforeStart(currentEvent)) {
-            pushToast(
-                "Handle time",
-                "The end time cannot be before the start time",
-                C.TOAST_TYPE.INFO
-            );
-            return;
-        }
-        setEvent(currentEvent);
+        // if (currentEvent.groupId) {
+        //     if (!currentEvent.endDate) {
+        //         pushToast(
+        //             "Handle end time",
+        //             "End time must be valid",
+        //             C.TOAST_TYPE.INFO
+        //         );
+        //         return;
+        //     }
+        // }
+        // if (F.isEndBeforeStart(currentEvent)) {
+        //     pushToast(
+        //         "Handle time",
+        //         "The end time cannot be before the start time",
+        //         C.TOAST_TYPE.INFO
+        //     );
+        //     return;
+        // }
+        if (!currRecurringDetails) setEvent(currEvent, null);
+        else setEvent(currEvent, currRecurringDetails);
         closeModal();
     }
 
@@ -211,14 +202,14 @@ const EventModal: React.FC<{
                 {React.createElement(I.cross)}
             </S.ModalCloseButton>
             <S.Row1Div>
-                <S.TitleInput value={currentEvent.title} onChange={handleTitle} />
+                <S.TitleInput value={currEvent.getTitle() ?? ""} onChange={handleTitle} />
                 <S.IconMenuButton $size={50} $svgSize={25} onClick={toggleIconMenu}>
-                    {React.createElement(C.ICONS[currentEvent.icon])}
+                    {React.createElement(ICONS[currEvent.getIcon()])}
                     {isIconMenu && (
                         <S.ContainerMenuDiv $block={isIconMenu ? 'block' : 'none'}>
                             <S.MenuItemDiv>
-                                {Object.entries(C.ICONS).map(([iconName, IconComponent], index: number) => (
-                                    <S.ItemButton key={index} $size={49} $svgSize={30} onClick={() => handleIcon(iconName)}>
+                                {Object.entries(ICONS).map(([iconName, IconComponent], index: number) => (
+                                    <S.ItemButton key={index} $size={49} $svgSize={30} onClick={() => handleIcon(iconName as ICON)}>
                                         {React.createElement(IconComponent)}
                                     </S.ItemButton>
                                 ))}
@@ -227,15 +218,15 @@ const EventModal: React.FC<{
                     )}
                 </S.IconMenuButton>
                 <S.IconMenuButton $size={50} $svgSize={25} onClick={toggleColorMenu}>
-                    <S.colorDivFirst $color={C.COLORS[currentEvent.color].primary} />
+                    <S.colorDivFirst $color={COLORS[currEvent.getColor()].primary} />
                     {isColorMenu && (
                         <S.ContainerMenuDiv $block={isColorMenu ? 'block' : 'none'}>
                             <S.MenuItemDiv>
-                                {Object.entries(C.COLORS).map(([colorName, order], index: number) => (
+                                {Object.entries(COLORS).map(([colorName, order], index: number) => (
                                     <S.ItemButton
                                         key={index}
                                         $size={49}
-                                        $svgSize={25} onClick={() => handleColor(colorName)} >
+                                        $svgSize={25} onClick={() => handleColor(currEvent.getColor())} >
                                         <S.colorDiv $color={order.primary} />
                                     </S.ItemButton>
                                 ))}
@@ -247,7 +238,7 @@ const EventModal: React.FC<{
 
             <S.Row2Div>
                 <S.ModalTextArea
-                    value={currentEvent.description}
+                    value={currEvent.getDescription() ?? ""}
                     onChange={handleDescription}
                 />
             </S.Row2Div>
@@ -255,7 +246,7 @@ const EventModal: React.FC<{
             <S.Row3Div>
                 <TimeInput
                     text={'Start'}
-                    time={currentEvent.start}
+                    time={currEvent.}
                     handleTime={handleTime}
                 />
                 <TimeInput
@@ -263,12 +254,13 @@ const EventModal: React.FC<{
                     time={currentEvent.end}
                     handleTime={handleTime}
                 />
+
                 <S.RecurringEventButton onClick={handleRecurringEvent}>
                     Recurring
                 </S.RecurringEventButton>
             </S.Row3Div>
 
-            {currentEvent.groupId && (
+            {/* {.groupId && (
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}
@@ -289,7 +281,7 @@ const EventModal: React.FC<{
                         />
                     </S.ContainerDaySelectorDiv>
                 </S.Row4Div>
-            )}
+            )} */}
 
             <S.Row5Div>
                 <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>

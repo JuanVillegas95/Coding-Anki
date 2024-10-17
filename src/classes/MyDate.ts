@@ -3,7 +3,8 @@ export type stringifiedDate = string; // YYYY-MM-DD
 export class MyDate {
   private date!: Date;
 
-  public static readonly DAYS = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+  public static readonly DAYS: string[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+  public static readonly NULL: Date = new Date(0);
 
   constructor(param?: Date | boolean | MyDate) {
     if(!param) this.date = new Date(new Date().setHours(0, 0, 0, 0));
