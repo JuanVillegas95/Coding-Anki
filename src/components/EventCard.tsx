@@ -6,12 +6,16 @@ import { Event, COLORS } from "@/classes/Event";
 import { MyTime } from '@/classes/MyTime';
 
 const EventCard: React.FC<{
+    topOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => void;
+    botOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => void;
+    dragOnMouseDown: (e: React.MouseEvent<HTMLDivElement>, eventToDrag: Event) => void;
     event: Event;
-    // isEventDragging: boolean;
+
+
     // eventOnMouseDown: T.EventOnMouseDownType;
     // isLinked: boolean
     // eventOnClick: ((e: React.MouseEvent<HTMLDivElement>, event: Event) => void) | (() => void);
-}> = ({ event }) => {
+}> = ({ event, topOnMouseDown, botOnMouseDown, dragOnMouseDown }) => {
     const { startTime, endTime, color, title, description, icon, recurringId } = event.getAttributes();
     const totalMinutes = event.getDurationMinutes();
     const topOffset = startTime.getTimeInPixels();
@@ -32,11 +36,10 @@ const EventCard: React.FC<{
     >
         <S.EventTopDiv
             $color={isShortEvent ? "transparent" : COLORS[color].primary}
-            // onMouseDown={(e) => eventOnMouseDown.top(e, event)}
-            onClick={(e) => { e.stopPropagation() }}
+            onMouseDown={(e) => topOnMouseDown(e, event)}
         />
         {/* <S.EventBodyDiv onMouseDown={(e) => eventOnMouseDown.drag(e, event)} */}
-        <S.EventBodyDiv>
+        <S.EventBodyDiv onMouseDown={(e) => dragOnMouseDown(e, event)}>
             {isShortEvent ?
                 <ShortEvent title={title ? title : ""} />
                 :
@@ -55,7 +58,7 @@ const EventCard: React.FC<{
         </S.EventBodyDiv>
         <S.EventBottomDiv
             onClick={(e) => { e.stopPropagation() }}
-        // onMouseDown={(e) => eventOnMouseDown.bottom(e, event)}
+            onMouseDown={(e) => botOnMouseDown(e, event)}
         />
     </S.EventDiv>
 };

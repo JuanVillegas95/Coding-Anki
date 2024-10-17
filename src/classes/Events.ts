@@ -86,18 +86,35 @@ export class Events {
 
   public updateEvent(updatedEvent: Event, recurringDetails: RecurringDetails | null): void {
     const eventId: eventId = updatedEvent.getEventId();
-    const exisitngEvent: Event | undefined = this.eventsMap.get(eventId);
+    const exisitngEvent: Event | undefined = this.eventsMap.get(eventId)?.clone();
+
     if(!exisitngEvent) return;
-    this.eventsMap.set(eventId, updatedEvent);
-    console.log("The following event was updated", updatedEvent.getSummary());
 
+    if(!recurringDetails){
+      const oldDay: string =  exisitngEvent.getDate().getStringifiedDate();
+      const newDay: string =  updatedEvent.getDate().getStringifiedDate();
+      console.log(oldDay, newDay)
+      if(oldDay !== newDay){
+        console.log("hi")
+
+        const eventIdsCopy: Set<eventId> = this.eventIdsMap.get(oldDay)!
+        eventIdsCopy.delete(eventId)
+        if(eventIdsCopy.size === 0) this.eventIdsMap.delete(oldDay);
+
+        if (!(this.eventIdsMap.has(newDay))) this.eventIdsMap.set(newDay, new Set([eventId]));
+        else this.eventIdsMap.get(newDay)!.add(eventId);
+  
+
+        
+      }
+      this.eventsMap.set(eventId, updatedEvent);
+    }
+
+    // console.log("The following event was updated", updatedEvent.getSummary());
   };
-
-
-
-
-
 };
+
+
 
 export enum STATUS {
   OK = "ok", // No warning should be shown.

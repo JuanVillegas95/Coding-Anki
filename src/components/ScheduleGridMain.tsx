@@ -4,32 +4,27 @@ import EventCard from './EventCard';
 import { Event } from "@/classes/Event";
 import { MyDate, stringifiedDate } from "@/classes/MyDate"
 import { MyTime, hoursMinutes, pixels } from '@/classes/MyTime';
+import { RecurringDetails } from "@/classes/RecurringDetails"
 
 const LEFT_MOUSE_CLICK: number = 0;
 
 const ScheduleGridMain: React.FC<{
     monday: MyDate;
-    setEvent: (eventToSet: Event) => void;
+    setEvent: (eventToSet: Event, recurringDetails: RecurringDetails | null) => void;
     getEvents: (date: stringifiedDate) => Event[];
     // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
     mainRef: React.RefObject<HTMLDivElement>;
     // isLinked: boolean;
 }> = ({ mainRef, monday, setEvent, getEvents }) => {
-    // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const columnDivRefs: React.RefObject<HTMLDivElement>[] = new Array(7).fill(null).map(() => useRef<HTMLDivElement>(null));
     const [isCreate, setIsCreate] = useState<boolean>(false);
-    const [isEventResizingTop, setIsEventResizingTop] = useState<boolean>(false);
-    const [isEventResizingBottom, setIsEventResizingBottom] = useState<boolean>(false);
-    const [isEventDragging, setIsEventDragging] = useState<boolean>(false);
-    const dragStartTime = useRef<Date>(new Date());
-    const dragThreshold = useRef<boolean>(false);
-    const columnDivRefs: React.RefObject<HTMLDivElement>[] = Array.from(
-        { length: 7 },
-        () => useRef<HTMLDivElement>(null)
-    );
-
-
+    const [isDrag, setIsDrag] = useState<boolean>(false);
+    const [isTop, setIsTop] = useState<boolean>(false);
+    const [isBot, setIsBot] = useState<boolean>(false);
     const event = useRef<Event | null>(null);
 
+    // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    // const dragThreshold = useRef<boolean>(false);
 
     // const closeModal = (): void => {
     //     setIsModalOpen(false);
@@ -38,149 +33,115 @@ const ScheduleGridMain: React.FC<{
     // const openModal = (): void => setIsModalOpen(true);
 
     const createOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, columnDate: MyDate) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK) return;
         const distanceFromTop: pixels = (e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top);
         const startTime: MyTime = new MyTime(distanceFromTop);
+
         if (Event.isOverlapping(getEvents(columnDate.getStringifiedDate()), startTime)) return;
 
-        setIsCreate(true);
         event.current = new Event(columnDate, startTime);
+        setIsCreate(true);
     }
 
-    const createOnMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const topOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK) return;
+        event.current = eventToResize.clone();
+        setIsTop(true)
+    }
+
+    const botOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, eventToResize: Event) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK) return;
+        event.current = eventToResize.clone();
+        setIsBot(true)
+    }
+
+    const dragOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, eventToDrag: Event) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK) return;
+        // dragThreshold.current = false;
+        event.current = eventToDrag.clone();
+        setIsDrag(true);
+    };
+
+    const createOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[]) => {
+        e.preventDefault(); e.stopPropagation();
         if (e.button !== LEFT_MOUSE_CLICK || !isCreate || !event.current) return;
 
+        const clonedEvent: Event = event.current.clone();
         const distanceFromTop: pixels = (e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top);
-        const endTime: MyTime = new MyTime(distanceFromTop);
-        event.current.setEndTime(endTime);
-        console.log(event.current.getSummary())
-        if (event.current.getDurationMinutes() < Event.VALID_MINUTES) return;
-        setEvent(event.current);
-    }
+        clonedEvent.setEndTime(new MyTime(distanceFromTop));
 
-    // // Handlers for mouse events
-    // const eventOnMouseDown = {
-    //     drag: (e: React.MouseEvent<HTMLDivElement>, dragEvent: Event) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.button !== C.LEFT_MOUSE_CLICK) return;
-    //         dragStartTime.current = new Date();
-    //         dragThreshold.current = false;
-    //         setIsEventDragging(true);
-    //         event.current = { // Deep copying object attributes
-    //             ...dragEvent,
-    //             start: { ...dragEvent.start },
-    //             end: { ...dragEvent.end },
-    //             selectedDays: [...dragEvent.selectedDays]
-    //         };
-    //     },
+        if (!clonedEvent.isValid(events)) return;
+        setEvent(clonedEvent, null);
+    };
 
-    //     bottom: (e: React.MouseEvent<HTMLDivElement>, resizeEvent: Event) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.button !== C.LEFT_MOUSE_CLICK) return;
+    const topOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[]) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK || !isTop || !event.current) return;
 
-    //         setIsEventResizingBottom(true);
-    //         event.current = { ...resizeEvent, end: { ...resizeEvent.end } }; // Deep copying object attributes
-    //     },
+        const clonedEvent: Event = event.current.clone();
+        const distanceFromTop: pixels = (e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top);
+        clonedEvent.setStartTime(new MyTime(distanceFromTop));
 
-    //     top: (e: React.MouseEvent<HTMLDivElement>, resizeEvent: Event) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.button !== C.LEFT_MOUSE_CLICK) return;
+        if (!clonedEvent.isValid(events)) return;
 
-    //         setIsEventResizingTop(true);
-    //         event.current = { ...resizeEvent, start: { ...resizeEvent.start } };  // Deep copying object attributes
-    //     },
+        setEvent(clonedEvent, null);
+    };
 
+    const botOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[]) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK || !isBot || !event.current) return;
 
-    // };
+        const clonedEvent: Event = event.current.clone();
 
-    // const eventOnMouseMove = {
-    //     drag: (e: React.MouseEvent<HTMLDivElement>, colRef: React.RefObject<HTMLDivElement>) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (!isEventDragging || e.button !== C.LEFT_MOUSE_CLICK || !event.current) return;
+        const distanceFromTop: pixels = (e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top);
+        clonedEvent.setEndTime(new MyTime(distanceFromTop));
 
-    //         dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= C.DRAG_THRESHOLD);
+        if (!clonedEvent.isValid(events)) return;
 
-    //         if (!dragThreshold.current) return;
+        setEvent(clonedEvent, null);
+    };
 
-    //         const previousStart = event.current.start;
-    //         const previousEnd = event.current.end;
+    const dragOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[], colRef: React.RefObject<HTMLDivElement>) => {
+        e.preventDefault(); e.stopPropagation();
+        if (e.button !== LEFT_MOUSE_CLICK || !isDrag || !event.current) return;
+        // dragThreshold.current = ((new Date().getTime() - dragStartTime.current.getTime()) >= DRAG_THRESHOLD);
+        // if (!dragThreshold.current) return;
 
-    //         if (!event.current.groupId) {
-    //             // const currentEventDayWeek: number = F.getDay(event.current.date);
-    //             // const enteredEventDayWeek: number = parseInt(colRef.current!.dataset.key as string);
-    //             // event.current.date = F.strigifyDate(
-    //             //     F.addDateBy(
-    //             //         F.parseDateStringToUTC(event.current.date),
-    //             //         Math.sign(enteredEventDayWeek - currentEventDayWeek)
-    //             //     )
-    //             // );
-    //             // event.current.selectedDays = new Array(7).fill(false);
-    //             // event.current.selectedDays[F.getDay(event.current.date)] = true;
-    //         }
+        const clonedEvent: Event = event.current.clone();
 
-    //         const [start, end] = F.calculateTimeOnDrag(e, colRef, event.current);
-    //         event.current.start = start;
-    //         event.current.end = end;
+        const enterDayWeek: number = parseInt(colRef.current!.dataset.key as string);
+        const distanceFromTop: pixels = e.clientY - columnDivRefs[0].current!.getBoundingClientRect().top;
+        const { startTime, endTime }: { startTime: MyTime, endTime: MyTime } = clonedEvent.getTimeOnDrag(distanceFromTop);
 
-    //         // Perform validation while dragging
-    //         if (!F.isNewEventValid(event.current, getEvents(event.current.date))) {
-    //             // If invalid, revert to the previous position
-    //             event.current.start = previousStart;
-    //             event.current.end = previousEnd;
-    //             return;
-    //         }
+        clonedEvent.adjustDate(enterDayWeek);
+        clonedEvent.setStartTime(startTime);
+        clonedEvent.setEndTime(endTime);
 
-    //         setEvent(event.current);
-    //     },
+        if (!clonedEvent.isValid(events)) return;
 
-    //     bottom: (e: React.MouseEvent<HTMLDivElement>) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingBottom || !event.current) return;
+        // Update with the cloned event
+        setEvent(clonedEvent, null);
+    };
 
-    //         event.current.end = F.calculateEventTime(e, columnDivRefs[0]);
-    //         event.current.height = F.calculateEventHeight(event.current);
-    //         event.current.duration = F.calculateEventDuration(event.current.start, event.current.end);
+    const stopAction = (): void => {
+        // if (isCreate && event.current) openModal();
+        setIsBot(false);
+        setIsDrag(false);
+        setIsTop(false);
+        setIsCreate(false);
+    };
 
-    //         if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
+    const onMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[], colRef: React.RefObject<HTMLDivElement>): void => {
+        if (isCreate) createOnMouseMove(e, events);
+        else if (isTop) topOnMouseMove(e, events);
+        else if (isBot) botOnMouseMove(e, events);
+        else if (isDrag) dragOnMouseMove(e, events, colRef);
+    };
 
-    //         setEvent(event.current);
-    //     },
-
-    //     top: (e: React.MouseEvent<HTMLDivElement>) => {
-    //         e.preventDefault();
-    //         e.stopPropagation();
-    //         if (e.button !== C.LEFT_MOUSE_CLICK || !isEventResizingTop || !event.current) return;
-
-    //         event.current.start = F.calculateEventTime(e, columnDivRefs[0]);
-    //         event.current.height = F.calculateEventHeight(event.current);
-    //         event.current.duration = F.calculateEventDuration(event.current.start, event.current.end);
-
-    //         if (!F.isNewEventValid(event.current, getEvents(event.current.date))) return;
-
-    //         setEvent(event.current);
-    //     },
-    // };
-
-    // const stopEventAction = (): void => {
-    //     if (isEventCreating &&
-    //         event.current &&
-    //         F.isNewEventValid(event.current, getEvents(event.current.date))
-    //     ) openModal();
-
-    //     setIsEventCreating(false);
-    //     setIsEventDragging(false);
-    //     setIsEventResizingBottom(false);
-    //     setIsEventResizingTop(false);
-    // };
 
     // const eventOnClick = (e: React.MouseEvent<HTMLDivElement>, clickedEvent: Event): void => {
     //     e.preventDefault();
@@ -189,41 +150,42 @@ const ScheduleGridMain: React.FC<{
     //     openModal();
     // };
 
+
     return <S.ContainerMain
         ref={mainRef}
-        onMouseLeave={() => { if (isCreate) setIsCreate(false) }}
-        onMouseUp={() => { if (isCreate) setIsCreate(false) }}
+        onMouseLeave={stopAction}
+        onMouseUp={stopAction}
     >
-        {columnDivRefs.map((colRef, index) => {
-            const columnDate: MyDate = new MyDate(monday.getMyDate());
-            columnDate.addBy(index);
-            const filteredEvents: Event[] = getEvents(columnDate.getStringifiedDate());
+        {
+            columnDivRefs.map((colRef, index) => {
+                const columnDate: MyDate = new MyDate(monday.getMyDate());
+                columnDate.addBy(index);
+                const filteredEvents: Event[] = getEvents(columnDate.getStringifiedDate());
 
-            return <S.CellColumnDiv
-                ref={colRef}
-                data-key={index}
-                key={index}
-                onMouseDown={(e) => createOnMouseDown(e, columnDate)}
-                onMouseMove={(e) => {
-                    if (isCreate) createOnMouseMove(e);
-                    // else if (isEventDragging) eventOnMouseMove.drag(e, colRef);
-                    // else if (isEventResizingTop) eventOnMouseMove.top(e);
-                    // else if (isEventResizingBottom) eventOnMouseMove.bottom(e);
-                }}
-            >
-                {Array.from({ length: 48 }, (_, j) => <S.CellDiv key={j} />)}
-                {filteredEvents.map((event: Event, idx: number) => (
-                    <EventCard
-                        key={idx}
-                        event={event}
-                    // isEventDragging={isEventDragging}
-                    // eventOnMouseDown={eventOnMouseDown}
-                    // eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
-                    // isLinked={isLinked}
-                    />
-                ))}
-            </S.CellColumnDiv>
-        })}
+                return <S.CellColumnDiv
+                    ref={colRef}
+                    data-key={index}
+                    key={index}
+                    onMouseDown={(e) => createOnMouseDown(e, columnDate)}
+                    onMouseMove={(e) => onMouseMove(e, filteredEvents, colRef)}
+                >
+                    {Array.from({ length: 48 }, (_, j) => <S.CellDiv key={j} />)}
+                    {filteredEvents.map((event: Event, idx: number) => (
+                        <EventCard
+                            key={idx}
+                            event={event}
+                            topOnMouseDown={topOnMouseDown}
+                            botOnMouseDown={botOnMouseDown}
+                            dragOnMouseDown={dragOnMouseDown}
+                        // isEventDragging={isEventDragging}
+                        // eventOnMouseDown={eventOnMouseDown}
+                        // eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
+                        // isLinked={isLinked}
+                        />
+                    ))}
+                </S.CellColumnDiv>
+            })
+        }
         {/* <S.HourLineDiv
             $fromTop={F.calculateTopOffset(new Time(currentDate.getHours(), currentDate.getMinutes()))}
         /> */}
@@ -236,7 +198,7 @@ const ScheduleGridMain: React.FC<{
             deleteEvent={deleteEvent}
         />} */}
 
-    </S.ContainerMain>
+    </S.ContainerMain >
 
 };
 

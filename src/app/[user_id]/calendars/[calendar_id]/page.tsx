@@ -10,7 +10,7 @@ import useToast from "@/hooks/useToast";
 import { Calendar, calendarId } from "@/classes/Calendar";
 import { MyDate, stringifiedDate } from "@/classes/MyDate";
 import { Event } from "@/classes/Event";
-
+import { RecurringDetails } from "@/classes/RecurringDetails"
 import * as S from "@/utils/style.calendar";
 
 export default function Calendars() {
@@ -95,15 +95,16 @@ export default function Calendars() {
 
     const getEvents = (date: stringifiedDate): Event[] => getCurrentCalendar().getEventsByDate(date);
 
-    const setEvent = (eventToSet: Event): void => {
+    const setEvent = (eventToSet: Event, recurringDetails: RecurringDetails | null): void => {
         setCalendars((prevCalendars: Map<string, Calendar>): Map<string, Calendar> => {
             const currentCalendar: Calendar = getCurrentCalendar();
-            currentCalendar.setEvent(eventToSet, null);
+            currentCalendar.setEvent(eventToSet, recurringDetails);
             const updatedCalendars: Map<string, Calendar> = new Map(prevCalendars);
             updatedCalendars.set(calendarId, currentCalendar);
             return updatedCalendars;
         });
     }
+
 
 
     return <React.Fragment >

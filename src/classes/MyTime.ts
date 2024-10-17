@@ -48,26 +48,26 @@ export class MyTime {
   public hoursToPixels(hours: number): number { return hours * MyTime.HOURS_HEIGHT_PIXELS; };
 
   public static formatTime(unit: number): string { return unit < 10 ? `0${unit}` : `${unit}`; };
-
+  
   public setHours(hours: number): void {
-    if (hours < 0 || hours >= 24) return;
-    this.hours = hours;
+    if (hours < 0) { this.hours = 0; return; }
+    if (hours >= 24) {this.hours = 23; return; };
+    this.hours = hours;  
   }
 
   public setMinutes(minutes: number): void {
-    if (minutes < 0 || minutes >= 60) return;
-    this.minutes = minutes;
+      if (minutes < 0) { this.minutes = 0; return; }
+      if (minutes >= 60) { this.minutes = 59; return; }
+      this.minutes = minutes;  
   }
 
   private pixelsToTime(distanceFromTop: pixels): hoursMinutes {
     const totalHours: number = this.pixelsToHours(distanceFromTop);
-    const totalMinutes: number = Math.floor(this.hoursToMinutes(totalHours));
-    const hours: number = Math.floor(this.minutesToHours(totalMinutes));
+    const totalMinutes: number = Math.round(this.hoursToMinutes(totalHours));  
+    const hours: number = Math.floor(this.minutesToHours(totalMinutes));  
     const minutes: number = totalMinutes % 60;
     return { hours, minutes };
   }
-
-  // Static method to format a time unit (hours or minutes) to a two-digit format
 
   // Static method to generate an array of 24-hour formatted time intervals
   public static generate24HourIntervals(): string[] {
@@ -98,16 +98,43 @@ export class MyTime {
   }
 }
 
+// export const calculateTimeOnDrag = (
+//   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+//   columnDivRef: React.RefObject<HTMLDivElement>,
+//   event: Event
+// ): [Time, Time] => {
+//   // Destructuring to extract start and end times
+//   let { hours: startHour, minutes: startMinutes } = event.start;
+//   let { hours: endHour, minutes: endMinutes } = event.end;
 
-// // Calculates the event duration
-// export const calculateEventDuration = ( start: Time, end: Time ): Time => {
-//   const totalStartMinutes: number = timeToMinutes(start);
-//   const totalEndMinutes: number = timeToMinutes(end);
+//   // Calculate the distance from the top of the column to the mouse position
+//   const columnTop = columnDivRef.current!.getBoundingClientRect().top;
+//   const distanceFromTop = e.clientY - columnTop - event.height / 2;
 
-//   const eventTotalMinutes: number = totalEndMinutes - totalStartMinutes;
-  
-//   const eventHours: number = Math.floor(minutesToHours(eventTotalMinutes));
-//   const eventMinutes: number = eventTotalMinutes % 60;
+//   // Convert distance to hours and minutes
+//   const startHoursTotal = pixelsToHours(distanceFromTop);
+//   const startMinutesTotal = Math.floor(hoursToMinutes(startHoursTotal));
 
-//   return new Time(eventHours,eventMinutes);
-// }
+//   const heightHoursTotal = pixelsToHours(event.height);
+//   const heightMinutesTotal = Math.floor(hoursToMinutes(heightHoursTotal));
+
+//   // Calculate total minutes for the end time
+//   const endMinutesTotal = heightMinutesTotal + startMinutesTotal;
+
+//   // Ensure the calculated times are within a valid range (0-23 hours)
+//   const newStartHour = Math.floor(minutesToHours(startMinutesTotal));
+//   const newEndHour = Math.floor(minutesToHours(endMinutesTotal));
+
+//   if (newEndHour <= 23 && newStartHour >= 0) {
+//     // Update end time values
+//     endHour = newEndHour;
+//     endMinutes = endMinutesTotal % 60;
+
+//     // Update start time values
+//     startHour = newStartHour;
+//     startMinutes = startMinutesTotal % 60;
+//   }
+
+//   // Return the updated start and end times
+//   return [new Time(startHour, startMinutes), new Time(endHour, endMinutes)];
+// };

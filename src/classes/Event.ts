@@ -31,6 +31,7 @@ export class Event {
 
     public static readonly THRESHOLD_MINUTES = 60;
     public static readonly VALID_MINUTES = 20;
+    public static readonly DRAG_THRESHOLD_MS= 200;
 
     constructor(
       date: MyDate,
@@ -54,8 +55,6 @@ export class Event {
       this.description = description;
     }
   
-    // eventId
-
     public getSummary(): string {
       return `
       Event ${this.eventId} summrary:
@@ -105,6 +104,32 @@ export class Event {
 
     public getHeight(): pixels { return this.endTime.getTimeInPixels() - this.startTime.getTimeInPixels(); };
 
+    public isDurationValid(): boolean { return this.getDurationMinutes() > Event.VALID_MINUTES; };
+
+    public isValid(events: Event[]): boolean {  
+      if (!this.isDurationValid() || this.isColliding(events)) return false;
+      return true;
+    }
+
+    public getTimeOnDrag(distanceFromTop: pixels): {startTime: MyTime, endTime: MyTime} {
+      const padding: pixels = this.getHeight() / 2;
+      const startTime: MyTime = new MyTime(distanceFromTop - padding);
+      const endTime: MyTime = new MyTime (startTime.getTimeInPixels() + this.getHeight());
+      return { startTime, endTime };
+    };
+
+    public adjustDate(enterDatWeek: number): void {
+      const currentEventDayWeek: number = this.getDate().getDay();
+      const dayDifference: number = enterDatWeek - currentEventDayWeek;
+      if (dayDifference !== 0) {
+          const newDate: MyDate = new MyDate(this.getDate().getMyDate());
+          newDate.addBy(dayDifference);
+          this.setDate(newDate.getMyDate());
+      }
+  }
+  
+  
+
     public getAttributes(): EventAttributes {
       return {
           eventId: this.eventId,
@@ -133,6 +158,17 @@ export class Event {
       );
     };
 
+    public isColliding (events: Event[]): boolean{
+      const newStartTotalMinutes: number = this.startTime.getTimeInMinutes();
+      const newEndTotalMinutes: number = this.endTime.getTimeInMinutes();
+      for(const { startTime, endTime, eventId} of events){
+        if(eventId === this.eventId) continue;
+        const startTotalMinutes = startTime.getTimeInMinutes();
+        const endTodalMinutes = endTime.getTimeInMinutes();
+        if (newStartTotalMinutes < endTodalMinutes && newEndTotalMinutes > startTotalMinutes) return true; 
+      }
+      return false;
+    };
     
     public static isOverlapping = (events: Event[], time: MyTime) => {
       const newTimeTotalMinutes: number = time.getTimeInMinutes();
@@ -239,133 +275,7 @@ export class Event {
   };
 
 
-// export const calculateTimeOnDrag = (
-//   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-//   columnDivRef: React.RefObject<HTMLDivElement>,
-//   event: Event
-// ): [Time, Time] => {
-//   // Destructuring to extract start and end times
-//   let { hours: startHour, minutes: startMinutes } = event.start;
-//   let { hours: endHour, minutes: endMinutes } = event.end;
-
-//   // Calculate the distance from the top of the column to the mouse position
-//   const columnTop = columnDivRef.current!.getBoundingClientRect().top;
-//   const distanceFromTop = e.clientY - columnTop - event.height / 2;
-
-//   // Convert distance to hours and minutes
-//   const startHoursTotal = pixelsToHours(distanceFromTop);
-//   const startMinutesTotal = Math.floor(hoursToMinutes(startHoursTotal));
-
-//   const heightHoursTotal = pixelsToHours(event.height);
-//   const heightMinutesTotal = Math.floor(hoursToMinutes(heightHoursTotal));
-
-//   // Calculate total minutes for the end time
-//   const endMinutesTotal = heightMinutesTotal + startMinutesTotal;
-
-//   // Ensure the calculated times are within a valid range (0-23 hours)
-//   const newStartHour = Math.floor(minutesToHours(startMinutesTotal));
-//   const newEndHour = Math.floor(minutesToHours(endMinutesTotal));
-
-//   if (newEndHour <= 23 && newStartHour >= 0) {
-//     // Update end time values
-//     endHour = newEndHour;
-//     endMinutes = endMinutesTotal % 60;
-
-//     // Update start time values
-//     startHour = newStartHour;
-//     startMinutes = startMinutesTotal % 60;
-//   }
-
-//   // Return the updated start and end times
-//   return [new Time(startHour, startMinutes), new Time(endHour, endMinutes)];
-// };
 
 
 
 
-
-// // Calculates the  end time of an event based the height and start time
-// export const calculateEventEnd = ({ start, height }: Event): Time => {
-//   const totalMinutesStart: number = timeToMinutes(start);
-//   const totalMinutesHeight: number = Math.floor(hoursToMinutes(pixelsToHours(height)));
-//   const totalMinutes: number = totalMinutesStart + totalMinutesHeight;
-
-//   const hourEnd: number = Math.floor(minutesToHours(totalMinutes));
-//   const minutesEnd: number  = totalMinutes % 60;
-  
-//   return new Time(hourEnd,minutesEnd);
-// }
-
-// export const SHORT_DURATION_THRESHOLD = 60; // Less than 60 minutes is a "SHORT" event.
-// export const MAX_DURATION_MINUTES = 20;
-// export const DRAG_THRESHOLD = 200;
-
-// export const isEndBeforeStart = ({ start, end }: Event): boolean => { 
-//   const startTotalMinutes: number = timeToMinutes(start);
-//   const endTotalMinutes: number = timeToMinutes(end);
-
-//   return endTotalMinutes < startTotalMinutes;
-// };
-
-// export const isEventColliding = (newEvent: Event, events: Event[]): boolean => {
-//   const newEventStartMinutes = timeToMinutes(newEvent.start);
-//   const newEventEndMinutes = timeToMinutes(newEvent.end);
-
-//   for (const { start, end, id } of events) {
-//     if (newEvent.id === id) continue;
-//     const eventStartMinutes = timeToMinutes(start);
-//     const eventEndMinutes = timeToMinutes(end);
-
-//     if (newEventStartMinutes < eventEndMinutes && newEventEndMinutes > eventStartMinutes) return true; 
-//   }
-
-//   return false; 
-// };
-
-
-
-// export const isNewEventValid = (newEvent: Event, events: Event[]): boolean => {
-
-//   const totalMinutes: number = timeToMinutes(newEvent.duration);
-
-//   if(totalMinutes < C.MAX_DURATION_MINUTES) return false
-
-//   const isTimeValid: boolean = (newEvent.start.hours < 0 || newEvent.end.hours > 23) ? false : true;
-//   if(!isTimeValid) return false;
-
-//   const isEndValid: boolean = isEndBeforeStart(newEvent);
-//   if(isEndValid) return false
-
-//   const eventColliding: boolean= isEventColliding(newEvent,events);
-//   if(eventColliding) return false
-
-//   return true;
-// }
-
-
-
-// export const calculateStartAndEndTime = (topOffset: number, height: number): { start: Time, end: Time } => {
-//   // Convert the topOffset to hours using the pixelsToHours utility function
-//   const startHours = pixelsToHours(topOffset);
-  
-//   // Convert the fractional hours to full hours and minutes
-//   const startFullHours = Math.floor(startHours);
-//   const startMinutes = Math.round((startHours - startFullHours) * 60);
-  
-//   // Create the start time object
-//   const start: Time = new Time(startFullHours, startMinutes);
-//   // Calculate the total pixel value for the end time (topOffset + height)
-//   const endPixels = topOffset + height;
-  
-//   // Convert the total pixels to hours using the pixelsToHours utility function
-//   const endHours = pixelsToHours(endPixels);
-  
-//   // Convert the fractional hours to full hours and minutes
-//   const endFullHours = Math.floor(endHours);
-//   const endMinutes = Math.round((endHours - endFullHours) * 60);
-  
-//   // Create the end time object
-//   const end: Time = new Time(endFullHours, endMinutes);
-
-//   return { start, end };
-// };

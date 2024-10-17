@@ -8,7 +8,7 @@ export class MyDate {
   constructor(param?: Date | boolean | MyDate) {
     if(!param) this.date = new Date(new Date().setHours(0, 0, 0, 0));
     else if (typeof param === "boolean" && true) this.date = this.getMostRecentMonday(); 
-    else if (param instanceof Date) this. date = new Date(param.setHours(0,0,0,0));
+    else if (param instanceof Date) this.date = new Date(param.setHours(0,0,0,0));
     else if (param instanceof MyDate) this.date = param.getMyDate();
   }
   
