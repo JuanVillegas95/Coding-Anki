@@ -16,7 +16,7 @@ const ScheduleGridMain: React.FC<{
     getEvents: (date: stringifiedDate) => Event[];
     closeModal: () => void;
     openModal: () => void;
-    // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
+    pushToast: (id: string, description: string, type: "SUCCESS" | "INFO" | "ERROR") => void;
     mainRef: React.RefObject<HTMLDivElement>;
     // isLinked: boolean;
 }> = ({ mainRef, monday, setEvent, getEvents, event, closeModal, openModal }) => {

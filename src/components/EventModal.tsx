@@ -8,6 +8,7 @@ import DaySelector from './DaySelector';
 import { COLOR, COLORS, Event, ICON, ICONS } from "@/classes/Event";
 import { RecurringDetails, recurringId } from "@/classes/RecurringDetails";
 import { MyDate } from '@/classes/MyDate';
+import { MyTime } from '@/classes/MyTime';
 
 const ESCAPE_KEYS: string[] = ["Esc", "Escape"];
 
@@ -16,10 +17,10 @@ const EventModal: React.FC<{
     event: React.MutableRefObject<Event | null>;
     getRecurringdDetails: (recurringId: recurringId) => RecurringDetails | null;
     // deleteEvent: (event: Event) => void;
-    // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
+    pushToast: (id: string, description: string, type: "SUCCESS" | "INFO" | "ERROR") => void;
     isEventModal: boolean;
     closeModal: () => void;
-}> = ({ isEventModal, closeModal, event, setEvent, getRecurringdDetails }) => {
+}> = ({ isEventModal, closeModal, event, setEvent, getRecurringdDetails, pushToast }) => {
     const [currRecurringDetails, setCurrRecurringDetails] = useState<RecurringDetails | null>(getRecurringdDetails(event.current!.getRecurringId()))
     const [currEvent, setCurrEvent] = useState<Event>(event.current!.clone())
     const tempRecurringId = useRef<recurringId>(event.current!.getRecurringId());
@@ -47,14 +48,14 @@ const EventModal: React.FC<{
 
     const handleTitle = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const title = e.target.value;
-        // if (title.length > 40) {
-        //     pushToast(
-        //         "Invalid title length",
-        //         "Event title must be under 40 characters.",
-        //         C.TOAST_TYPE.INFO,
-        //     );
-        //     return;
-        // }
+        if (title.length > 40) {
+            pushToast(
+                "Invalid title length",
+                "Event title must be under 40 characters.",
+                "INFO",
+            );
+            return;
+        }
         const clonedEvent: Event = currEvent.clone();
         clonedEvent.setTitle(title)
         setCurrEvent(clonedEvent)
@@ -74,14 +75,14 @@ const EventModal: React.FC<{
 
     const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
         const description = e.target.value;
-        // if (description.length > 200) {
-        //     pushToast(
-        //         "Invalid description",
-        //         "Event description must be under 200 characters.",
-        //         C.TOAST_TYPE.INFO
-        //     );
-        //     return;
-        // }
+        if (description.length > 200) {
+            pushToast(
+                "Invalid description",
+                "Event description must be under 200 characters.",
+                "INFO",
+            );
+            return;
+        }
         const clonedEvent: Event = currEvent.clone();
         clonedEvent.setDescription(description);
         setCurrEvent(clonedEvent);
@@ -95,8 +96,8 @@ const EventModal: React.FC<{
         switch (tag) {
             case 'StartHour': { clonedEvent.getStartTime().setHours(value); } break;
             case 'StartMinute': { clonedEvent.getStartTime().setMinutes(value); } break;
-            case 'EndHour': { clonedEvent.getStartTime().setHours(value); } break;
-            case 'EndMinute': { clonedEvent.getStartTime().setMinutes(value); } break;
+            case 'EndHour': { clonedEvent.getEndTime().setHours(value); } break;
+            case 'EndMinute': { clonedEvent.getEndTime().setMinutes(value); } break;
         }
 
         setCurrEvent(clonedEvent)
@@ -124,32 +125,33 @@ const EventModal: React.FC<{
     const handleDate = (e: React.ChangeEvent<HTMLInputElement>, label: string): void => {
         const date: string = e.target.value;
         const clonedRecurringDetails: RecurringDetails = currRecurringDetails!.clone();
+
+
         if (label === "Start") clonedRecurringDetails.setStartDate(new MyDate(date))
         if (label === "End") clonedRecurringDetails.setEndDate(new MyDate(date))
+
+        const startDate: Date = clonedRecurringDetails.getStartDate().getJsDate();
+        const endDate: Date = clonedRecurringDetails.getEndDate().getJsDate()
+
+        if (startDate >= endDate) {
+            pushToast(
+                "Handle date",
+                "The start date cannot be after the end date",
+                "INFO"
+            );
+            return;
+        }
+
+        const dateDifference = endDate.getTime() - startDate.getTime();
+        if (dateDifference > MyTime.ONE_YEAR_IN_MS) {
+            pushToast(
+                "Handle date",
+                "The event duration cannot be greater than one year",
+                "INFO"
+            );
+            return;
+        }
         setCurrRecurringDetails(clonedRecurringDetails);
-
-
-        // if (startDate >= endDate) {
-        //     pushToast(
-        //         "Handle date",
-        //         "The start date cannot be after the end date",
-        //         C.TOAST_TYPE.INFO
-        //     );
-        //     return;
-        // }
-
-        // if (updatedEvent.endDate) {
-        //     const dateDifference = endDate.getTime() - startDate.getTime();
-        //     if (dateDifference > C.ONE_YEAR_IN_MS) {
-        //         pushToast(
-        //             "Handle date",
-        //             "The event duration cannot be greater than one year.",
-        //             C.TOAST_TYPE.INFO
-        //         );
-        //         return;
-        //     }
-        // }
-
     };
 
 
@@ -176,24 +178,22 @@ const EventModal: React.FC<{
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // if (currentEvent.groupId) {
-        //     if (!currentEvent.endDate) {
-        //         pushToast(
-        //             "Handle end time",
-        //             "End time must be valid",
-        //             C.TOAST_TYPE.INFO
-        //         );
-        //         return;
-        //     }
-        // }
-        // if (F.isEndBeforeStart(currentEvent)) {
-        //     pushToast(
-        //         "Handle time",
-        //         "The end time cannot be before the start time",
-        //         C.TOAST_TYPE.INFO
-        //     );
-        //     return;
-        // }
+        if (currRecurringDetails && currRecurringDetails.getEndDate().areDatesTheSame(MyDate.NULL)) {
+            pushToast(
+                "Handle end time",
+                "End date must be valid",
+                "INFO",
+            );
+            return;
+        }
+        if (currEvent.isEndBeforeStart()) {
+            pushToast(
+                "Handle time",
+                "The end time cannot be before the start time",
+                "INFO"
+            );
+            return;
+        }
         if (!currRecurringDetails) setEvent(currEvent, null);
         else setEvent(currEvent, currRecurringDetails);
         closeModal();

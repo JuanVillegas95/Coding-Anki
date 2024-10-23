@@ -1,39 +1,33 @@
-// useToast.ts
 import { useState, useCallback, useMemo } from "react";
 import * as S from "../utils/style.calendar";
-
 import React from "react";
-import { success, info, error } from "@/utils/icons"
+import { success, info, error } from "@/utils/icons";
 
-enum TOAST_TYPE {
-    SUCCESS = "SUCCESS",
-    INFO = "INFO",
-    ERROR = "ERROR",
-}
+// Define TOAST_TYPE as a union of string literals
+type TOAST_TYPE = "SUCCESS" | "INFO" | "ERROR";
 
 class Toast {
     id: string;
     description: string;
     type: TOAST_TYPE;
+
     constructor(id: string, description: string, type: TOAST_TYPE) {
         this.id = id;
         this.description = description;
         this.type = type;
     }
 
-    public static readonly TOAST_TYPE = TOAST_TYPE;
-
     public static readonly TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
-        [TOAST_TYPE.SUCCESS]: success,
-        [TOAST_TYPE.INFO]: info,
-        [TOAST_TYPE.ERROR]: error,
+        SUCCESS: success,
+        INFO: info,
+        ERROR: error,
     };
 }
 
-const useToast = () => {
+export const useToast = () => {
     const [toasts, setToasts] = useState<Map<string, Toast>>(new Map());
 
-    const pushToast = useCallback((id: string, description: string, type: TOAST_TYPE): void => {
+    const pushToast = useCallback((id: string, description: string, type: "SUCCESS" | "INFO" | "ERROR"): void => {
         const newToast = new Toast(id, description, type);
         setToasts((prevToasts) => {
             if (prevToasts.has(newToast.id)) return prevToasts;
@@ -58,7 +52,6 @@ const useToast = () => {
         return toastsArray[toastsArray.length - 1];
     }, [toasts]);
 
-    // Toast component encapsulated within the hook
     const ToastComponent = useMemo(() => {
         const ToastMessage: React.FC = () => {
             const [isVisible, setIsVisible] = useState<boolean>(true);
@@ -102,11 +95,6 @@ const useToast = () => {
         return ToastMessage;
     }, [toasts, popToast, tailToast]);
 
-    return {
-        pushToast,
-        ToastComponent,
-        TOAST_TYPE,
-    };
+    return [ToastComponent, pushToast] as const;
 };
 
-export default useToast;

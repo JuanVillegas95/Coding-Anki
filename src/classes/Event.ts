@@ -103,13 +103,25 @@ export class Event {
 
     public getHeight(): pixels { return this.endTime.getTimeInPixels() - this.startTime.getTimeInPixels(); };
 
+    public isEndBeforeStart(): boolean { return this.getDurationMinutes() < 0; };
+
     public isDurationValid(): boolean { return this.getDurationMinutes() > Event.VALID_MINUTES; };
 
-    public isValid(events: Event[]): boolean {  
-      if (!this.isDurationValid() || this.isColliding(events)) return false;
-      return true;
-    }
+    public isValid(events: Event[]): boolean { return this.isDurationValid() && !this.isColliding(events); };
 
+    public getAttributes(): EventAttributes {
+      return {
+          eventId: this.eventId,
+          recurringId: this.recurringId,
+          date: this.date,
+          startTime: this.startTime,
+          endTime: this.endTime,
+          color: this.color,
+          icon: this.icon,
+          title: this.title,
+          description: this.description
+      };
+    }
     public adjustTime(distanceFromTop: pixels): void {
       const padding: pixels = this.getHeight() / 2;
       const startTime: MyTime = new MyTime(distanceFromTop - padding);
@@ -126,24 +138,8 @@ export class Event {
           newDate.addBy(dayDifference);
           this.setMyDate(newDate.getJsDate());
       }
-  }
-  
-  
-
-    public getAttributes(): EventAttributes {
-      return {
-          eventId: this.eventId,
-          recurringId: this.recurringId,
-          date: this.date,
-          startTime: this.startTime,
-          endTime: this.endTime,
-          color: this.color,
-          icon: this.icon,
-          title: this.title,
-          description: this.description
-      };
     }
-
+  
     public clone(): Event {
       return new Event(
         this.date.clone(), 

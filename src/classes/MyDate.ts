@@ -16,7 +16,11 @@ export class MyDate {
   
   public getJsDate(): Date { return this.date; };
 
-  public getStringifiedDate(): string { return this.date.toISOString().split('T')[0]; };
+  public getStringifiedDate(): string { 
+    const [month, day, year] = this.date.toLocaleDateString().split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
 
   public clone(): MyDate { return new MyDate(this.date); };
   

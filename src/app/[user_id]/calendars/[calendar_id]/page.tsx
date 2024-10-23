@@ -6,7 +6,7 @@ import DaySection from "@/components/DaySection"
 import ScheduleGridMain from "@/components/ScheduleGridMain";
 import MenuAside from "@/components/MenuAside";
 import { StatusModal } from "@/components/StatusModal";
-import useToast from "@/hooks/useToast";
+import { useToast } from "@/hooks/useToast";
 import { Calendar, calendarId } from "@/classes/Calendar";
 import { MyDate, stringifiedDate } from "@/classes/MyDate";
 import { Event } from "@/classes/Event";
@@ -18,13 +18,13 @@ import * as S from "@/utils/style.calendar";
 export default function Calendars() {
     const calendar: Calendar = new Calendar("1", "yes", null);
     const calendarId: calendarId = calendar.getCalendarId();
+    const [ToastComponent, pushToast] = useToast();
     const [calendars, setCalendars] = useState<Map<calendarId, Calendar>>(new Map([[calendarId, calendar]]));
     const [isEventModal, setIsEventModal] = useState<boolean>(false);
     const [monday, setMonday] = useState<MyDate>(new MyDate(true));
     const asideRef = useRef<HTMLDivElement | null>(null);
     const mainRef = useRef<HTMLDivElement | null>(null);
     const event = useRef<Event | null>(null);
-    const { pushToast, ToastComponent, TOAST_TYPE } = useToast();
 
     // const [linkedCalendar, setLinkedCalendar] = useState<string>("")
     // const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
@@ -142,7 +142,7 @@ export default function Calendars() {
                     openModal={openModal}
                     closeModal={closeModal}
                     event={event}
-                // pushToast={pushToast}
+                    pushToast={pushToast}
                 // isLinked={(linkIcon === I.linkIn.src)}
                 />
             </S.CalendarContainerDiv>
@@ -151,16 +151,16 @@ export default function Calendars() {
                 setLinkedCalendar={setLinkedCalendarFriend}
             /> */}
         </S.CalendarWrapperDiv>
+        <ToastComponent />
         {isEventModal && <EventModal
             isEventModal={isEventModal}
             closeModal={closeModal}
             event={event}
             setEvent={setEvent}
             getRecurringdDetails={getRecurringdDetails}
-        // pushToast={pushToast}
+            pushToast={pushToast}
         // deleteEvent={deleteEvent}
         />}
-        {/* <ToastComponent /> */}
         {/* {(status !== STATUS.OK) && <StatusModal
             status={status}
             conflictDetails={getCurrentCalendar().getConflictDetails()}
