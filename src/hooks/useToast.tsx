@@ -3,31 +3,30 @@ import { useState, useCallback, useMemo } from "react";
 import * as S from "../utils/style.calendar";
 
 import React from "react";
-import { success, info, error} from "@/utils/icons"
+import { success, info, error } from "@/utils/icons"
 
 enum TOAST_TYPE {
     SUCCESS = "SUCCESS",
     INFO = "INFO",
     ERROR = "ERROR",
 }
-  
+
 class Toast {
     id: string;
     description: string;
-    type: TOAST_TYPE; 
-    // Constructor
-    constructor(id: string, description: string, type: TOAST_TYPE) { 
-      this.id = id;
-      this.description = description;
-      this.type = type;
+    type: TOAST_TYPE;
+    constructor(id: string, description: string, type: TOAST_TYPE) {
+        this.id = id;
+        this.description = description;
+        this.type = type;
     }
-  
+
     public static readonly TOAST_TYPE = TOAST_TYPE;
-  
+
     public static readonly TOAST_ICON: Record<TOAST_TYPE, React.ComponentType> = {
-      [TOAST_TYPE.SUCCESS]: success,
-      [TOAST_TYPE.INFO]: info,
-      [TOAST_TYPE.ERROR]: error,
+        [TOAST_TYPE.SUCCESS]: success,
+        [TOAST_TYPE.INFO]: info,
+        [TOAST_TYPE.ERROR]: error,
     };
 }
 

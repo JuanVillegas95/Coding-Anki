@@ -6,14 +6,15 @@ export class MyDate {
   public static readonly DAYS: string[] = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
   public static readonly NULL: Date = new Date(0);
 
-  constructor(param?: Date | boolean | MyDate) {
+  constructor(param?: Date | boolean | MyDate | string) {
     if(!param) this.date = new Date(new Date().setHours(0, 0, 0, 0));
     else if (typeof param === "boolean" && true) this.date = this.getMostRecentMonday(); 
+    else if (typeof param === "string") this.date =  new Date(new Date(param).setHours(0, 0, 0, 0));
     else if (param instanceof Date) this.date = new Date(param.setHours(0,0,0,0));
-    else if (param instanceof MyDate) this.date = param.getMyDate();
+    else if (param instanceof MyDate) this.date = param.getJsDate();
   }
   
-  public getMyDate(): Date { return this.date; };
+  public getJsDate(): Date { return this.date; };
 
   public getStringifiedDate(): string { return this.date.toISOString().split('T')[0]; };
 
@@ -41,7 +42,7 @@ export class MyDate {
   public getFormattedMonth(): string {
     const currMonth: string = this.date.toLocaleString("en-US", { month: "short" }); 
     for (let date: MyDate = new MyDate(this.date); date.getDay() === 7; date.addBy(1)) {
-      const newMonth: string = date.getMyDate().toLocaleString("en-US", { month: "short" });
+      const newMonth: string = date.getJsDate().toLocaleString("en-US", { month: "short" });
       if (currMonth !== newMonth) return `${currMonth} - ${newMonth}`;
     }
     return this.date.toLocaleDateString('en-US', { month: 'long', timeZone: 'UTC' });

@@ -67,9 +67,9 @@ export class Event {
 
     public setEventId(eventId: eventId): void { this.eventId = eventId; };
 
-    public getDate(): MyDate { return this.date; };
+    public getMyDate(): MyDate { return this.date; };
 
-    public setDate(date: Date ): void { this.date = new MyDate(date) };
+    public setMyDate(date: Date ): void { this.date = new MyDate(date) };
 
     public getRecurringId(): recurringId { return this.recurringId; };
   
@@ -119,12 +119,12 @@ export class Event {
     };
 
     public adjustDate(enterDatWeek: number): void {
-      const currentEventDayWeek: number = this.getDate().getDay();
+      const currentEventDayWeek: number = this.getMyDate().getDay();
       const dayDifference: number = enterDatWeek - currentEventDayWeek;
       if (dayDifference !== 0) {
-          const newDate: MyDate = new MyDate(this.getDate().getMyDate());
+          const newDate: MyDate = new MyDate(this.getMyDate().getJsDate());
           newDate.addBy(dayDifference);
-          this.setDate(newDate.getMyDate());
+          this.setMyDate(newDate.getJsDate());
       }
   }
   

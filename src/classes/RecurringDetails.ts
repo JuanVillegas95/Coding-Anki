@@ -11,11 +11,11 @@ export class RecurringDetails {
     private selectedDays: boolean[];
 
     constructor(
-        startDate: MyDate,
-        endDate: MyDate,
+        startDate: MyDate = new MyDate(MyDate.NULL),
+        endDate: MyDate = new MyDate(MyDate.NULL),
+        selectedDays: boolean[] = Array(7).fill(false),
         eventIds: Set<eventId> = new Set(),
-        selectedDays: boolean[] = Array(7).fill(false) // Corrected syntax here
-    ){
+    ) {
         this.eventIds = eventIds;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -66,4 +66,13 @@ export class RecurringDetails {
     public deleteEventId(eventId: eventId): void {
         if (this.eventIds.has(eventId)) this.eventIds.delete(eventId);
     }
+
+    public clone(): RecurringDetails {
+        const clonedEventIds = new Set<eventId>(this.eventIds);
+        const clonedStartDate = this.startDate.clone();
+        const clonedEndDate = this.endDate.clone();
+        const clonedSelectedDays = [...this.selectedDays];
+        return new RecurringDetails(clonedStartDate, clonedEndDate, clonedSelectedDays, clonedEventIds);
+    }
+    
 }

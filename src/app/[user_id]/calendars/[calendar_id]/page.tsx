@@ -11,23 +11,25 @@ import { Calendar, calendarId } from "@/classes/Calendar";
 import { MyDate, stringifiedDate } from "@/classes/MyDate";
 import { Event } from "@/classes/Event";
 import { RecurringDetails, recurringId } from "@/classes/RecurringDetails"
+import EventModal from "@/components/EventModal"
+
 import * as S from "@/utils/style.calendar";
 
 export default function Calendars() {
     const calendar: Calendar = new Calendar("1", "yes", null);
     const calendarId: calendarId = calendar.getCalendarId();
     const [calendars, setCalendars] = useState<Map<calendarId, Calendar>>(new Map([[calendarId, calendar]]));
+    const [isEventModal, setIsEventModal] = useState<boolean>(false);
     const [monday, setMonday] = useState<MyDate>(new MyDate(true));
+    const asideRef = useRef<HTMLDivElement | null>(null);
+    const mainRef = useRef<HTMLDivElement | null>(null);
+    const event = useRef<Event | null>(null);
+    const { pushToast, ToastComponent, TOAST_TYPE } = useToast();
+
     // const [linkedCalendar, setLinkedCalendar] = useState<string>("")
     // const [linkIcon, setLinkIcon] = useState<string>(I.linkOut.src)
 
     // const [status, setStatus] = useState<STATUS>(STATUS.OK);
-    // const { pushToast, ToastComponent } = useToast();
-
-    const asideRef = useRef<HTMLDivElement>(null);
-    const mainRef = useRef<HTMLDivElement>(null);
-
-    // const [calendar, setCalendar] = useState(null);
     // const [loading, setLoading] = useState(true);
     // const [error, setError] = useState<string | null>(null);
 
@@ -91,6 +93,7 @@ export default function Calendars() {
     // const setTimeZoneSelect = (timeZone: string): void => setTimeZone(timeZone)
 
     // const setLinkedCalendarFriend = (e: React.ChangeEvent<HTMLSelectElement>): void => setLinkedCalendar(e.target.value)
+
     const getCurrentCalendar = (): Calendar => calendars!.get(calendarId) as Calendar;
 
     const getEvents = (date: stringifiedDate): Event[] => getCurrentCalendar().getEventsByDate(date);
@@ -107,6 +110,14 @@ export default function Calendars() {
         });
     }
 
+    const closeModal = (): void => {
+        event.current = null;
+        setIsEventModal(false)
+    };
+
+    const openModal = (): void => {
+        setIsEventModal(true)
+    };
 
 
     return <React.Fragment >
@@ -128,6 +139,9 @@ export default function Calendars() {
                     setEvent={setEvent}
                     getEvents={getEvents}
                     mainRef={mainRef}
+                    openModal={openModal}
+                    closeModal={closeModal}
+                    event={event}
                 // pushToast={pushToast}
                 // isLinked={(linkIcon === I.linkIn.src)}
                 />
@@ -137,6 +151,15 @@ export default function Calendars() {
                 setLinkedCalendar={setLinkedCalendarFriend}
             /> */}
         </S.CalendarWrapperDiv>
+        {isEventModal && <EventModal
+            isEventModal={isEventModal}
+            closeModal={closeModal}
+            event={event}
+            setEvent={setEvent}
+            getRecurringdDetails={getRecurringdDetails}
+        // pushToast={pushToast}
+        // deleteEvent={deleteEvent}
+        />}
         {/* <ToastComponent /> */}
         {/* {(status !== STATUS.OK) && <StatusModal
             status={status}

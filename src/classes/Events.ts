@@ -47,7 +47,7 @@ export class Events {
 
   public addEvent(newEvent: Event, recurringDetails: RecurringDetails | null): void {
     const eventId: eventId = newEvent.getEventId();
-    const stringifiedDate: stringifiedDate = newEvent.getDate().getStringifiedDate();
+    const stringifiedDate: stringifiedDate = newEvent.getMyDate().getStringifiedDate();
     const recurringId: recurringId = newEvent.getRecurringId();
 
     // Adding in recurringDetailsMap
@@ -65,7 +65,7 @@ export class Events {
 
   public deleteEvent(eventToDelete: Event): void {
     const eventId: eventId = eventToDelete.getEventId();
-    const stringifiedDate: stringifiedDate = eventToDelete.getDate().getStringifiedDate();
+    const stringifiedDate: stringifiedDate = eventToDelete.getMyDate().getStringifiedDate();
     const recurringId: recurringId = eventToDelete.getRecurringId();
 
     if(recurringId) {
@@ -94,8 +94,8 @@ export class Events {
     if(!exisitngEvent) return;
 
     if(!recurringDetails){
-      const oldDay: string =  exisitngEvent.getDate().getStringifiedDate();
-      const newDay: string =  updatedEvent.getDate().getStringifiedDate();
+      const oldDay: string =  exisitngEvent.getMyDate().getStringifiedDate();
+      const newDay: string =  updatedEvent.getMyDate().getStringifiedDate();
       if(oldDay !== newDay){
 
         const eventIdsCopy: Set<eventId> = this.eventIdsMap.get(oldDay)!

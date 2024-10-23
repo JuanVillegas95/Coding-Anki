@@ -6,35 +6,26 @@ import { MyDate, stringifiedDate } from "@/classes/MyDate"
 import { MyTime, hoursMinutes, pixels } from '@/classes/MyTime';
 import { RecurringDetails } from "@/classes/RecurringDetails"
 import { HourLine } from './HourLine';
-import EventModal from './EventModal'
+
 const LEFT_MOUSE_CLICK: number = 0;
 
 const ScheduleGridMain: React.FC<{
     monday: MyDate;
+    event: React.MutableRefObject<Event | null>;
     setEvent: (eventToSet: Event, recurringDetails: RecurringDetails | null) => void;
     getEvents: (date: stringifiedDate) => Event[];
+    closeModal: () => void;
+    openModal: () => void;
     // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
     mainRef: React.RefObject<HTMLDivElement>;
     // isLinked: boolean;
-}> = ({ mainRef, monday, setEvent, getEvents }) => {
+}> = ({ mainRef, monday, setEvent, getEvents, event, closeModal, openModal }) => {
     const columnDivRefs: React.RefObject<HTMLDivElement>[] = new Array(7).fill(null).map(() => useRef<HTMLDivElement>(null));
-    const [isEventModal, setIsEventModal] = useState<boolean>(false);
     const [isCreate, setIsCreate] = useState<boolean>(false);
     const [isDrag, setIsDrag] = useState<boolean>(false);
     const [isTop, setIsTop] = useState<boolean>(false);
     const [isBot, setIsBot] = useState<boolean>(false);
     const dragThreshold = useRef<boolean>(false);
-    const event = useRef<Event | null>(null);
-
-
-    const closeModal = (): void => {
-        event.current = null;
-        setIsEventModal(false)
-    };
-
-    const openModal = (): void => {
-        setIsEventModal(true)
-    };
 
     const createOnMouseDown = (e: React.MouseEvent<HTMLDivElement>, columnDate: MyDate) => {
         e.preventDefault(); e.stopPropagation();
@@ -80,6 +71,7 @@ const ScheduleGridMain: React.FC<{
 
         if (!clonedEvent.isValid(events)) return;
         setEvent(clonedEvent, null);
+        event.current = clonedEvent;
     };
 
     const topOnMouseMove = (e: React.MouseEvent<HTMLDivElement>, events: Event[]) => {
@@ -147,53 +139,36 @@ const ScheduleGridMain: React.FC<{
         openModal();
     };
 
+    return <S.ContainerMain ref={mainRef} onMouseLeave={stopAction} onMouseUp={stopAction}>
+        {columnDivRefs.map((colRef: React.RefObject<HTMLDivElement>, i: number) => {
+            const columnDate: MyDate = new MyDate(monday.getJsDate());
+            columnDate.addBy(i);
+            const filteredEvents: Event[] = getEvents(columnDate.getStringifiedDate());
 
-    return <S.ContainerMain
-        ref={mainRef}
-        onMouseLeave={stopAction}
-        onMouseUp={stopAction}
-    >
-        {
-            columnDivRefs.map((colRef, index) => {
-                const columnDate: MyDate = new MyDate(monday.getMyDate());
-                columnDate.addBy(index);
-                const filteredEvents: Event[] = getEvents(columnDate.getStringifiedDate());
-
-                return <S.CellColumnDiv
-                    ref={colRef}
-                    data-key={index}
-                    key={index}
-                    onMouseDown={(e) => createOnMouseDown(e, columnDate)}
-                    onMouseMove={(e) => onMouseMove(e, filteredEvents, colRef)}
-                >
-                    {Array.from({ length: 48 }, (_, j) => <S.CellDiv key={j} />)}
-                    {filteredEvents.map((event: Event, idx: number) => (
-                        <EventCard
-                            key={idx}
-                            event={event}
-                            topOnMouseDown={topOnMouseDown}
-                            botOnMouseDown={botOnMouseDown}
-                            dragOnMouseDown={dragOnMouseDown}
-                            isDrag={isDrag}
-                            eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
-                        // isLinked={isLinked}
-                        />
-                    ))}
-                </S.CellColumnDiv>
-            })
-        }
+            return <S.CellColumnDiv
+                onMouseDown={(e) => createOnMouseDown(e, columnDate)}
+                onMouseMove={(e) => onMouseMove(e, filteredEvents, colRef)}
+                ref={colRef}
+                data-key={i}
+                key={i}
+            >
+                {filteredEvents.map((event: Event, idx: number) => (
+                    <EventCard
+                        key={idx}
+                        event={event}
+                        topOnMouseDown={topOnMouseDown}
+                        botOnMouseDown={botOnMouseDown}
+                        dragOnMouseDown={dragOnMouseDown}
+                        isDrag={isDrag}
+                        eventOnClick={dragThreshold.current == false ? eventOnClick : () => { }}
+                    // isLinked={isLinked}
+                    />
+                ))}
+                {Array.from({ length: 48 }, (_, j) => <S.CellDiv key={j} />)}
+            </S.CellColumnDiv>
+        })}
         <HourLine />
-        {isEventModal && <EventModal
-            isEventModal={isEventModal}
-            closeModal={closeModal}
-            event={event}
-            // pushToast={pushToast}
-            setEvent={setEvent}
-        // deleteEvent={deleteEvent}
-        />}
-
     </S.ContainerMain >
-
 };
 
 export default ScheduleGridMain;

@@ -5,34 +5,35 @@ import { v4 as uuidv4 } from 'uuid';
 import TimeInput from './TimeInput';
 import DateInput from './DateInput';
 import DaySelector from './DaySelector';
-import { COLOR, COLORS, Event, ICON, ICONS, recurringId } from "@/classes/Event";
-import { RecurringDetails } from "@/classes/RecurringDetails";
+import { COLOR, COLORS, Event, ICON, ICONS } from "@/classes/Event";
+import { RecurringDetails, recurringId } from "@/classes/RecurringDetails";
 import { MyDate } from '@/classes/MyDate';
+
+const ESCAPE_KEYS: string[] = ["Esc", "Escape"];
 
 const EventModal: React.FC<{
     setEvent: (eventToSet: Event, recurringDetails: RecurringDetails | null) => void;
     event: React.MutableRefObject<Event | null>;
+    getRecurringdDetails: (recurringId: recurringId) => RecurringDetails | null;
     // deleteEvent: (event: Event) => void;
     // pushToast: (id: string, description: string, type: TOAST_TYPE) => void;
     isEventModal: boolean;
     closeModal: () => void;
-}> = ({ isEventModal, closeModal, event, setEvent }) => {
+}> = ({ isEventModal, closeModal, event, setEvent, getRecurringdDetails }) => {
+    const [currRecurringDetails, setCurrRecurringDetails] = useState<RecurringDetails | null>(getRecurringdDetails(event.current!.getRecurringId()))
     const [currEvent, setCurrEvent] = useState<Event>(event.current!.clone())
-    const [currRecurringDetails, setCurrRecurringDetails] = useState<RecurringDetails | null>(null)
     const tempRecurringId = useRef<recurringId>(event.current!.getRecurringId());
-
-
     const [isIconMenu, setIsIconMenu] = useState<boolean>(false);
     const [isColorMenu, setIsColorMenu] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     const handleKeyboardEvent = (e: KeyboardEvent) => {
-    //         if (C.ESCAPE_KEYS.includes(e.key) && isModalOpen) closeModal();
-    //     };
+    useEffect(() => {
+        const handleKeyboardEvent = (e: KeyboardEvent) => {
+            if (ESCAPE_KEYS.includes(e.key) && isEventModal) closeModal();
+        };
 
-    //     window.addEventListener('keydown', handleKeyboardEvent);
-    //     return () => window.removeEventListener('keydown', handleKeyboardEvent);
-    // }, [isModalOpen]);
+        window.addEventListener('keydown', handleKeyboardEvent);
+        return () => window.removeEventListener('keydown', handleKeyboardEvent);
+    }, [isEventModal]);
 
     const toggleIconMenu = () => {
         if (isColorMenu) setIsColorMenu(false);
@@ -64,6 +65,7 @@ const EventModal: React.FC<{
         clonedEvent.setIcon(icon)
         setCurrEvent(clonedEvent)
     };
+
     const handleColor = (color: COLOR): void => {
         const clonedEvent: Event = currEvent.clone();
         clonedEvent.setColor(color)
@@ -108,20 +110,24 @@ const EventModal: React.FC<{
         if (!tempRecurringId.current) tempRecurringId.current = uuidv4();
         if (clonedEvent.getRecurringId()) clonedEvent.setRecurringId(null);
         else clonedEvent.setRecurringId(tempRecurringId.current)
-        const startDate: MyDate = new MyDate(currEvent.getDate().getMyDate());
-        const endDate: MyDate = new MyDate(MyDate.NULL);
-        setCurrRecurringDetails(new RecurringDetails(startDate, endDate))
+
+        if (!currRecurringDetails) {
+            const startDate: MyDate = new MyDate(currEvent.getMyDate().getJsDate());
+            const endDate: MyDate = new MyDate(MyDate.NULL);
+            const selectedDays: boolean[] = Array(7).fill(false);
+            selectedDays[currEvent.getMyDate().getDay()] = true;
+            setCurrRecurringDetails(new RecurringDetails(startDate, endDate, selectedDays));
+        }
+        setCurrEvent(clonedEvent);
     };
 
     const handleDate = (e: React.ChangeEvent<HTMLInputElement>, label: string): void => {
         const date: string = e.target.value;
-        // const clonedEvent: Event = currentEvent.clone();
+        const clonedRecurringDetails: RecurringDetails = currRecurringDetails!.clone();
+        if (label === "Start") clonedRecurringDetails.setStartDate(new MyDate(date))
+        if (label === "End") clonedRecurringDetails.setEndDate(new MyDate(date))
+        setCurrRecurringDetails(clonedRecurringDetails);
 
-        // if (label === "Start") updatedEvent.startDate = date;
-        // if (label === "End") updatedEvent.endDate = date;
-
-        // const startDate: Date = F.parseDateStringToUTC(updatedEvent.startDate)
-        // const endDate: Date = F.parseDateStringToUTC(updatedEvent.endDate)
 
         // if (startDate >= endDate) {
         //     pushToast(
@@ -144,18 +150,16 @@ const EventModal: React.FC<{
         //     }
         // }
 
-        // setCurrentEvent(updatedEvent)
     };
 
 
     const handleSelectedDays = (e: React.ChangeEvent<HTMLInputElement>, index: number): void => {
-        // const isSelected: boolean = e.target.checked;
-        // const updatedEvent: Event = { ...currentEvent, selectedDays: [...currentEvent.selectedDays] };
-        // updatedEvent.selectedDays[index] = isSelected;
-        // setCurrentEvent(updatedEvent)
+        const clonedRecurringDetails = currRecurringDetails!.clone();
+        const selectedDays = clonedRecurringDetails.getSelectedDays();
+        selectedDays[index] = e.target.checked;
+        clonedRecurringDetails.setSelectedDays(selectedDays);
+        setCurrRecurringDetails(clonedRecurringDetails);
     };
-
-
 
 
     const handleDeleteEvent = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -246,12 +250,12 @@ const EventModal: React.FC<{
             <S.Row3Div>
                 <TimeInput
                     text={'Start'}
-                    time={currEvent.}
+                    time={currEvent.getStartTime()}
                     handleTime={handleTime}
                 />
                 <TimeInput
                     text={'End'}
-                    time={currentEvent.end}
+                    time={currEvent.getEndTime()}
                     handleTime={handleTime}
                 />
 
@@ -260,28 +264,27 @@ const EventModal: React.FC<{
                 </S.RecurringEventButton>
             </S.Row3Div>
 
-            {/* {.groupId && (
+            {currEvent.getRecurringId() && (
                 <S.Row4Div>
                     <DateInput
                         text={'Start'}
-                        date={currentEvent.startDate}
+                        date={currRecurringDetails!.getStartDate().getStringifiedDate()}
                         handleDate={handleDate}
                     />
                     <DateInput
                         text={'End'}
-                        date={currentEvent.endDate}
+                        date={currRecurringDetails!.getEndDate().getStringifiedDate()}
                         handleDate={handleDate}
                     />
                     <S.ContainerDaySelectorDiv>
                         <DaySelector
-                            selectedDays={currentEvent.selectedDays}
-                            startDate={currentEvent.date}
+                            selectedDays={currRecurringDetails!.getSelectedDays()}
+                            startDate={currRecurringDetails!.getStartDate().getStringifiedDate()}
                             handleSelectedDays={handleSelectedDays}
-                            groupId={currentEvent.groupId}
                         />
                     </S.ContainerDaySelectorDiv>
                 </S.Row4Div>
-            )} */}
+            )}
 
             <S.Row5Div>
                 <S.DeleteButton onClick={handleDeleteEvent}>Delete</S.DeleteButton>
