@@ -27,6 +27,28 @@ export class Events {
     this.collidingEvents = [];
   };
 
+  private eventsMapSet(eventId: eventId, eventToSet: Event): void {
+    this.eventsMap.set(eventId, eventToSet);
+  }
+
+  private eventIdsMapSet(stringifiedDate: stringifiedDate, eventId: eventId): void {
+    if (!(this.eventIdsMap.has(stringifiedDate))) this.eventIdsMap.set(stringifiedDate, new Set([eventId]));
+    else this.eventIdsMap.get(stringifiedDate)!.add(eventId);
+  }
+
+  private recurringDetailsMapSet(recurringId: recurringId, recurringDetails: RecurringDetails | null): void {
+    if(recurringId && recurringDetails) this.recurringDetailsMap.set(recurringId, recurringDetails);
+  }
+
+  private recurringDetailsMapDelete(recurringId: recurringId): void {
+    const recurringDetailsCopy: RecurringDetails = this.recurringDetailsMap.get(recurringId)!
+    recurringDetailsCopy.deleteEventId(eventId);
+    if(recurringDetailsCopy.isEventIdsEmpty()) this.recurringDetailsMap.delete(recurringId)
+  }
+
+  private eventsMapDelete(eventId: eventId): void {
+  }
+
   public getRecurringDetails(recurringId: recurringId): RecurringDetails | null {
     if(!this.recurringDetailsMap.has(recurringId)) return null;
     return this.recurringDetailsMap.get(recurringId)!;
@@ -45,20 +67,15 @@ export class Events {
 
   public hasEvent(eventId: eventId): boolean { return this.eventsMap.has(eventId); };
 
+
   public addEvent(newEvent: Event, recurringDetails: RecurringDetails | null): void {
     const eventId: eventId = newEvent.getEventId();
     const stringifiedDate: stringifiedDate = newEvent.getMyDate().getStringifiedDate();
     const recurringId: recurringId = newEvent.getRecurringId();
 
-    // Adding in recurringDetailsMap
-    if(recurringId && recurringDetails) this.recurringDetailsMap.set(recurringId, recurringDetails);
-
-    // Adding in eventsMap
-    if (!(this.eventsMap.has(newEvent.getEventId()))) this.eventsMap.set(newEvent.getEventId(), newEvent);
-
-    // Adding in eventIdsMap
-    if (!(this.eventIdsMap.has(stringifiedDate))) this.eventIdsMap.set(stringifiedDate, new Set([eventId]));
-    else this.eventIdsMap.get(stringifiedDate)!.add(eventId);
+    this.recurringDetailsMapSet(recurringId, recurringDetails);
+    this.eventsMapSet(eventId, newEvent);
+    this.eventIdsMapSet(stringifiedDate, eventId);
     
     console.log("The following event was added", newEvent.getSummary());
   };
@@ -69,9 +86,7 @@ export class Events {
     const recurringId: recurringId = eventToDelete.getRecurringId();
 
     if(recurringId) {
-      const recurringDetailsCopy: RecurringDetails = this.recurringDetailsMap.get(recurringId)!
-      recurringDetailsCopy.deleteEventId(eventId);
-      if(recurringDetailsCopy.isEventIdsEmpty()) this.recurringDetailsMap.delete(recurringId)
+
     }
 
     // Deleting in eventIdsMap
